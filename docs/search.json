@@ -1,0 +1,33 @@
+{
+  "articles": [
+    {
+      "path": "about.html",
+      "title": "About this site",
+      "description": "Some additional details about the website\n",
+      "author": [
+        {
+          "name": "Jose Storopoli",
+          "url": "https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en"
+        }
+      ],
+      "date": "February 2, 2020",
+      "contents": "\n\n\n\n\n\n",
+      "last_modified": "2021-01-08T16:21:35-03:00"
+    },
+    {
+      "path": "index.html",
+      "title": "Rcpp - A interface entre R e C++",
+      "description": "Como fazer seu código R ficar mais rápido com Rcpp\n",
+      "author": [
+        {
+          "name": "Jose Storopoli",
+          "url": "https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en"
+        }
+      ],
+      "date": "February 2, 2020",
+      "contents": "\n\n\n\n\n\n",
+      "last_modified": "2021-01-08T16:21:35-03:00"
+    }
+  ],
+  "collections": []
+}

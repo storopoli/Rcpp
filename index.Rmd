@@ -1,0 +1,22 @@
+---
+title: "Rcpp - A interface entre R e C++"
+description: |
+  Como fazer seu código R ficar mais rápido com Rcpp
+author:
+  - name: Jose Storopoli
+    url: https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en
+    affiliation: UNINOVE
+    affiliation_url: https://www.uninove.br
+    orcid_id: 0000-0002-0559-5176
+site: distill::distill_website
+date: February 2, 2020
+citation_url: https://storopoli.github.io/Rcpp
+slug: storopoli2020rcpp
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!--Academicons Icons-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">

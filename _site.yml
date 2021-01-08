@@ -1,0 +1,37 @@
+name: "Rcpp"
+title: "Rcpp - A interface entre R e C++"
+description: |
+  Como fazer seu código R ficar mais rápido com Rcpp
+base_url: https://storopoli.io/Estatistica-Bayesiana
+google_analytics: "UA-186284914-4"
+theme: "theme.css"
+output_dir: "docs"
+alt_formats: true
+navbar:
+  logo:
+    image: images/uninove.png
+    href: https://www.uninove.br
+  source_url: https://github.com/storopoli/Rcpp
+  search: true
+  navbar:
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+  right:
+    - icon: ai ai-google-scholar ai-lg
+      href: https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en
+    - icon: ai ai-orcid ai-lg
+      href: https://orcid.org/0000-0002-0559-5176
+    - icon: ai ai-lattes ai-lg
+      href: http://lattes.cnpq.br/2281909649311607
+output:
+  distill::distill_article:
+    toc: true
+    toc_float: true
+    highlight: tango
+    highlight_downlit: true
+    self_contained: false
+creative_commons: CC BY-SA
+repository_url: https://github.com/storopoli/Rcpp
