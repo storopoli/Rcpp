@@ -372,3 +372,8 @@ knitr::include_graphics("images/gandalf-wise.png")
 
 Nesse breve sobrevoo de C++ a intenção é apenas possibilitar alguém que não tenha nenhum conhecimento em C++ à ser introduzido em alguns conceitos de C++, notoriamente focando em **funções** (eu acredito ser a principal razão de usarmos C++ em R -- acelerar o tempo de execução de funcões). Usando uma analogia, esse sobrevoo permite o leitor "dirigir C++ por um estacionamento vazio". Caso se interesse, C++ é uma linguagem EXTREMAMENTE rica e complexa. Veja os livros, referências, vídeos e podcasts que eu recomendei lá em cima.
 
+## Ambiente
+
+```{r SessionInfo}
+sessionInfo()
+```

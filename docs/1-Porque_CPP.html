@@ -2421,6 +2421,7 @@ Tutoriais
 <li><a href="#casos-condicionais-switch">Casos condicionais <code>switch</code></a></li>
 <li><a href="#quando-usar-c-no-seu-código-r">Quando usar C++ no seu código R?</a></li>
 <li><a href="#o-que-mais-existe-em-c">O que mais existe em C++?</a></li>
+<li><a href="#ambiente">Ambiente</a></li>
 </ul>
 </nav>
 </div>
@@ -2473,8 +2474,8 @@ int addCpp(int x, int y, int z){
 <pre><code># A tibble: 2 x 6
   expression   min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 R           604.   672.  1426026.    3.81MB        0
-2 Cpp        1485.  3039.   369986.   29.76KB        0</code></pre>
+1 R           570.   659.  1394146.    3.81MB        0
+2 Cpp        1472.  3254.   335412.   29.76KB        0</code></pre>
 </div>
 <p>Aqui vocês vem que C++ não tem nenhuma vantagem sobre R: é mais verboso, chato de escrever e ainda é mais lenta!</p>
 <h3 id="exemplo---amostrador-de-gibbs">Exemplo - Amostrador de Gibbs</h3>
@@ -2539,8 +2540,8 @@ NumericMatrix gibbsCpp(int N, int thin) {
 <pre><code># A tibble: 2 x 6
   expression   min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 R          3351.  3625.      255.    5.36MB     26.3
-2 Cpp         184.   199.     4887.     4.1KB     39.1</code></pre>
+1 R          3418.  3702.      239.    5.36MB     25.7
+2 Cpp         185.   202.     4741.     4.1KB     36.9</code></pre>
 </div>
 <p>No meu computador <code>gibbsCpp()</code> executa 20x mais rápido que <code>gibbsR()</code>!</p>
 <h2 id="sobrevoo-de-c">Sobrevoo de C++</h2>
@@ -2589,7 +2590,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#roqrngaftx .gt_table {
+#looscngyeo .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2614,7 +2615,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-left-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_heading {
+#looscngyeo .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2626,7 +2627,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_title {
+#looscngyeo .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2636,7 +2637,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-bottom-width: 0;
 }
 
-#roqrngaftx .gt_subtitle {
+#looscngyeo .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2646,13 +2647,13 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-top-width: 0;
 }
 
-#roqrngaftx .gt_bottom_border {
+#looscngyeo .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_col_headings {
+#looscngyeo .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2667,7 +2668,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_col_heading {
+#looscngyeo .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2687,7 +2688,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   overflow-x: hidden;
 }
 
-#roqrngaftx .gt_column_spanner_outer {
+#looscngyeo .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2699,15 +2700,15 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-right: 4px;
 }
 
-#roqrngaftx .gt_column_spanner_outer:first-child {
+#looscngyeo .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#roqrngaftx .gt_column_spanner_outer:last-child {
+#looscngyeo .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#roqrngaftx .gt_column_spanner {
+#looscngyeo .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2719,7 +2720,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   width: 100%;
 }
 
-#roqrngaftx .gt_group_heading {
+#looscngyeo .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2741,7 +2742,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   vertical-align: middle;
 }
 
-#roqrngaftx .gt_empty_group_heading {
+#looscngyeo .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2756,15 +2757,15 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   vertical-align: middle;
 }
 
-#roqrngaftx .gt_from_md > :first-child {
+#looscngyeo .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#roqrngaftx .gt_from_md > :last-child {
+#looscngyeo .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#roqrngaftx .gt_row {
+#looscngyeo .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2783,7 +2784,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   overflow-x: hidden;
 }
 
-#roqrngaftx .gt_stub {
+#looscngyeo .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2795,7 +2796,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-left: 12px;
 }
 
-#roqrngaftx .gt_summary_row {
+#looscngyeo .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2805,7 +2806,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-right: 5px;
 }
 
-#roqrngaftx .gt_first_summary_row {
+#looscngyeo .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2815,7 +2816,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-top-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_grand_summary_row {
+#looscngyeo .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2825,7 +2826,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-right: 5px;
 }
 
-#roqrngaftx .gt_first_grand_summary_row {
+#looscngyeo .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2835,11 +2836,11 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-top-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_striped {
+#looscngyeo .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#roqrngaftx .gt_table_body {
+#looscngyeo .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2848,7 +2849,7 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-bottom-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_footnotes {
+#looscngyeo .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2862,13 +2863,13 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_footnote {
+#looscngyeo .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#roqrngaftx .gt_sourcenotes {
+#looscngyeo .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2882,46 +2883,46 @@ Figure 1: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#roqrngaftx .gt_sourcenote {
+#looscngyeo .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#roqrngaftx .gt_left {
+#looscngyeo .gt_left {
   text-align: left;
 }
 
-#roqrngaftx .gt_center {
+#looscngyeo .gt_center {
   text-align: center;
 }
 
-#roqrngaftx .gt_right {
+#looscngyeo .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#roqrngaftx .gt_font_normal {
+#looscngyeo .gt_font_normal {
   font-weight: normal;
 }
 
-#roqrngaftx .gt_font_bold {
+#looscngyeo .gt_font_bold {
   font-weight: bold;
 }
 
-#roqrngaftx .gt_font_italic {
+#looscngyeo .gt_font_italic {
   font-style: italic;
 }
 
-#roqrngaftx .gt_super {
+#looscngyeo .gt_super {
   font-size: 65%;
 }
 
-#roqrngaftx .gt_footnote_marks {
+#looscngyeo .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="roqrngaftx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="looscngyeo" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3025,8 +3026,8 @@ Figure 2: Anatomia de uma função em C++
 <pre><code># A tibble: 2 x 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 value        1.22µs   1.49µs   637788.    2.49KB      0  
-2 reference    1.18µs   1.44µs   573672.    2.49KB     57.4</code></pre>
+1 value        1.27µs   1.48µs   611916.    2.49KB     61.2
+2 reference    1.24µs   1.47µs   633130.    2.49KB      0  </code></pre>
 </div>
 <h2 id="loops-for-em-c">Loops <code>for</code> em C++</h2>
 <blockquote>
@@ -3104,7 +3105,49 @@ Figure 2: Anatomia de uma função em C++
 </div>
 <h2 id="o-que-mais-existe-em-c">O que mais existe em C++?</h2>
 <p>Nesse breve sobrevoo de C++ a intenção é apenas possibilitar alguém que não tenha nenhum conhecimento em C++ à ser introduzido em alguns conceitos de C++, notoriamente focando em <strong>funções</strong> (eu acredito ser a principal razão de usarmos C++ em R – acelerar o tempo de execução de funcões). Usando uma analogia, esse sobrevoo permite o leitor “dirigir C++ por um estacionamento vazio”. Caso se interesse, C++ é uma linguagem EXTREMAMENTE rica e complexa. Veja os livros, referências, vídeos e podcasts que eu recomendei lá em cima.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h2 id="ambiente">Ambiente</h2>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>R version 4.0.3 (2020-10-10)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods  
+[7] base     
+
+other attached packages:
+[1] dplyr_1.0.2 gt_0.2.2    Rcpp_1.0.5 
+
+loaded via a namespace (and not attached):
+ [1] pillar_1.4.7     compiler_4.0.3   highr_0.8       
+ [4] tools_4.0.3      digest_0.6.27    downlit_0.2.1   
+ [7] checkmate_2.0.0  gtable_0.3.0     evaluate_0.14   
+[10] lifecycle_0.2.0  tibble_3.0.4     png_0.1-7       
+[13] pkgconfig_2.0.3  rlang_0.4.10     bench_1.1.1     
+[16] cli_2.2.0        commonmark_1.7   distill_1.1     
+[19] yaml_2.2.1       parallel_4.0.3   xfun_0.20       
+[22] stringr_1.4.0    knitr_1.30       sass_0.2.0      
+[25] generics_0.1.0   vctrs_0.3.6      grid_4.0.3      
+[28] tidyselect_1.1.0 glue_1.4.2       R6_2.5.0        
+[31] jpeg_0.1-8.1     fansi_0.4.1      profmem_0.6.0   
+[34] rmarkdown_2.6    purrr_0.3.4      ggplot2_3.3.3   
+[37] magrittr_2.0.1   backports_1.2.1  scales_1.1.1    
+[40] ellipsis_0.3.1   htmltools_0.5.0  assertthat_0.2.1
+[43] colorspace_2.0-0 utf8_1.1.4       stringi_1.5.3   
+[46] munsell_0.5.0    crayon_1.3.4    </code></pre>
+</div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>

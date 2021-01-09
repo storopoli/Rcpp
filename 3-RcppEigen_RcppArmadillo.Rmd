@@ -1,7 +1,7 @@
 ---
-title: "About this site"
+title: "Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`"
 description: |
-  Some additional details about the website
+  Como usar as bibliotecas C++ `Eigen` e `Armadillo` para poderosa Álgebra Linear
 author:
   - name: Jose Storopoli
     url: https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en
@@ -20,3 +20,296 @@ knitr::opts_chunk$set(echo = TRUE,
 
 <!--Academicons Icons-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+Imagine Álgebra Linear. Adição, Multiplição de Matrizes. Sistemas de Equações Lineares. Inversões de Matrizes. Decomposições de Matrizes. Autovalores, Autovetores e Valores Singulares. Eu pessoalmente acredito que o inferno deve ser um lugar que as pessoas são obrigadas a fazer cálculos de álgebra linear na mão! POR TODA A ETERNIDADE!^[apesar de eu achar Álgebra Linear fascinante e ter trocado alguns e-mails com Gilbert Strang].
+
+Caso você não saiba, o computador não foi criado ~~para assistir pornografia~~ para envio de e-mails, navegação na internet, ou games. Mas sim para operações e manipulações de matrizes! Shayle Searle no livro
+[Matrix Algebra Useful for Statistics](https://www.wiley.com/en-us/Matrix+Algebra+Useful+for+Statistics%2C+2nd+Edition-p-9781118935149) recorda que, durante seus anos de estudante de doutorado em 1959 na Cornell University, ele e seus colegas ficaram impressionados quando conseguiram inverter uma matriz de dimensão 10 x 10 em 7 minutos num computador. Searle também recorda que um ano antes, um colega inverteu uma matriz de dimensão 40 x 40 usando uma calculadora elétrica. Ele demorou 6 semanas!
+
+Nesse tutorial vou mostrar como usar o básico das bibliotecas C++ [`Eigen`](https://eigen.tuxfamily.org) e [`Armadillo`](http://arma.sourceforge.net). Ambas fazem a mesma coisa: Álgebra Linear e Manipulação de Matrizes e Vetores. Elas diferem (além da síntaxe) em uma coisa:
+
+* `Armadillo` depende de LAPACK/BLAS/MKL
+* `Eigen` não possui nenhuma dependência
+
+Além disso, em diversos benchmarks que eu fiz, `Eigen` (pelo menos no meu computador) é mais rápida que `Armadillo`. Esse tutorial apresentará primeiro `Armadillo` e a sua interface com R usando o `{RcppArmadillo}` e `{Rcpp}`. Na sequência apresentarei `Eigen` e sua interface com R usando o `{RcppEigen}` e `{Rcpp}`. Não se preocupe, qualquer uma das duas é literalmente "Álgebra Linear com Lasers": são muito rápidas!
+
+```{r algebra-linear-lasers, echo=FALSE, fig.cap='Qualquer escolha entre `Armadillo` e `Eigen` são bem rápidas: Álgebra Linear com Lasers!.'}
+knitr::include_graphics("images/algebra-linear.jpg")
+```
+
+## `Armadillo`
+
+`Armadillo` é uma biblioteca de álgebra linear de alta qualidade para a linguagem C ++, visando um bom equilíbrio entre velocidade e facilidade de uso. Ela fornece sintaxe deliberadamente semelhante ao `Matlab`. Caso você tenha experiência prévia com `Matlab`, use `Armadillo` e seja feliz. Veja em seu site mais informações sobre a biblioteca `Armadillo`[http://arma.sourceforge.net]. Além disso, recomendo as seguintes referências sobre `Armadillo`:
+
+1. [*Cheatsheet* de síntaxe `Armadillo` vs `Matlab` / `Octave`](http://arma.sourceforge.net/docs.html#syntax) feita pela própria equipe da `Armadillo`.
+2. [Site do pacote `{RcppArmadillo}`](http://dirk.eddelbuettel.com/code/rcpp.armadillo.html) que faz a interface entre `Rcpp` e `Armadillo`.
+3. [*Cheatsheet* de operações comuns de `{RcppArmadillo}`](https://www.thecoatlessprofessor.com/programming/cpp/common-operations-with-rcpparmadillo/) pelo James Balamuta (também conhecido como TheCoatlessProfessor).
+4. [Documentação do `Armadillo`](http://arma.sourceforge.net/docs.html)
+
+### Classes do `Armadillo`
+
+`Armadillo` possui algumas categorias de classes para representar diferentes objetos de álgebra linear:
+
+* `Dense Matrix` -- Classes para matrizes densas (não-esparsas), com elementos armazenados em ordem de coluna principal (ou seja, coluna por coluna).
+  ```cpp
+  mat      = 	Mat<double>
+  dmat     = 	Mat<double>
+  fmat     = 	Mat<float>
+  cx_mat   = 	Mat<cx_double>  // cx_ é Complex Numbers
+  cx_dmat  = 	Mat<cx_double>  // cx_ é Complex Numbers
+  cx_fmat  = 	Mat<cx_float>   // cx_ é Complex Numbers
+  ```
+* `Dense Vector` -- aqui se divide em vetores coluna (*Column Vector*) e vetores linha (*Row Vector*).
+   * `Column Vector` -- `Dense Matrix` com apenas uma única coluna.
+    ```cpp
+    vec      = 	colvec	     = 	Col<double>
+    dvec     = 	dcolvec	     = 	Col<double>
+    fvec     = 	fcolvec	     = 	Col<float>
+    cx_vec   = 	cx_colvec    = 	Col<cx_double>  // cx_ é Complex Numbers
+    cx_dvec  = 	cx_dcolvec	 = 	Col<cx_double>  // cx_ é Complex Numbers
+    cx_fvec  = 	cx_fcolvec	 = 	Col<cx_float>   // cx_ é Complex Numbers
+    ```
+   * `Row Vector` -- `Dense Matrix` com apenas uma única linha.
+    ```cpp
+    rowvec	     = 	 Row<double>
+    drowvec	     = 	 Row<double>
+    frowvec	     = 	 Row<float>
+    cx_rowvec 	 = 	 Row<cx_double>  // cx_ é Complex Numbers
+    cx_drowvec	 = 	 Row<cx_double>  // cx_ é Complex Numbers
+    cx_frowvec	 = 	 Row<cx_float>   // cx_ é Complex Numbers
+    ```
+* `Sparse Matrix` -- Classes para matrizes esparsas; destina-se a armazenar matrizes muito grandes, onde a grande maioria dos elementos são zero.
+  ```cpp
+  sp_mat      =   SpMat<double>
+  sp_dmat     =   SpMat<double>
+  sp_fmat     =   SpMat<float>
+  sp_cx_mat   =   SpMat<cx_double>  // cx_ é Complex Numbers
+  sp_cx_dmat  =   SpMat<cx_double>  // cx_ é Complex Numbers
+  sp_cx_fmat  =   SpMat<cx_float>   // cx_ é Complex Numbers
+  ```
+
+### Como usar `Armadillo` com `{Rcpp}` -- `{RcppArmadillo}`
+
+Primeiro, certifique-se que você possui a biblioteca `Armadillo` instalada:
+
+* Linux: `sudo apt-get install make libopenblas-dev liblapack-dev libarpack2-dev libsuperlu-dev`
+* MacOS: `brew install armadillo`
+* Windows: baixe no [site do `Armadillo`](http://arma.sourceforge.net/download.html)
+
+Segundo, installe o pacote `{RcppArmadillo}` para R.
+
+Terceiro, coloque em toda função que deseja usar o `Armadillo` com `{Rcpp}` a seguinte síntaxe:
+
+```cpp
+#include <RcppArmadillo.h>
+using namespace arma;
+
+// [[Rcpp::depends(RcppArmadillo)]]
+```
+
+**Atenção!**: não usar o header do `{Rcpp}` (`#include <Rcpp.h>`), pois ele conflita com o header do `{RcppArmadillo}` (`#include <RcppArmadillo.h>`).
+
+Pronto! É isso.
+
+### Como usar Matrizes Esparsas no `{RcppArmadillo}`
+
+O R possui um pacote `{Matrix}` que dá suporte à matrizes esparsas com uma classe `dgCMatrix` que significa **d**ouble **s**parse **C**ompressed Matrix. Veja um exemplo abaixo de uma matriz densa com 1,000,000 de elementos. Vamos enfiar alguns zeros nela de maneira aleatória. A matriz densa possui um tamanho de 7,6mb.
+
+```{r dense-Matrix}
+set.seed(123)
+data <- rnorm(1e6)
+zero_index <- sample(1e6)[1:9e5]
+data[zero_index] <- 0
+mat <- matrix(data, ncol=1000)
+mat[1:5,1:5]
+print(object.size(mat), units = "auto")
+```
+
+Agora a mesma matriz mas armazenada como uma matriz esparsa pelo pacote `{Matrix}`. Note que os zeros foram eliminados da matriz (são armazenados de uma outra maneira) e o seu tamanho agora é 1,1mb.
+
+```{r sparse-Matrix}
+library(Matrix)
+mat_sparse <- Matrix(mat, sparse=TRUE)
+mat_sparse[1:5,1:5]
+print(object.size(mat_sparse),units="auto")
+```
+
+Se inspecionarmos de maneira detalhada um objeto `dgCMatrix`, vemos que temos três atributos importantes:
+
+* `i` -- vetor com o índice da linha de todos os elementos não-zero.
+* `p` -- vetor com o índice da coluna de todos os elementos não-zero.
+* `x` -- vetor com os valores de todos os elementos não-zero.
+
+```{r str-dense-Matrix}
+str(mat_sparse)
+```
+
+Para que `{RcppArmadillo}` nos retorne um objeto `dgCMatrix`, é simples: basta a função retornar um objeto `arma::sp_mat`. Este exemplo foi retirado da [vinheta de Matriz Esparsa do `{RcppArmadillo`}](https://cran.r-project.org/web/packages/RcppArmadillo/vignettes/RcppArmadillo-sparseMatrix.pdf).
+
+```{Rcpp armaEx-Rcpp}
+#include <RcppArmadillo.h>
+using namespace Rcpp;
+using namespace arma;
+
+// [[Rcpp::depends(RcppArmadillo)]]
+
+// [[Rcpp::export]]
+sp_mat sqrt_(sp_mat X) {
+  return sqrt(X);
+}
+```
+
+```{r sqrt_}
+i <- c(1,3:8)
+p <- c(2,9,6:10)
+x <- 7 * (1:7)
+A <- sparseMatrix(i, p, x = x)
+sqrt_(A)
+```
+
+## `Eigen`
+
+* Linux: `sudo apt install libeigen3-dev`
+* MacOS: `brew install eigen`
+* Windows: baixe no [site do `Eigen`](http://eigen.tuxfamily.org/index.php?title=Main_Page#Download)
+
+
+## Benchmarks
+
+Está na hora de mais uma vez colocarmos o que vimos em prática.
+
+### Exemplo -- 
+
+Nesse caso vamos comparar multiplicar duas matrizes em C++ usando o `{Rcpp}`, `{RcppArmadillo}` e `{RcppEigen}`
+
+```{Rcpp mat_mul}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericVector mat_mul(const NumericVector& A, const NumericVector& B) {
+  NumericVector C = A * B;
+  
+  // dimensões para Vector virar Matrix no R
+  int dim = sqrt(A.length());
+  C.attr("dim") = Dimension(dim, dim);
+  
+  return C;
+}
+```
+
+```{Rcpp mat_mul_arma}
+#include <RcppArmadillo.h>
+using namespace Rcpp;
+using namespace arma;
+
+// [[Rcpp::depends(RcppArmadillo)]]
+
+// [[Rcpp::export]]
+mat mat_mul_arma(const mat& A, const mat& B) {
+  return A * B;
+}
+```
+
+```{Rcpp mat_mul_eigen}
+#include <RcppEigen.h>
+using namespace Rcpp;
+using namespace Eigen;
+
+// [[Rcpp::depends(RcppEigen)]]
+
+// [[Rcpp::export]]
+MatrixXd mat_mul_eigen(const MatrixXd& A, const MatrixXd& B){
+  return A * B;
+}
+```
+
+```{r bench-mat_mul}
+n <- 10^3
+X <- matrix(rnorm(n * n), nrow = n)
+
+bench::mark(
+  Rcpp = mat_mul(X, X),
+  arma = mat_mul_arma(X, X),
+  eigen = mat_mul_eigen(X, X),
+  check = FALSE
+)
+```
+
+No meu computador `{RcppEigen}` é mais rápido que `{RcppArmadillo}`, mas ambos são mais lentos que uma implementação simples com `{Rcpp}`. 
+
+### Exemplo --
+
+Dirk Eddelbuettel na [vinheta introdutória do `{Rcpp}`](https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-introduction.pdf)
+
+```{Rcpp fast_lm_arm}
+#include <RcppArmadillo.h>
+using namespace arma;
+
+// [[Rcpp::depends(RcppArmadillo)]]
+
+// [[Rcpp::export]]
+Rcpp::List fast_lm_arma(const vec& y, const mat& X) {
+
+  int n = X.n_rows, k = X.n_cols;
+  
+  colvec coef  = solve(X, y); 
+  colvec resid = y - X*coef; 
+  
+  double sig2 = as_scalar(trans(resid)*resid/(n-k));
+  colvec stderrest = sqrt(sig2 * diagvec(inv(trans(X)*X)));
+  
+  return Rcpp::List::create(Rcpp::Named("coefficients") = coef,
+                            Rcpp::Named("stderr")       = stderrest);
+}
+```
+
+```{Rcpp fast_lm_eigen}
+#include <RcppEigen.h>
+using namespace Eigen;
+
+// [[Rcpp::depends(RcppEigen)]]
+
+// [[Rcpp::export]]
+Rcpp::List fast_lm_eigen(const VectorXd& y, const MatrixXd& X) {
+
+  int n = X.rows(), k = X.cols();
+	
+	// Usando SVD Decomposition
+	//VectorXd coef = X.bdcSvd(ComputeThinU | ComputeThinV).solve(y);
+
+	// Usando QR Decomposition
+	//VectorXd coef = X.colPivHouseholderQr().solve(y);
+
+	// Usando Normal Equations com LDL Decomposition (mais rápida)
+	VectorXd coef = (X.transpose() * X).ldlt().solve(X.transpose() * y);
+	
+	VectorXd resid = y - X*coef;
+
+	double sig2 = resid.squaredNorm() / (n - k);
+ 
+  VectorXd stderrest = (sig2 * ((X.transpose() * X).inverse()).diagonal()).array().sqrt();
+	
+	return Rcpp::List::create(Rcpp::Named("coefficients") = coef,
+                            Rcpp::Named("stderr")       = stderrest);
+}
+```
+
+```{r bench-fast_lm}
+y <- log(trees$Volume)
+X <- cbind(1, log(trees$Girth))
+bench::mark(
+  R = lm(y ~ X),
+  arma = fast_lm_arma(y, X),
+  eigen = fast_lm_eigen(y, X),
+  check = FALSE
+)
+```
+
+## Usar `{RcppArmadillo}` ou `{RcppEigen}` no seu Pacote R
+
+## Ambiente
+
+```{r SessionInfo}
+sessionInfo()
+```

@@ -103,7 +103,7 @@ addCpp(11, 21, 31)
 
 ### `cppFunction()`
 
-`cppFunction()` faz a mesma coisa que `sourceCpp()`: retorna uma função criadas em C++ para o ambiente do R. Mas com uma pequena diferença: você pode omitir todas as intruções do `{Rcpp}` -- o `#include <Rcpp.h>`, `using namespase Rcpp;` e `// [[Rcpp::export]]`.
+`cppFunction()` faz a mesma coisa que `sourceCpp()`: retorna uma função criada em C++ para o ambiente do R. Mas com uma pequena diferença: você pode omitir todas as instruções do `{Rcpp}` -- o `#include <Rcpp.h>`, `using namespase Rcpp;` e `// [[Rcpp::export]]`.
 
 Usarei o mesmo exemplo do `sourceCpp()`, sendo que agora não preciso mais incluir as instruções do `{Rcpp}`:
 
@@ -138,8 +138,9 @@ Isto não funciona muito bem quando executamos uma função C++ no R com o `{Rcp
 writeLines(readLines("teste_print.cpp"))
 ```
 
-```{r Rcpp-teste_print}
-sourceCpp("teste_print.cpp", showOutput = FALSE)
+```{r Rcpp-teste_print, warning=TRUE, message=TRUE}
+sourceCpp("teste_print.cpp")
+teste_print()
 ```
 
 
@@ -293,10 +294,10 @@ A criação dos objetos `Matrix` é similar à criação de objetos `Vector`. Ve
 ```cpp
 // Criação de um objeto Matrix equivalente a
 // m <- matrix(0, nrow=2, ncol=2)
-NumericMatrix m1( 2 );
+NumericMatrix m1(2);
 
 // m <- matrix(0, nrow=2, ncol=3)
-NumericMatrix m2( 2 , 3 );
+NumericMatrix m2(2 , 3);
 ```
 
 Você pode acessar os elementos da mesma forma que `Vector.` Além disso, um objeto `Matrix` em R é na verdade um vetor cujo número de linhas e colunas é definido no atributo `dim.` Portanto, se você criar um vetor com o atributo `dim` em `{Rcpp}` e devolvê-lo a R, ele será tratado como uma matriz:
@@ -314,9 +315,9 @@ return v;
 
 ### `{Rcpp}` -- `List`
 
-Em `{Rcpp}`, objetos `List` são implementados como uma espécie de `Vector`. Em outras palavras, `Vector` é um vetor cujo elemento é um valor escalar, enquanto `List` é um vetor cujos elementos são quaisquer tipos de dados. Portanto, `Vector` e` List` geralmente têm as mesmas funcionalidades.
+Em `{Rcpp}`, objetos `List` são implementados como uma espécie de `Vector`. Em outras palavras, `Vector` é um vetor cujo elemento é um valor escalar, enquanto `List` é um vetor cujos elementos são quaisquer tipos de dados. Portanto, `Vector` e `List` geralmente têm as mesmas funcionalidades.
 
-Para criar um objeto `List`, usamos a função`List::create()`. Além disso, para especificar o nome do elemento ao criar `List`, use a função `Named()`ou `_[]`:
+Para criar um objeto `List`, usamos a função `List::create()`. Além disso, para especificar o nome do elemento ao criar `List`, use a função `Named()`ou `_[]`:
 
 ```cpp
 // Criação de um objeto List L dos vetores v1, v2
@@ -328,7 +329,7 @@ List L = List::create(Named("nome1") = v1 , _["nome2"] = v2);
 
 ### `{Rcpp}` -- `DataFrame`
 
-Em `{Rcpp}`, objetos `DataFrame` também são implementados como uma espécie de espécie de `Vector`. Em outras palavras, `Vector` é um vetor cujos elementos são valores escalares e `DataFrame` é um vetor cujos elementos são `Vector`. Portanto, `DataFrame` tem muitas funcionalidades em comum com `Vector`.
+Em `{Rcpp}`, objetos `DataFrame` também são implementados como uma espécie de `Vector`. Em outras palavras, `Vector` é um vetor cujos elementos são valores escalares e `DataFrame` é um vetor cujos elementos são `Vector`. Portanto, `DataFrame` tem muitas funcionalidades em comum com `Vector`.
 
 `DataFrame::create()` é usado para criar um objeto `DataFrame`. Além disso, use `Named()` ou `_[]` se desejar especificar os nomes das colunas ao criar o objeto `DataFrame`:
 
@@ -372,21 +373,194 @@ bench::mark(
 ```
 
 
-Sucesso! Ganho de 700x para uma matriz de dimensão `r format(n, big.mark = ".", decimal.mark = ",")` x `r format(n, big.mark = ".", decimal.mark = ",")`!
+Sucesso! Ganho de 700x `r emo::ji("exploding_head")` para uma matriz de dimensão `r format(n, big.mark = ".", decimal.mark = ",")` x `r format(n, big.mark = ".", decimal.mark = ",")`!
 
 ## Usando a biblioteca padrão C++11 STL no `{Rcpp}`
 
+Caso queira usufruir da biblioteca padrão C++11 STL no `{Rcpp}` é simples: basta incluir `// [[Rcpp::plugins("cpp11")]]` em qualquer parte do seu código C++.
+
+Caso queira usufruir da biblioteca padrão C++20 STL no `{Rcpp}` é também simples: basta incluir `// [[Rcpp::plugins("cpp2a")]]`^[verifique também como instalar um compilador C++ que dê suporte ao C++20 (talvez o g++ versão 10).] em qualquer parte do código C++.
+
+### Exemplo -- `std::transforme_reduce()`
+
+Aqui eu vou ser um pouco abusado no exemplo e já vou pular direto para um algoritmo relativamente novo no mundo da STL de C++ (e um dos meus preferidos...). No mundo das linguagens de programação ele é conhecimento como [`MapReduce`](https://en.wikipedia.org/wiki/MapReduce), mas em C++ chama-se [`transform_reduce()`](https://en.cppreference.com/w/cpp/algorithm/transform_reduce) e está disponível no header [`<numeric>`](https://en.cppreference.com/w/cpp/header/numeric) desde C++17.
+
+Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos fazer três implementações de uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado:
+
+1. `sum_of_squares_R()`: feita no R com vetorização usando o `{purrr}`.
+2. `sum_of_squares_rcpp()`: feita de maneira ingênua no C++ com dois loops `for` triviais que (1) multiplica cada elemento consigo mesmo e (2) adiciona todos os elementos do vetor à uma variável `double`.
+3. `sum_of_squares_cpp20()`: solução elegante que usa `transform_reduce` para transformar todos os elementos multiplicando-os por si mesmos e ao mesmo tempo somando todos os elementos.
+
+```{r sum_of_squares_R}
+library(magrittr)
+sum_of_squares_R <- function(v) {
+  purrr::map_dbl(v, ~ .x * .x) %>% 
+    purrr::reduce(`+`)
+}
+```
+
+```{Rcpp sum_of_squares_cpp}
+#include <Rcpp.h>
+// [[Rcpp::plugins("cpp11")]]
+// [[Rcpp::plugins("cpp2a")]]
+#include <numeric>
+
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double sum_of_squares_rcpp(NumericVector& v){
+  int sum_of_elems = 0;
+  
+  // primeiro for multiplicando cada elemento consigo mesmo
+  for(int i=0; i < v.size(); i++){
+    v[i] = v[i] * v[i];
+  }
+  
+  // segundo for somando todos os elementos
+  for(auto it = v.cbegin(); it != v.cend(); ++it)
+    sum_of_elems += *it;
+  return sum_of_elems;
+}
+
+// [[Rcpp::export]]
+double sum_of_squares_cpp20(const NumericVector& v){
+  
+  return transform_reduce(v.cbegin(),
+                          v.cend(),
+                          0L,
+                          std::plus{},
+                          [] (auto i) {return i * i;});
+}
+```
+
+```{r bench_sum_of_squares}
+set.seed(123)
+n <- 1000
+v <- rnorm(n)
+bench::mark(
+  R = sum_of_squares_R(v),
+  rcpp = sum_of_squares_rcpp(v),
+  cpp20 = sum_of_squares_cpp20(v),
+  check = FALSE,
+  time_unit = "us"
+)
+```
+
+Mais um sucesso! Ganho de 600x `r emo::ji("exploding_head")` para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos! O mais impressionante é que uma solução simples e ingênua com dois loops `for` em C++ ficou quase tão rápida quanto uma solução C++ usando `transform_reduce()`!
+
+## `{Rcpp}` e Boost
+
+[Boost](https://www.boost.org) é um conjunto de bibliotecas para a linguagem de programação C++ que fornece suporte para tarefas e estruturas como álgebra linear, geração de números pseudo-aleatórios, multithreading, processamento de imagem, expressões regulares e teste de unidade. Ele contém ~~uma porrada~~ 164 bibliotecas individuais (versão 1.75) e sua versão inicial foi lançada em 1999.
+
+A maioria das bibliotecas Boost são licenciadas sob a Licença de Software Boost, projetada para permitir que Boost seja usado com projetos de software proprietários e gratuitos. Muitos dos fundadores da Boost estão no comitê internacional de padrões C++, e várias bibliotecas Boost foram aceitas para incorporação no padrão C++11 (por exemplo, smart pointers, `thread`, `regex`, `random`, `ratio`, `tuple`) e no padrão C ++ 17 (por exemplo, `filesystem`, `any`, `optional`, `variant`, `string_view`).
+
+Antes de usar o Boost no `{Rcpp}` certifique-se que você tem o Boost instalado no seu sistema operacional:
+
+* Linux: `sudo apt-get install libboost-all-dev`
+* MacOS: `brew install boost`
+* Windows: baixe no site do [Boost.org](https://www.boost.org/users/download/) ou `choco install boost-msvc-14.1`
+
+Para usar o Boost no `{Rcpp}` também é muito simples:
+
+1. Certifique-se que você tem o pacote `{BH}` (**B**oost **H**eaders) de R instalado.
+2. Inclua a síntaxe `// [[Rcpp::depends(BH)]]` em qualquer lugar do seu código C++.
+3. Inclua o header que deseja usar do boost no topo do seu código C++. Ex: `#include <boost/header_qualquer.hpp>`
+
+### Exemplo -- Máximo Divisor Comum
+
+O Máximo Divisor Comum (MDC), em inglês [*Greatest Common Divisor* (GCD)](https://en.wikipedia.org/wiki/Greatest_common_divisor), de dois ou mais inteiros, que não são todos zero, é o maior inteiro positivo que divide cada um dos inteiros. Três abordagens:
+
+1. `rGDCD()`: R usando o [algoritmo de Euclides](https://en.wikipedia.org/wiki/Euclidean_algorithm).
+2. `cppGCD()`: C++ usando [`std::gcd()`](https://en.cppreference.com/w/cpp/numeric/gcd) do header [`<numeric>`](https://en.cppreference.com/w/cpp/header/numeric) (C++17).
+3. `boostGCD()`: C++ usando a biblioteca [`boost::integer`](https://www.boost.org/doc/libs/1_75_0/libs/integer/doc/html/index.html).
+
+```{r rGCD}
+rGCD <- function(a, b) {
+  if (a == 0) {
+    b
+  }
+  else {
+    rGCD(b %% a, a)
+  }
+}
+```
+
+
+```{Rcpp boost}
+#include <Rcpp.h>
+// [[Rcpp::plugins("cpp11")]]
+// [[Rcpp::plugins("cpp17")]]
+// [[Rcpp::depends(BH)]]
+#include <numeric>
+#include <boost/integer/common_factor_rt.hpp>
+
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+int cppGCD(int& a, int& b){
+  return std::gcd(a, b);
+}
+ 
+// [[Rcpp::export]]
+int boostGCD(int& a, int& b) {
+    return boost::integer::gcd(a, b);
+}
+```
+
+```{r bench_GCD}
+a <- 7919
+b <- 7412
+bench::mark(
+  R = rGCD(a, b),
+  cpp = cppGCD(a, b),
+  boost = boostGCD(a, b)
+)
+```
+Aqui eu escolhi um número primo bem grande, 7189, e um número aleatório próximo dele, 7412. Como vocês podem ver a solução usando a biblioteca `boost::integer` é 4,5x mais rápida que uma implementação em R e similar com a implementação de C++17.
+
 ## `{Rcpp}` e Rmarkdown
 
+Para usar o `{Rcpp}` em documentos markdown basta colocar `Rcpp` no chunk ao invés de `r`. Sendo que no Rmarkdown não é necessário incluir as instruções do `{Rcpp}` -- o `#include <Rcpp.h>` ou `using namespace Rcpp;`, isto já é feito automático para você.
+
+```{r rcpp-rmarkdown, fig.cap='`{Rcpp}` no Rmarkdown'}
+knitr::include_graphics("images/rcpp-rmarkdown.png")
+```
+
+
 ## Usar `{Rcpp}` no seu pacote R
+
+Para adicionar `{Rcpp}` a um pacote existente, coloque seus arquivos C++ no diretório `src/` e crie ou modifique os seguintes arquivos de configuração:
+
+* No `DESCRIPTION` adicione:
+  ```
+  LinkingTo: Rcpp
+  Imports: Rcpp
+  ```
+* Certifique-se de que seu `NAMESPACE` inclua:
+  ```
+  useDynLib(mypackage)
+  importFrom(Rcpp, sourceCpp)
+  ```
+
+A maneira mais fácil de configurar isso automaticamente é usar a função [`usethis::use_rcpp()`](https://usethis.r-lib.org/reference/use_rcpp.html).
+
+Antes de dar `build` do pacote, você precisará executar `Rcpp::compileAttributes()`. Esta função verifica os arquivos C++ em busca de atributos `Rcpp::export` e gera o código necessário para disponibilizar as funções em R. Execute novamente `compileAttributes()` sempre que as funções forem adicionadas, removidas ou seus nomes forem alterados. Isso é feito automaticamente pelo pacote `devtools` e pelo Rstudio.
+
+Para obter mais detalhes, consulte a vinheta do pacote `{Rcpp}`, `vignette("Rcpp-package")`.
 
 ## Materiais Adicionais de Consulta
 
 Diversos materiais me ajudaram a aprender e criar esse conjunto de tutoriais de `{Rcpp}`:
 
-* Livro [Seamless R and C++ Integration with Rcpp](http://www.rcpp.org/book/) do criador do ecossitema `{Rcpp}` Dirk Eddelbuettel
-* [Capítulo 25 -- Rewriting R code in C++](https://adv-r.hadley.nz/rcpp.html) do livro Advanced R do Hadley Wickham
-* [Galeria de exemplos de `{Rcpp}`](https://gallery.rcpp.org)
-* Livro [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/) do Masaki E. Tsuda
-* [Documentação Não-Oficial](https://thecoatlessprofessor.com/programming/cpp/unofficial-rcpp-api-documentation/) de `{Rcpp}` do James Balamuta (também conhecido como TheCoatlessProfessor)
-* Vídeo do [Dirk Eddelbuettel na conferência useR! 2020 sobre `{Rcpp}`](https://youtu.be/57H34Njrns4)
+* Livro [Seamless R and C++ Integration with Rcpp](http://www.rcpp.org/book/) do criador do ecossitema `{Rcpp}` Dirk Eddelbuettel.
+* [Capítulo 25 -- Rewriting R code in C++](https://adv-r.hadley.nz/rcpp.html) do livro Advanced R do Hadley Wickham.
+* [Galeria de exemplos de `{Rcpp}`](https://gallery.rcpp.org).
+* Livro [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/) do Masaki E. Tsuda.
+* [Documentação Não-Oficial](https://thecoatlessprofessor.com/programming/cpp/unofficial-rcpp-api-documentation/) de `{Rcpp}` do James Balamuta (também conhecido como TheCoatlessProfessor).
+* Vídeo do [Dirk Eddelbuettel na conferência useR! 2020 sobre `{Rcpp}`](https://youtu.be/57H34Njrns4).
+
+## Ambiente
+
+```{r SessionInfo}
+sessionInfo()
+```
