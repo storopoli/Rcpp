@@ -1,0 +1,392 @@
+---
+title: "Como incorporar C++ no R -- `{Rcpp}`"
+description: |
+  Como usar o `{Rcpp}` para funções em C++ no R
+author:
+  - name: Jose Storopoli
+    url: https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en
+    affiliation: UNINOVE
+    affiliation_url: https://www.uninove.br
+    orcid_id: 0000-0002-0559-5176
+date: February 2, 2021
+citation_url: https://storopoli.github.io/Rcpp/2-Rcpp.html
+slug: storopoli2021rcpp
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center")
+```
+
+<!--Academicons Icons-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+A maneira mais fácil e simples de usar código C++ no R é pelo pacote `{Rccp}`. O primeiro passo é importar o pacote:
+
+```{r Rcpp}
+library(Rcpp)
+```
+
+## Criando funções em C++ no R
+
+No `{Rcpp}` é possível criarmos funções de duas maneiras^[tem também o `evalCpp()` mas não vou cobrir aqui], sendo que ambas retornam as funções criadas em C++ para o ambiente do R:
+
+1. `sourceCpp()`: lê código C++ de um arquivo `.cpp` ou de uma `string`.
+2. `cppFunction()`: cria uma função C++ de uma `string`.
+
+### `sourceCpp()`
+
+Todo código C++ que é utilizado pelo `{Rcpp}` deve começar com duas instruções no arquivo (ou `string` do código):
+
+```cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+```
+
+* `#include <Rcpp.h>` -- indica que deve ser incluído o cabeçalho (*header*) do `{Rcpp}` no arquivo. Isto permite com que o código faça a interface com o R usando o `{Rcpp}`.
+* `using namespace Rcpp;` -- importa todos os nomes que estão incluídos dentro da biblioteca `{Rcpp}`. Para os que ~~tem TOC~~ gostam de boas práticas, não é recomendável importar todos nomes de uma `namespace` em C++. Isto evita conflitos de nome. Caso queira usar algo de uma `namespace` você pode fazer de duas maneiras:
+   1. Não importando a `namespace` e acessar o nome desejado da `namespace` com os quatro pontos (`::`). Exemplo:
+   ```cpp
+   Rcpp::List // toda vez que usar List tem que indicar que é o List do Rcpp.
+   ```
+   2. Importando apenas o nome desejado da namespace com o `using`. Exemplo:
+   ```cpp
+   using Rcpp::List;
+   List  // toda vez que você digitar List C++ entende que é o List do Rcpp.
+   ```
+   
+Além disso, para cada função que for criada no código C++ é necessário incluir o `// [[Rcpp::export]]` logo acima da função. Isto é necessário pois indica ao `{Rcpp}` que a função deve ser exportada de volta para uso no ambiente do R. No exemplo abaixo criei uma função `addCpp()` logo depois do `Rcpp::export`:
+
+```cpp
+// [[Rcpp::export]]
+int addCpp(int x, int y, int z){
+   int result = x + y + z;
+   return result;
+}
+```
+
+Há duas maneiras de usar `sourceCpp()`: fornecendo um arquivo `.cpp` ou um código C++ como `string`.
+
+#### `sourceCpp()` -- Usando um arquivo `.cpp`
+
+Criei um arquivo chamado `addCpp.cpp` com o código C++ pronto para ser usado pelo `{Rcpp}` com o `sourceCpp()`. Note que inclui um bloco de código R que automaticamente será executado após a compilação do arquivo. O ideal é inserir esses blocos de código R na parte final dos seus arquivos `.cpp`.
+
+```{r content-addCpp}
+writeLines(readLines("addCpp.cpp"))
+```
+
+```{r sourceCpp-example-file, warning=FALSE}
+sourceCpp(file = "addCpp.cpp")
+```
+
+#### `sourceCpp()` -- Usando uma `string`
+
+Da mesma maneira que usamos `sourceCpp()` para um arquivo `.cpp`, também é possível usar uma `string` em código C++. Abaixo o mesmo exemplo anterior, mas usando uma `string`:
+
+```{r sourceCpp-example-string, warning=FALSE}
+sourceCpp(code = "
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+int addCpp(int x, int y, int z){
+  int result = x + y + z;
+  return result;
+}
+
+/*** R
+addCpp(11, 21, 31)
+*/
+")
+```
+
+
+### `cppFunction()`
+
+`cppFunction()` faz a mesma coisa que `sourceCpp()`: retorna uma função criadas em C++ para o ambiente do R. Mas com uma pequena diferença: você pode omitir todas as intruções do `{Rcpp}` -- o `#include <Rcpp.h>`, `using namespase Rcpp;` e `// [[Rcpp::export]]`.
+
+Usarei o mesmo exemplo do `sourceCpp()`, sendo que agora não preciso mais incluir as instruções do `{Rcpp}`:
+
+```{r cppFunction, warning=FALSE}
+cppFunction("
+int addCpp(int x, int y, int z){
+  int result = x + y + z;
+  return result;
+}
+")
+
+addCpp(1, 2, 4)
+```
+
+
+## Como exibir mensagens e erros em funções `{Rcpp}`
+
+Tradicionalmente, em C++, usamos o cabeçalho `<iostream>` da C++11 STL para imprimir na tela mensagens (`cout`) e erros `cerr`:
+
+```cpp
+#include <iostream>
+using std::cout;
+using std::cerr;
+
+cout << "Imprima algo na tela\n";
+cerr << "Imprima um erro na tela\n";
+```
+
+Isto não funciona muito bem quando executamos uma função C++ no R com o `{Rcpp}`. Para isso existem dois objetos na `namespace` `Rcpp`: `Rcout` e `Rcerr`. Veja um exemplo:
+
+```{r content-teste_print}
+writeLines(readLines("teste_print.cpp"))
+```
+
+```{r Rcpp-teste_print}
+sourceCpp("teste_print.cpp", showOutput = FALSE)
+```
+
+
+## Cancelando a Execução no `{Rcpp}`
+
+A função `CheckUserInterrupt()` do `{Rcpp}` verifica se o botão `ctrl + c` foi pressionado e, se for pressionado, interromperá a execução da função.
+
+Se você quiser executar um cálculo que leve muito tempo, seria melhor executar `checkUserInterrupt()` aproximadamente uma vez a cada poucos segundos. Veja este exemplo de um loop `for`:
+
+```cpp
+for (int i=0; i<100000; ++i) {
+    // Checando interrupção a cada 1000 iterações
+    if (i % 1000 == 0){
+        Rcpp::checkUserInterrupt();
+    }
+
+    // instruções do loop ...
+}
+```
+
+## Tipos de Dados e Variáveis do `{Rcpp}`
+
+Temos sete tipos de variáveis que são usualmente usados no R: `logical`, `integer`, `numeric`,`complex`, `character`, `Date` e `POSIXct`. Sendo que esses sete tipos são usados no R para construir vetores (`arrays` 1-D) e matrizes (`arrays` 2-D). Apenas um lembrete:
+
+```{r vec-matrix}
+vec_int <- c(1L, 2L, 3L, 4L)
+str(vec_int)
+
+
+mat_num <- matrix(c(1.1, 2.2, 3.3, 4.4), nrow = 2, ncol = 2)
+str(mat_num)
+```
+
+`{Rcpp}` possui tipos de vetores e matrizes para representar correspondentemente aos do R.
+
+A tabela abaixo apresenta a correspondência dos tipos de dados entre R/`{Rcpp}`/C++:
+
+```{r table_R_Cpp, echo =FALSE}
+library(gt)
+library(dplyr)
+tibble::tribble(
+      ~`Tipo de Variável`,   ~`Vetor R`,                     ~`Vetor Rcpp`,                     ~`Matriz Rcpp`, ~`Escalar Rcpp`, ~`Escalar C++`,
+   "Lógica",   "logical",                  "LogicalVector",                  "LogicalMatrix",          "-",        "bool",
+   "Inteiro",   "integer",                  "IntegerVector",                  "IntegerMatrix",          "-",         "int",
+      "Real",   "numeric",                  "NumericVector",                  "NumericMatrix",          "-",      "double",
+   "Complexo",   "complex",                  "ComplexVector",                  "ComplexMatrix",   "Rcomplex",     "complex",
+    "String", "character", "CharacterVector (StringVector)", "CharacterMatrix (StringMatrix)",     "String",      "std::string",
+      "Date",      "Date",                     "DateVector",                              "-",       "Date",           "-",
+  "Datetime",   "POSIXct",                 "DatetimeVector",                              "-",   "Datetime",      "time_t"
+  ) %>%
+  mutate_all(~stringr::str_glue("`{.}`")) %>% 
+  gt() %>% 
+  fmt_markdown(everything())
+```
+
+Além de vetores e matrizes, `{Rcpp}` também possui as estrutura de dados correspondentes ao `data.frame` e `list`:
+
+```{r table_Rcpp, echo=FALSE}
+tibble::tribble(
+            ~R,       ~Rcpp,
+  "data.frame", "DataFrame",
+        "list",      "List"
+  ) %>%
+  mutate_all(~stringr::str_glue("`{.}`")) %>% 
+  gt() %>% 
+  fmt_markdown(everything())
+```
+
+No `{Rcpp}`, `Vector`, `DataFrame`, `List` são todos implementados como tipos de vetores. Ou seja, `Vector` é um vetor em que seus elementos são valores escalares, `DataFrame` é um vetor em que seus elementos são `Vector`, `List` é um vetor em que seus elementos são qualquer tipo de tipo de dados. Portanto, `Vector`, `DataFrame`, `List` tem muitas funcionalidades em comum.
+
+**Muito importante**: `{Rcpp}` converterá qualquer tipo de retorno das funções para o seu respectivo tipo em R. Por exemplo, `NumericVector` será convertido para um vetor de `numeric` no R. Assim como `LogicalMatrix` será convertida para uma matriz de `logical` no R.
+
+### `{Rcpp}` -- `Vector`
+
+`Vector` no `{Rcpp}` são `arrays` 1-D com tamanho dinâmico (não-estático). Note que `Vector` é um objeto dentro do `namespace` `Rcpp`.
+
+#### Criando Objetos de `Vector`
+
+Veja alguns exemplos de como criar objetos de `Vector` com o código em R correspondente comentado com `//`:
+
+```cpp
+// Crie um objeto Vector equivalente a
+// v <- rep(0, 3)
+NumericVector v (3);
+
+// v <- rep(1, 3)
+NumericVector v (3,1);
+
+// v <- c(1,2,3) 
+// C++11 Inicialização em Lista
+NumericVector v = {1,2,3}; 
+
+// v <- c(1,2,3)
+NumericVector v = NumericVector::create(1,2,3);
+
+// v <- c(x=1, y=2, z=3)
+NumericVector v =
+NumericVector::create(Named("x",1), Named("y")=2 , _["z"]=3);
+```
+
+a função `Rcpp::Named()` é usada para criar vetores (e outros objetos) nomeados e há 3 variações conforme demonstrado acima.
+
+#### Acessando Elementos de `Vector`
+
+Você pode acessar um elemento individual de um objeto `Vector` usando o operador `[]` ou `()`[^1] Ambos os operadores aceitam `NumericVector`/`IntegerVector` (índice numérico), `CharacterVector` (nomes de elementos) e `LogicalVector`. O operador `[]` ignora o acesso fora do limite, enquanto o operador `()` lança uma exceção `index_out_of_bounds`.
+
+[^1]: lembrando que C++ os índices começam em zero: então o primeiro elemento é `Vector[0]`.
+
+Você pode também usar o método `.names()` do `Vector` para designar nomes ao elementos.
+
+```cpp
+// Criando o Vector v
+NumericVector v  {10,20,30,40,50};
+
+// Designando nomes dos elementos
+v.names() = CharacterVector({"A","B","C","D","E"});
+
+// Extraindo valores dos elementos de Vector
+double x1 = v[0];
+double x2 = v["A"];
+
+// Designando valores aos elementos de Vector
+v[0]   = 100;
+v["A"] = 100;
+```
+
+#### Métodos de `Vector`
+
+Abaixo um exemplo dos principais métodos de `Vector`^[quem conhece C++, em especial a C++11 STL, pode ver que muitos métodos de `Vector` são iguais à `std::vector`.]. Lembrando que muitas dessas funcionalidades são compartilhadas com `Matrix`, `List` e `DataFrame`. Para uma lista completa dos métodos das classes de `{Rcpp}` recomendo a [documentação não-oficial](https://thecoatlessprofessor.com/programming/cpp/unofficial-rcpp-api-documentation/) de `{Rcpp}` do James Balamuta (também conhecido como TheCoatlessProfessor).
+
+* `length()`, `size()`
+* `names()`
+* `fill(x)`
+* `sort()`
+* `push_back(x)`, `push_front(x)`, `insert(i, x)`, `erase(i)`
+
+#### Operações com `Vector`
+
+Além de métodos, os elementos `Vector` possuem alguns operadores:
+
+* adição, subtração, multiplicação, divisão: `+`,`-`, `*`, `/`
+* igualdade e desigualdades: `==`, `!=`, `<`, `>`, `>=`, `<=`
+* negação: `!`
+
+### `{Rcpp}` -- `Matrix`
+
+`Matrix` no `{Rcpp}` são `arrays` 2-D com tamanho estático. Note que `Matrix` é um objeto dentro do `namespace` `Rcpp`.
+
+A criação dos objetos `Matrix` é similar à criação de objetos `Vector`. Veja alguns exemplos de como criar objetos de `Matrix` com o código em R correspondente comentado com `//`:
+
+```cpp
+// Criação de um objeto Matrix equivalente a
+// m <- matrix(0, nrow=2, ncol=2)
+NumericMatrix m1( 2 );
+
+// m <- matrix(0, nrow=2, ncol=3)
+NumericMatrix m2( 2 , 3 );
+```
+
+Você pode acessar os elementos da mesma forma que `Vector.` Além disso, um objeto `Matrix` em R é na verdade um vetor cujo número de linhas e colunas é definido no atributo `dim.` Portanto, se você criar um vetor com o atributo `dim` em `{Rcpp}` e devolvê-lo a R, ele será tratado como uma matriz:
+
+```cpp
+// Criação de um objeto Vector
+NumericVector v = {1,2,3,4};
+
+// Designa o número de linhas e colunas no atributo dim do objeto Vector
+v.attr("dim") = Dimension(2, 2);
+
+// Valor de retorno. Será tratado como uma matriz no R
+return v;
+```
+
+### `{Rcpp}` -- `List`
+
+Em `{Rcpp}`, objetos `List` são implementados como uma espécie de `Vector`. Em outras palavras, `Vector` é um vetor cujo elemento é um valor escalar, enquanto `List` é um vetor cujos elementos são quaisquer tipos de dados. Portanto, `Vector` e` List` geralmente têm as mesmas funcionalidades.
+
+Para criar um objeto `List`, usamos a função`List::create()`. Além disso, para especificar o nome do elemento ao criar `List`, use a função `Named()`ou `_[]`:
+
+```cpp
+// Criação de um objeto List L dos vetores v1, v2
+List L = List::create(v1, v2);
+
+// Criação atribuindo nomes aos elementos da Lista L
+List L = List::create(Named("nome1") = v1 , _["nome2"] = v2);
+```
+
+### `{Rcpp}` -- `DataFrame`
+
+Em `{Rcpp}`, objetos `DataFrame` também são implementados como uma espécie de espécie de `Vector`. Em outras palavras, `Vector` é um vetor cujos elementos são valores escalares e `DataFrame` é um vetor cujos elementos são `Vector`. Portanto, `DataFrame` tem muitas funcionalidades em comum com `Vector`.
+
+`DataFrame::create()` é usado para criar um objeto `DataFrame`. Além disso, use `Named()` ou `_[]` se desejar especificar os nomes das colunas ao criar o objeto `DataFrame`:
+
+```cpp
+// Criação de um objeto DataFrame df dos vetores v1, v2
+DataFrame df = DataFrame::create(v1, v2);
+
+// Criação atribuindo nomes às colunas de DataFrame df
+DataFrame df = DataFrame::create( Named("V1") = v1 , _["V2"] = v2 );
+```
+
+## Exemplo -- Multiplicação de Matrizes
+
+Está na hora de colocarmos o que vimos em prática. Nesse caso vamos comparar multiplicar duas matrizes usando o R (operador `%*%`) e usando o C++ com `{Rcpp}`.
+
+```{Rcpp mat_mul}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericVector mat_mul(const NumericVector& A, const NumericVector& B) {
+  NumericVector C = A * B;
+  
+  // dimensões para Vector virar Matrix no R
+  double dim = sqrt(A.length());
+  C.attr("dim") = Dimension(dim, dim);
+  
+  return C;
+}
+```
+
+```{r bench-mat_mul}
+n <- 10^3
+X <- matrix(rnorm(n * n), nrow = n)
+
+bench::mark(
+  R = X %*% X,
+  Cpp = mat_mul(X, X),
+  check = FALSE
+)
+```
+
+
+Sucesso! Ganho de 700x para uma matriz de dimensão `r format(n, big.mark = ".", decimal.mark = ",")` x `r format(n, big.mark = ".", decimal.mark = ",")`!
+
+## Usando a biblioteca padrão C++11 STL no `{Rcpp}`
+
+## `{Rcpp}` e Rmarkdown
+
+## Usar `{Rcpp}` no seu pacote R
+
+## Materiais Adicionais de Consulta
+
+Diversos materiais me ajudaram a aprender e criar esse conjunto de tutoriais de `{Rcpp}`:
+
+* Livro [Seamless R and C++ Integration with Rcpp](http://www.rcpp.org/book/) do criador do ecossitema `{Rcpp}` Dirk Eddelbuettel
+* [Capítulo 25 -- Rewriting R code in C++](https://adv-r.hadley.nz/rcpp.html) do livro Advanced R do Hadley Wickham
+* [Galeria de exemplos de `{Rcpp}`](https://gallery.rcpp.org)
+* Livro [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/) do Masaki E. Tsuda
+* [Documentação Não-Oficial](https://thecoatlessprofessor.com/programming/cpp/unofficial-rcpp-api-documentation/) de `{Rcpp}` do James Balamuta (também conhecido como TheCoatlessProfessor)
+* Vídeo do [Dirk Eddelbuettel na conferência useR! 2020 sobre `{Rcpp}`](https://youtu.be/57H34Njrns4)

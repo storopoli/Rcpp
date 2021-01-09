@@ -1,0 +1,22 @@
+---
+title: "About this site"
+description: |
+  Some additional details about the website
+author:
+  - name: Jose Storopoli
+    url: https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en
+    affiliation: UNINOVE
+    affiliation_url: https://www.uninove.br
+    orcid_id: 0000-0002-0559-5176
+date: February 2, 2021
+citation_url: https://storopoli.github.io/Rcpp/4-RcppParallel.html
+slug: storopoli2021rcppparallel
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center")
+```
+
+<!--Academicons Icons-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">

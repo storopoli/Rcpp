@@ -8,13 +8,14 @@ author:
     affiliation: UNINOVE
     affiliation_url: https://www.uninove.br
     orcid_id: 0000-0002-0559-5176
-date: February 2, 2020
-citation_url: https://storopoli.github.io/Rcpp/PLACEHOLDER.html
-slug: storopoli2020PLACEHOLDER
+date: February 2, 2021
+citation_url: https://storopoli.github.io/Rcpp/3-RcppEigen_RcppArmadillo.html
+slug: storopoli2021rcppeigenrcpparmadillo
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center")
 ```
 
 <!--Academicons Icons-->

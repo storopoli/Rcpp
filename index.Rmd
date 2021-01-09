@@ -9,14 +9,91 @@ author:
     affiliation_url: https://www.uninove.br
     orcid_id: 0000-0002-0559-5176
 site: distill::distill_website
-date: February 2, 2020
+date: February 2, 2021
 citation_url: https://storopoli.github.io/Rcpp
-slug: storopoli2020rcpp
+slug: storopoli2021rcpp
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center")
 ```
 
 <!--Academicons Icons-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+[![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
+
+
+Ok, você quer fazer o seu código R rodar mais rápido? Já pensou em colocar partes do seu código em C++?
+
+```{r 12-parsecs, echo=FALSE, fig.asp='R + C++ sem dúvida batem a marca dos 12 parsecs'}
+knitr::include_graphics("images/12-parsecs.gif")
+```
+
+## Índice
+
+1. [Por que C++? R não é suficiente?](1-Porque_CPP.html)
+2. [Como incorporar C++ no R -- `{Rcpp}`](2-Rcpp.html)
+3. [Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`](3-RcppEigen_RcppArmadillo.html)
+4. [Paralelização -- `{RcppParallel}`](4-RcppParallel.html)
+5. [`{cpp11}` -- Nova Interface do pessoal do RStudio](5-cpp11.html)
+
+## Como Configurar um Ambiente para `{Rcpp}`
+
+Claro, que primeiro você deve instalar o [R pelo CRAN](https://cran.r-project.org).
+
+* **Linux**: Instale a versão desenvolvedor do R com `sudo apt-get install r-base-dev` ou similar
+* **MacOS**: Instale o Xcode da App Store e execute o comando `xcode-select --install` para instalar o Xcode Command Line Tools
+* **Windows**: Instale o [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
+
+## Pacotes do ecossistema R + C++
+
+```{r cran-data, warning=FALSE, message=FALSE, echo=FALSE}
+library(cranlogs)
+library(crandep)
+library(gt)
+library(dplyr)
+get_reverse_deps <- function(package) {
+  length(crandep::get_dep(package, "Reverse_linking_to"))
+}
+
+pacotes <- c("Rcpp", "RcppArmadillo", "RcppEigen", "BH", "RcppParallel", "cpp11")
+cran_downloads(pacotes, from = "2016-01-01", to = "2020-12-31") %>% 
+  count(package, wt = count) %>% 
+  left_join(tibble(package = pacotes,
+       linkings = purrr::map_dbl(pacotes, get_reverse_deps))) %>% 
+  mutate(package = stringr::str_glue("`{package}`")) %>% 
+  arrange(-n) %>% 
+  rename(Pacote = package,
+         `Total de Downloads` = n,
+         `Links Reversos` = linkings ) %>% 
+  gt() %>% 
+  tab_header("Total de Downloads do CRAN") %>% 
+  tab_footnote("Downloads entre 01/01/2016 e 31/12/2020.",
+               locations = cells_column_labels(
+                 columns = vars(`Total de Downloads`)
+               )) %>% 
+  tab_footnote("Link reverso ocorre quando um pacote depende do código em C/C++ de outro.",
+               locations = cells_column_labels(
+                 columns = vars(`Links Reversos`)
+               )) %>% 
+  tab_footnote(stringr::str_glue("Total em {format(Sys.Date(), format = '%d/%m/%Y')}."),
+               locations = cells_column_labels(
+                 columns = vars(`Links Reversos`)
+               )) %>% 
+  fmt_number(columns = vars(`Total de Downloads`), suffixing = TRUE, locale = "pt_BR") %>% 
+  fmt_number(columns = vars(`Links Reversos`), decimals = 0, locale = "pt_BR") %>% 
+  fmt_markdown(vars(Pacote))
+```
+
+## Licença
+
+Este obra está licenciado com uma Licença
+[Creative Commons Atribuição-CompartilhaIgual 4.0 Internacional][cc-by-sa].
+
+[![CC BY-SA 4.0][cc-by-sa-image]][cc-by-sa]
+
+[cc-by-sa]: http://creativecommons.org/licenses/by-sa/4.0/
+[cc-by-sa-image]: https://licensebuttons.net/l/by-sa/4.0/88x31.png
+[cc-by-sa-shield]: https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg
