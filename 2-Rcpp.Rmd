@@ -353,7 +353,7 @@ NumericVector mat_mul(const NumericVector& A, const NumericVector& B) {
   NumericVector C = A * B;
   
   // dimensões para Vector virar Matrix no R
-  double dim = sqrt(A.length());
+  int dim = sqrt(A.length());
   C.attr("dim") = Dimension(dim, dim);
   
   return C;

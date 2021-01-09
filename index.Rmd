@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 Ok, você quer fazer o seu código R rodar mais rápido? Já pensou em colocar partes do seu código em C++?
 
-```{r 12-parsecs, echo=FALSE, fig.asp='R + C++ sem dúvida batem a marca dos 12 parsecs'}
+```{r 12-parsecs, echo=FALSE, fig.cap='R com C++ sem dúvida bate a marca dos 12 parsecs'}
 knitr::include_graphics("images/12-parsecs.gif")
 ```
 
