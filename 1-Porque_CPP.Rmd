@@ -226,7 +226,7 @@ A figura \@ref(fig:cppfunction) mostra a anatomia de uma função em C++. Ela é
 * **Tipo de Retorno**: toda função em C++ deve especificar, antes do seu nome, o tipo de dado que é retornado pela função.
 * **Valor de Retorno**: toda função em C++ deve especificar explicitamente qual valor retornar com um `return`. No R podemos ser mais desleixados pois o valor de retorno será sempre a ultima declaração da função. Em C++ isto não funciona. A lógica de C++ é que a função termina quando ela atinge o primeiro `return` e retorna o dado/variável especificado(a). 
 
-```{r cppfunction, echo=FALSE, fig.cap='Anatomia de uma função em C++'}
+```{r cppfunction, echo=FALSE, fig.cap='Anatomia de uma função em C++. Figura adaptada da Vinheta Oficial Introdutória do `{Rcpp}` de Dirk Eddelbuettel'}
 knitr::include_graphics("images/cpp_function.png")
 ```
 

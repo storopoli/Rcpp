@@ -133,50 +133,54 @@ tibble::tribble(
 
 Vamos reutilizar o exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html).
 
-Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos comparar a função usando dois loops `for`^[`{cpp11}` ainda não possui suporte à funcionalidades de C++20 -- `std::transform_reduce()`.] tanto no `{Rcpp}` quanto no `{cpp11}`. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado.
+Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos comparar a função usando um [`std::acummulate`](https://en.cppreference.com/w/cpp/algorithm/accumulate) de C+11 STL^[`{cpp11}` ainda não possui suporte à funcionalidades de C++20 -- `std::transform_reduce()`.] tanto no `{Rcpp}` quanto no `{cpp11}`. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado.
+
+Para ser uma comparação justa, vamos usar também do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html), a função `sum_of_squares_rcpp_sugar()` que usa [`{Rcpp}` Sugar](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf).
 
 ```{Rcpp sum_of_squares_rcpp}
 #include <Rcpp.h>
-// [[Rcpp::plugins("cpp11")]]
+#include <numeric>
 
 using namespace Rcpp;
+
+// [[Rcpp::plugins("cpp11")]]
 
 // [[Rcpp::export]]
 double sum_of_squares_rcpp(NumericVector v){
   double sum_of_elems = 0;
   
-  // primeiro for multiplicando cada elemento consigo mesmo
-  for(int i=0; i < v.size(); i++){
-    v[i] = v[i] * v[i];
-  }
-  
-  // segundo for somando todos os elementos
-  for(auto it = v.cbegin(); it != v.cend(); ++it)
-    sum_of_elems += *it;
+  sum_of_elems += std::accumulate(v.cbegin(),
+                                  v.cend(),
+                                  0.0,
+                                  [] (double i, double j) {return i + (j * j);});
   return sum_of_elems;
+}
+
+// [[Rcpp::export]]
+double sum_of_squares_rcpp_sugar(NumericVector v){
+  return(sum(v*v));
 }
 ```
 
 
 ```{cpp11 sum_of_squares_cpp11}
 #include "cpp11/doubles.hpp"  // aqui usando somente o header doubles
+#include <numeric>
+
 using namespace cpp11;
 namespace writable = cpp11::writable;
 
 
-[[cpp11::register]] double sum_of_squares_cpp11(writable::doubles v){
+[[cpp11::register]] double sum_of_squares_cpp11(doubles v){
   double sum_of_elems = 0;
   
-  // primeiro for multiplicando cada elemento consigo mesmo
-  for(int i=0; i < v.size(); i++){
-    v[i] = v[i] * v[i];
-  }
-  
-  // segundo for somando todos os elementos
-  for(auto it = v.cbegin(); it != v.cend(); ++it)
-    sum_of_elems += *it;
+  sum_of_elems += std::accumulate(v.cbegin(),
+                                  v.cend(),
+                                  0.0,
+                                  [] (double i, double j) {return i + (j * j);});
   return sum_of_elems;
 }
+
 ```
 
 ```{r bench-sum_of_squares}
@@ -186,11 +190,12 @@ v <- rnorm(n)
 bench::mark(
   Rcpp = sum_of_squares_rcpp(v),
   cpp11 = sum_of_squares_cpp11(v),
+  Rcppsugar = sum_of_squares_rcpp_sugar(v),
   check = FALSE,
 )
 ```
 
-Apesar de ser uma nova proposta o `{cpp11}`, pelo menos neste simples benchmark e no meu computador, possui um desempenho bem inferior ao do `{Rcpp}`: 60x mais lerdo...
+Quando usada a biblioteca padrão C++11 STL tanto `{cpp11}` quanto `{Rcpp}` e `{Rcpp}` Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos. É claro que solução do `{Rcpp}` Sugar é muito mais elegante e simples com uma única linhana função.
 
 ## `{cpp11}` e Rmarkdown
 
