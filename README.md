@@ -10,13 +10,13 @@ Ok, você quer fazer o seu código R rodar mais rápido? Já pensou em colocar p
 
 ## Índice
 
-Acesse o site dos tutoriais em [storopoli.io/Rcpp](http://storopoli/io/Rcpp)
+Acesse o site dos tutoriais em [storopoli.io/Rcpp](http://storopoli.io/Rcpp)
 
-1. [Por que C++? R não é suficiente?](http://storopoli/io/Rcpp/1-Porque_CPP.html)
-2. [Como incorporar C++ no R -- `{Rcpp}`](http://storopoli/io/Rcpp/2-Rcpp.html)
-3. [Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`](http://storopoli/io/Rcpp/3-RcppEigen_RcppArmadillo.html)
-4. [Paralelização -- `{RcppParallel}`](http://storopoli/io/Rcpp/4-RcppParallel.html)
-5. [`{cpp11}` -- Nova Interface do pessoal do RStudio](http://storopoli/io/Rcpp/5-cpp11.html)
+1. [Por que C++? R não é suficiente?](http://storopoli.io/Rcpp/1-Porque_CPP.html)
+2. [Como incorporar C++ no R -- `{Rcpp}`](http://storopoli.io/Rcpp/2-Rcpp.html)
+3. [Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`](http://storopoli.io/Rcpp/3-RcppEigen_RcppArmadillo.html)
+4. [Paralelização -- `{RcppParallel}`](http://storopoli/.io/Rcpp/4-RcppParallel.html)
+5. [`{cpp11}` -- Nova Interface do pessoal do RStudio](http://storopoli.io/Rcpp/5-cpp11.html)
 
 ## Como Configurar um Ambiente para `{Rcpp}`
 
