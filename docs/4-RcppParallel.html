@@ -23,7 +23,6 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -2327,7 +2326,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Paralelização -- `{RcppParallel}`","description":"Como fazer seu código Rcpp ser ainda mais rápido","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000+00:00","citationText":"Storopoli, 2021"}
+{"title":"Paralelização -- `{RcppParallel}`","description":"Como fazer seu código Rcpp ser ainda mais rápido","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000-03:00","citationText":"Storopoli, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2401,7 +2400,14 @@ Tutoriais
 <nav class="l-text toc figcaption" id="TOC">
 <h3>Contents</h3>
 <ul>
+<li><a href="#c-em-paralelo-biblioteca-intel-tbb">C++ em Paralelo – Biblioteca Intel <code>TBB</code></a></li>
 <li><a href="#como-usar-rcpp-em-paralelo-rcppparallel">Como usar <code>{Rcpp}</code> em paralelo – <code>{RcppParallel}</code></a></li>
+<li><a href="#como-usar-rcppparallel">Como usar <code>{RcppParallel}</code></a>
+<ul>
+<li><a href="#quantos-threads">Quantos Threads?</a></li>
+<li><a href="#parallelfor-paralelizando-loops-for"><code>parallelFor</code> – Paralelizando Loops <code>for</code></a></li>
+<li><a href="#parallelreduce-paralelizando-operações-reduce"><code>parallelReduce</code> – Paralelizando operações <code>Reduce</code></a></li>
+</ul></li>
 <li><a href="#usar-rcppparallel-no-seu-pacote-r">Usar <code>{RcppParallel}</code> no seu Pacote R</a></li>
 <li><a href="#ambiente">Ambiente</a></li>
 </ul>
@@ -2409,7 +2415,7 @@ Tutoriais
 </div>
 <!--Academicons Icons-->
 <p><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css"></p>
-<p>Vimos que o <code>{Rcpp}</code> faz o seu código R ficar muito mais rápido. Tudo o que mostramos até agora foi usando apenas um único core/processador (<em>single thread</em>) do computador<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Agora imaginem o quão rápido seu código R pode ficar se você conseguir rodar <code>{Rcpp}</code> em paralelo!</p>
+<p>Vimos que o <code>{Rcpp}</code> faz o seu código R ficar muito mais rápido. Tudo o que mostramos até agora foi usando apenas um único core/processador (<em>single thread</em>) do computador<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Agora imaginem o quão rápido seu código R pode ficar se você conseguir rodar <code>{Rcpp}</code> em paralelo 🤯!</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:gif-hurricane"></span>
 <img src="images/hurricane.gif" alt="Código `{Rcpp}` rodando em paralelo: muito rápido!"  />
@@ -2418,6 +2424,8 @@ Figure 1: Código <code>{Rcpp}</code> rodando em paralelo: muito rápido!
 </p>
 </div>
 </div>
+<h2 id="c-em-paralelo-biblioteca-intel-tbb">C++ em Paralelo – Biblioteca Intel <code>TBB</code></h2>
+<p>O Pacote <code>{RcppParallel}</code> usa a biblioteca <code>TBB</code> da Intel. <a href="https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onetbb.html"><code>TBB</code> (<strong>T</strong>hreading <strong>B</strong>uilding <strong>B</strong>locks)</a> é uma biblioteca de C++ desenvolvida pela Intel para programação paralela em processadores multi-core. Usando <code>TBB</code>, um cálculo é dividido em tarefas que podem ser executadas em paralelo. A biblioteca gerencia e agenda threads para executar essas tarefas.</p>
 <h2 id="como-usar-rcpp-em-paralelo-rcppparallel">Como usar <code>{Rcpp}</code> em paralelo – <code>{RcppParallel}</code></h2>
 <p><strong>Primeiro</strong>, certifique-se que você possui a biblioteca <code>TBB</code> da Intel instalada:</p>
 <ul>
@@ -2425,14 +2433,209 @@ Figure 1: Código <code>{Rcpp}</code> rodando em paralelo: muito rápido!
 <li>MacOS: <code>brew install tbb</code></li>
 <li>Windows: baixe no <a href="https://software.intel.com/content/www/us/en/develop/articles/get-started-with-tbb.html">site da Intel</a></li>
 </ul>
-<p><strong>Segundo</strong>, installe o pacote <code>{RcppEigen}</code> para R.</p>
-<p><strong>Terceiro</strong>, coloque em todo código que deseja usar o <code>Eigen</code> com <code>{Rcpp}</code> a seguinte síntaxe:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppEigen.h&gt;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen;</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span></code></pre></div>
-<p><strong>Atenção!</strong>: não usar o header do <code>{Rcpp}</code> (<code>#include &lt;Rcpp.h&gt;</code>), pois ele conflita com o header do <code>{RcppEigen}</code> (<code>#include &lt;RcppEigen.h&gt;</code>).</p>
+<p><strong>Segundo</strong>, installe o pacote <code>{RcppParallel}</code> para R.</p>
+<p><strong>Terceiro</strong>, coloque em todo código que deseja paralelizar com <code>{RcppParallel}</code> a seguinte síntaxe:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppParallel.h&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> RcppParallel;</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">//[[Rcpp::depends(RcppParallel)]]</span></span></code></pre></div>
 <p>Pronto! É isso.</p>
+<h2 id="como-usar-rcppparallel">Como usar <code>{RcppParallel}</code></h2>
+<p>É possível implementar paralelização em diversas partes do seu código <code>{Rcpp}</code> com o <code>{RcppParallel}</code>. Aqui eu vou cobrir apenas os dois algoritmos paralelos do <code>{RcppParallel}</code><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>:</p>
+<ul>
+<li><code>parallelFor</code>: Este aqui é fácil de explicar. Qualquer loop <code>for</code> do seu código pode ser um bom candidato à paralelização.</li>
+<li><code>parallelReduce</code>: <code>Reduce</code> é um algoritmo bem conhecido em ciências da computação. <code>Reduce</code> aplica um operação binária (como adição) em uma sequência definida de elementos, resultando em um único valor. O exemplo <code>sum_of_squares</code> do <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a> é uma aplicação de um <code>Reduce</code><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. Toda vez que você tiver essa situação você pode paralelizar com <code>parallelReduce</code>.</li>
+</ul>
+<p>Ambos os algortimos usam o <code>struct</code> <code>Worker</code> definido no código do <code>{RcppParallel}</code> que é uma interface para a biblioteca <code>TBB</code>.</p>
+<p>Além disso <code>{RcppParallel}</code> usa duas classes, uma para vetores e outra para matrizes:</p>
+<ul>
+<li><code>RVector&lt;T&gt;</code> – onde <code>T</code> é o tipo de variável (<code>double</code>, <code>int</code> etc.)</li>
+<li><code>RMatrix&lt;T&gt;</code> – onde <code>T</code> é o tipo de variável (<code>double</code>, <code>int</code> etc.)</li>
+</ul>
+<h3 id="quantos-threads">Quantos Threads?</h3>
+<p>Ao carregar o <code>{RcppParallel}</code> é importante você designar o número de threads/cores que deseja que o código <code>{RcppParallel}</code> use para paralelização. Caso queira usar todos os seus threads/cores disponíveis, coloque como argumento <code>parallel::detectCores()</code> que retorna um número inteiro com todos os threads/cores disponíveis no seu computador. Aqui estou usando todos os threads/cores disponíveis: 12 threads/cores.</p>
+<p>Se não especificado, por padrão <code>{RcppParallel}</code> usa todos os threads/cores disponíveis.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://www.rcpp.org'>Rcpp</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://rcppcore.github.io/RcppParallel'>RcppParallel</a></span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html'>setThreadOptions</a></span><span class='op'>(</span><span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[1] 12</code></pre>
+</div>
+<h3 id="parallelfor-paralelizando-loops-for"><code>parallelFor</code> – Paralelizando Loops <code>for</code></h3>
+<p>Para usar o <code>parallelFor</code> você deve criar um objeto <code>Worker</code> e definir um operador <code>operator()</code> desse objeto que será invocado pelo <code>{RcppParallel}</code> e roda em paralelo. Isso cria uma função com com o nome do objeto <code>Worker</code> que você criou<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. Essa função toma como argumento um intervalo <code>[começo, fim)</code> e lida com todas as questões de segurança e travas de threads que são <del>um porre</del> bem complicadas de maneira automática. Note que o elemento <code>fim</code> do intervalo não é incluído no intervalo (mesmo padrão de comportamento dos iteradores <code>end</code> da biblioteca padrão C++11 STL).</p>
+<p>Para mais detalhes, consulte a <a href="http://rcppcore.github.io/RcppParallel/index.html#parallelfor">documentação do <code>parallelFor</code> no site do <code>{RcppParallel}</code></a>.</p>
+<h4 id="exemplo-parallelfor-raiz-quadrada-de-elementos-da-matriz.">Exemplo <code>parallelFor</code> – Raiz Quadrada de Elementos da Matriz.</h4>
+<p>Aqui vou usar o exemplo da <a href="http://rcppcore.github.io/RcppParallel/index.html#parallelfor">documentação do <code>parallelFor</code> no site do <code>{RcppParallel}</code></a> de uma função paralela que cacula a raiz quadrada dos elementos de uma matriz. Adicionei alguns comentários para você entender o que está sendo feito. Além disso, há uma versão single-thread também que vamos testar desempenho.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppParallel.h&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> RcppParallel;</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppParallel)]]</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Criando um objeto Worker chamado SquareRoot</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> SquareRoot : <span class="kw">public</span> Worker</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>   <span class="co">// Variáveis Membro públicas</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>   <span class="at">const</span> RMatrix&lt;<span class="dt">double</span>&gt; input;</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>   RMatrix&lt;<span class="dt">double</span>&gt; output;</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>   <span class="co">// Construtor do Objeto Worker SquareRoot</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>   SquareRoot(<span class="at">const</span> Rcpp::NumericMatrix input, Rcpp::NumericMatrix output) </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      : input(input), output(output) {}</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>   <span class="co">// Overload do operador ()</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>   <span class="dt">void</span> <span class="kw">operator</span>()(<span class="bu">std::</span>size_t begin, <span class="bu">std::</span>size_t end) {</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      <span class="bu">std::</span>transform(input.begin() + begin, </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                     input.begin() + end, </span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>                     output.begin() + begin, </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                     ::sqrt);</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>};</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">// Função que chama o Objeto Worker SquareRoot</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>NumericMatrix parallelMatrixSqrt(NumericMatrix x) {</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Variável local output inicializada</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  NumericMatrix output(x.nrow(), x.ncol());</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Invocação do operador() do Objeto Worker SquareRoot</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  SquareRoot squareRoot(x, output);</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Paralelização do loop for</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  parallelFor(<span class="dv">0</span>, x.length(), squareRoot);</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> output;</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co">// Versão single-thread</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>NumericMatrix matrixSqrt(NumericMatrix orig) {</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>  NumericMatrix mat(orig.nrow(), orig.ncol());</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>transform(orig.begin(), orig.end(), mat.begin(), ::sqrt);</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> mat;</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>^</span><span class='fl'>3</span>
+<span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+
+<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+  Rcpp <span class='op'>=</span> <span class='fu'>matrixSqrt</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span>,
+  RcppParallel <span class='op'>=</span> <span class='fu'>parallelMatrixSqrt</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span>,
+  check <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code># A tibble: 2 x 6
+  expression        min   median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
+1 Rcpp           8.75ms   9.04ms      107.    7.63MB     36.6
+2 RcppParallel   3.19ms   3.33ms      300.    7.63MB     75.8</code></pre>
+</div>
+<p>Um ganho de 3x em paralelização para uma matriz de dimensão 1.000 x 1.000!</p>
+<h3 id="parallelreduce-paralelizando-operações-reduce"><code>parallelReduce</code> – Paralelizando operações <code>Reduce</code></h3>
+<p><code>Reduce</code> é um algoritmo bem conhecido em ciências da computação. <code>Reduce</code> aplica um operação binária (como adição) em uma sequência definida de elementos, resultando em um único valor. O exemplo <code>sum_of_squares</code> do <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a> é uma aplicação de um <code>Reduce</code><a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. Toda vez que você tiver essa situação você pode paralelizar com <code>parallelReduce</code>.</p>
+<p>A lógica do <code>parallelReduce</code> é similar ao <code>parallelFor</code>. Primeiro ambos usam objetos <code>Worker</code>, com algumas diferenças:</p>
+<ul>
+<li>Aqui você precisa de dois construtores no seu <code>Worker</code>: um padrão e um “divisor”. O construtor padrão pega os dados de entrada e inicializa qualquer valor que está sendo acumulado (por exemplo, inicializar uma soma para zero). O construtor de divisão é chamado quando o trabalho precisa ser dividido em outros threads - ele toma uma referência à instância da qual está sendo dividido e simplesmente copia o ponteiro para os dados de entrada e inicializa seu valor “acumulado” para zero.</li>
+<li>Um operador <code>operator()</code> que executa o trabalho. Isso funciona da mesma forma que o operador <code>operator()</code> em <code>parallelFor</code>, mas em vez de gravar em outro vetor ou matriz, ele normalmente acumula um valor.</li>
+<li>Um método de junção que compõe as operações de duas instâncias de trabalho que foram divididas anteriormente. Aqui, simplesmente combinamos o valor acumulado da instância à qual estamos sendo associados ao nosso.</li>
+</ul>
+<p>Para mais detalhes, consulte a <a href="http://rcppcore.github.io/RcppParallel/index.html#parallelreduce">documentação do <code>parallelReduce</code> no site do <code>{RcppParallel}</code></a></p>
+<h4 id="exemplo-parallelreduce-soma-dos-quadrados">Exemplo <code>parallelReduce</code> – Soma dos Quadrados</h4>
+<p>Vamos reutilizar o exemplo <code>sum_of_squares</code> do <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a>.</p>
+<p>Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos no <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a> com dois loops <code>for</code>. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ <code>double</code> / R <code>numeric</code>) e computa a soma de todos os elementos do vetor elevados ao quadrado.</p>
+<p>Novamente vou incluir comentários para o entendimento do que estamos fazendo no <code>{RcppParallel}</code>. Além disso, há uma versão single-thread também que vamos testar desempenho.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppParallel.h&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> RcppParallel;</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppParallel)]]</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp11&quot;)]]</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp2a&quot;)]]</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">// Criando um objeto Worker chamado sum_of_squares</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> sum_of_squares : <span class="kw">public</span> Worker</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Variáveis Membro públicas</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> RVector&lt;<span class="dt">double</span>&gt; input;</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> value;</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Construtor padrão do Objeto Worker</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  sum_of_squares(<span class="at">const</span> NumericVector input) : input(input), value(<span class="dv">0</span>) {}</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Construtor &quot;divisor&quot;</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  sum_of_squares(<span class="at">const</span> sum_of_squares&amp; sum, Split) : input(sum.input), value(<span class="dv">0</span>) {}</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Overload do operador ()</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> <span class="kw">operator</span>()(<span class="bu">std::</span>size_t begin, <span class="bu">std::</span>size_t end) {</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      value += <span class="bu">std::</span>accumulate(input.begin() + begin,</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>                               input.begin() + end,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>                               <span class="fl">0.0</span>,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>                               [] (<span class="kw">auto</span> i, <span class="kw">auto</span> j) {<span class="cf">return</span> i + (j * j);});</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> join(<span class="at">const</span> sum_of_squares&amp; rhs) { </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      value += rhs.value; </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>};</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="co">// Função que chama o Objeto Worker sum_of_squares</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> parallel_sum_of_squares(NumericVector x) {</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>   <span class="co">// variável local inicializada</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>   sum_of_squares sum(x);</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>   <span class="co">// Paralelização do Reduce</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>   parallelReduce(<span class="dv">0</span>, x.length(), sum);</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>   <span class="cf">return</span> sum.value;</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="co">// Versão single-thread</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares(NumericVector x) {</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>   <span class="cf">return</span> <span class="bu">std::</span>accumulate(x.begin(),</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>                          x.end(),</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>                          <span class="fl">0.0</span>,</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>                          [] (<span class="kw">auto</span> i, <span class="kw">auto</span> j) {<span class="cf">return</span> i + (j * j);});</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1e6</span>
+<span class='va'>v</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
+<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+  Rcpp <span class='op'>=</span> <span class='fu'>sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+  RcppParallel <span class='op'>=</span> <span class='fu'>parallel_sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+  check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+<span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code># A tibble: 2 x 6
+  expression        min   median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
+1 Rcpp            899µs    922µs     1080.    2.49KB        0
+2 RcppParallel    100µs    120µs     8310.    2.49KB        0</code></pre>
+</div>
+<p>Mais um sucesso! Ganho de 9x 🤯 para um vetor com 1.000.000 elementos!</p>
 <h2 id="usar-rcppparallel-no-seu-pacote-r">Usar <code>{RcppParallel}</code> no seu Pacote R</h2>
 <p>As instruções abaixo foram retiradas da documentação do <a href="http://rcppcore.github.io/RcppParallel/#r_packages"><code>{RcppParallel}</code></a>.</p>
 <p>Se você deseja usar <code>{RcppParallel}</code> de dentro de um pacote R, você precisa editar vários arquivos para criar os links de construção e tempo de execução necessários. As seguintes adições devem ser feitas:</p>
@@ -2460,32 +2663,51 @@ PKG_LIBS += $(shell &quot;${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe&quot; \
 </code></pre>
 </div>
 <pre><code>R version 4.0.3 (2020-10-10)
-Platform: x86_64-apple-darwin17.0 (64-bit)
-Running under: macOS Big Sur 10.16
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.10
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
 
 locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods  
 [7] base     
 
+other attached packages:
+[1] RcppParallel_5.0.2 Rcpp_1.0.5        
+
 loaded via a namespace (and not attached):
- [1] compiler_4.0.3  magrittr_2.0.1  tools_4.0.3     htmltools_0.5.0
- [5] parallel_4.0.3  yaml_2.2.1      distill_1.1     stringi_1.5.3  
- [9] rmarkdown_2.6   highr_0.8       downlit_0.2.1   knitr_1.30     
-[13] stringr_1.4.0   xfun_0.20       digest_0.6.27   rlang_0.4.10   
-[17] evaluate_0.14  </code></pre>
+ [1] rstudioapi_0.13   knitr_1.30        magrittr_2.0.1   
+ [4] downlit_0.2.1     rlang_0.4.10      fansi_0.4.1      
+ [7] stringr_1.4.0     highr_0.8         tools_4.0.3      
+[10] parallel_4.0.3    xfun_0.20         utf8_1.1.4       
+[13] cli_2.2.0         ellipsis_0.3.1    htmltools_0.5.0  
+[16] yaml_2.2.1        assertthat_0.2.1  digest_0.6.27    
+[19] lifecycle_0.2.0   tibble_3.0.4      crayon_1.3.4     
+[22] purrr_0.3.4       vctrs_0.3.6       distill_1.1      
+[25] glue_1.4.2        evaluate_0.14     rmarkdown_2.6    
+[28] emo_0.0.0.9000    bench_1.1.1       stringi_1.5.3    
+[31] pillar_1.4.7      compiler_4.0.3    generics_0.1.0   
+[34] profmem_0.6.0     lubridate_1.7.9.2 pkgconfig_2.0.3  </code></pre>
 </div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>tecnicamente, <code>Eigen</code> e <code>Armadillo</code> podem, dependendo da configuração do sistema operacional, automaticamente se beneficiar de paralelizações usando o <code>OpenMP</code>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>a biblioteca <code>TBB</code> tem muito mais algoritmos complexos caso necessario. Recomendo você olhar este <a href="http://rcppcore.github.io/RcppParallel/tbb.html">link da documentação do <code>{RcppParallel}</code></a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>tecnicamente é um <code>MapReduce</code>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p>mais questões técnicas: quando você define um operador <code>operator()</code> de um objeto em C++ você dá um <em>overload</em> no operador parenthesis do objeto e o resultado é uma síntaxe similar à uma função com o nome do objeto.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5" role="doc-endnote"><p>tecnicamente é um <code>MapReduce</code>.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 <!--radix_placeholder_article_footer-->

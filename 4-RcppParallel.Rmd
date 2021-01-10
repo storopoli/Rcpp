@@ -89,21 +89,17 @@ Para mais detalhes, consulte a [documentação do `parallelFor` no site do `{Rcp
 
 #### Exemplo `parallelFor` -- Raiz Quadrada de Elementos da Matriz.
 
-Aqui vou usar o exemplo da [documentação do `parallelFor` no site do `{RcppParallel}`](http://rcppcore.github.io/RcppParallel/index.html#parallelfor), mas vou adicionar alguns comentários para você entender o que está sendo feito.
+Aqui vou usar o exemplo da [documentação do `parallelFor` no site do `{RcppParallel}`](http://rcppcore.github.io/RcppParallel/index.html#parallelfor) de uma função paralela que cacula a raiz quadrada dos elementos de uma matriz. Adicionei alguns comentários para você entender o que está sendo feito. Além disso, há uma versão single-thread também que vamos testar desempenho.
 
-```{Rcpp parallelFor}
+```{Rcpp parallelMatrixSqrt}
 #include <Rcpp.h>
 #include <RcppParallel.h>
 #include <algorithm>
 
 using namespace Rcpp;
 using namespace RcppParallel;
-using std::transform;
 
 // [[Rcpp::depends(RcppParallel)]]
-
-// [[Rcpp::plugins("cpp11")]]
-// [[Rcpp::plugins("cpp2a")]]
 
 // Criando um objeto Worker chamado SquareRoot
 struct SquareRoot : public Worker
@@ -113,7 +109,6 @@ struct SquareRoot : public Worker
    RMatrix<double> output;
    
    // Construtor do Objeto Worker SquareRoot
-   // [[Rcpp::export]]
    SquareRoot(const Rcpp::NumericMatrix input, Rcpp::NumericMatrix output) 
       : input(input), output(output) {}
    
@@ -141,16 +136,38 @@ NumericMatrix parallelMatrixSqrt(NumericMatrix x) {
   
   return output;
 }
+
+// Versão single-thread
+// [[Rcpp::export]]
+NumericMatrix matrixSqrt(NumericMatrix orig) {
+  NumericMatrix mat(orig.nrow(), orig.ncol());
+  std::transform(orig.begin(), orig.end(), mat.begin(), ::sqrt);
+  return mat;
+}
 ```
 
+```{r bench-mat_MatrixSqrt}
+n <- 10^3
+X <- matrix(rnorm(n * n), nrow = n)
 
+bench::mark(
+  Rcpp = matrixSqrt(X),
+  RcppParallel = parallelMatrixSqrt(X),
+  check = FALSE
+)
+```
 
+Um ganho de 3x em paralelização para uma matriz de dimensão `r format(n, big.mark = ".", decimal.mark = ",")` x `r format(n, big.mark = ".", decimal.mark = ",")`!
 
 ### `parallelReduce` -- Paralelizando operações `Reduce`
 
 `Reduce` é um algoritmo bem conhecido em ciências da computação. `Reduce` aplica um operação binária (como adição) em uma sequência definida de elementos, resultando em um único valor. O exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) é uma aplicação de um `Reduce`^[tecnicamente é um `MapReduce`.]. Toda vez que você tiver essa situação você pode paralelizar com `parallelReduce`.
 
-A lógica do `parallelReduce` é similar ao `parallelFor`. Primeiro ambos usam um `Worker`
+A lógica do `parallelReduce` é similar ao `parallelFor`. Primeiro ambos usam objetos `Worker`, com algumas diferenças:
+
+* Aqui você precisa de dois construtores no seu `Worker`: um padrão e um "divisor". O construtor padrão pega os dados de entrada e inicializa qualquer valor que está sendo acumulado (por exemplo, inicializar uma soma para zero). O construtor de divisão é chamado quando o trabalho precisa ser dividido em outros threads - ele toma uma referência à instância da qual está sendo dividido e simplesmente copia o ponteiro para os dados de entrada e inicializa seu valor "acumulado" para zero.
+* Um operador `operator()` que executa o trabalho. Isso funciona da mesma forma que o operador `operator()` em `parallelFor`, mas em vez de gravar em outro vetor ou matriz, ele normalmente acumula um valor.
+* Um método de junção que compõe as operações de duas instâncias de trabalho que foram divididas anteriormente. Aqui, simplesmente combinamos o valor acumulado da instância à qual estamos sendo associados ao nosso.
 
 Para mais detalhes, consulte a [documentação do `parallelReduce` no site do `{RcppParallel}`](http://rcppcore.github.io/RcppParallel/index.html#parallelreduce)
 
@@ -158,32 +175,83 @@ Para mais detalhes, consulte a [documentação do `parallelReduce` no site do `{
 
 Vamos reutilizar o exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html).
 
-Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos  no [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) com dois loops `for`. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado:
+Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos  no [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) com dois loops `for`. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado.
+
+Novamente vou incluir comentários para o entendimento do que estamos fazendo no `{RcppParallel}`. Além disso, há uma versão single-thread também que vamos testar desempenho.
 
 ```{Rcpp parallelReduce}
+#include <Rcpp.h>
 #include <RcppParallel.h>
+#include <algorithm>
 using namespace RcppParallel;
+using namespace Rcpp;
 
-// Criando um objeto Worker
+// [[Rcpp::depends(RcppParallel)]]
+
+// [[Rcpp::plugins("cpp11")]]
+// [[Rcpp::plugins("cpp2a")]]
+
+// Criando um objeto Worker chamado sum_of_squares
 struct sum_of_squares : public Worker
 {
   // Variáveis Membro públicas
   const RVector<double> input;
-  double output;
+  double value;
   
-  // Construtor do Objeto Worker
-  sum_of_squares(const NumericVector input, double output) 
-    : input(input), output(output) {}
+  // Construtor padrão do Objeto Worker
+  sum_of_squares(const NumericVector input) : input(input), value(0) {}
+  
+  // Construtor "divisor"
+  sum_of_squares(const sum_of_squares& sum, Split) : input(sum.input), value(0) {}
   
   // Overload do operador ()
-  void operator()(std::size_t cbegin, std::size_t cend) {
-      std::transform(input.begin() + begin, 
-                     input.begin() + end, 
-                     output.begin() + begin, 
-                     ::sqrt);
+  void operator()(std::size_t begin, std::size_t end) {
+      value += std::accumulate(input.begin() + begin,
+                               input.begin() + end,
+                               0.0,
+                               [] (auto i, auto j) {return i + (j * j);});
    }
+  
+  void join(const sum_of_squares& rhs) { 
+      value += rhs.value; 
+   }
+};
+
+// Função que chama o Objeto Worker sum_of_squares
+// [[Rcpp::export]]
+double parallel_sum_of_squares(NumericVector x) {
+   // variável local inicializada
+   sum_of_squares sum(x);
+   
+   // Paralelização do Reduce
+   parallelReduce(0, x.length(), sum);
+   
+   return sum.value;
 }
+
+// Versão single-thread
+// [[Rcpp::export]]
+double sum_of_squares(NumericVector x) {
+   return std::accumulate(x.begin(),
+                          x.end(),
+                          0.0,
+                          [] (auto i, auto j) {return i + (j * j);});
+}
+
 ```
+
+```{r bench-sum_of_squares}
+set.seed(123)
+n <- 1e6
+v <- rnorm(n)
+bench::mark(
+  Rcpp = sum_of_squares(v),
+  RcppParallel = parallel_sum_of_squares(v),
+  check = FALSE,
+)
+```
+
+Mais um sucesso! Ganho de 9x `r emo::ji("exploding_head")` para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos!
 
 ## Usar `{RcppParallel}` no seu Pacote R
 
