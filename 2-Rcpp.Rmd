@@ -178,7 +178,7 @@ str(mat_num)
 
 A tabela abaixo apresenta a correspondência dos tipos de dados entre R/`{Rcpp}`/C++:
 
-```{r table_R_Cpp, echo =FALSE}
+```{r table-Rcpp, echo =FALSE}
 library(gt)
 library(dplyr)
 tibble::tribble(
@@ -198,7 +198,7 @@ tibble::tribble(
 
 Além de vetores e matrizes, `{Rcpp}` também possui as estrutura de dados correspondentes ao `data.frame` e `list`:
 
-```{r table_Rcpp, echo=FALSE}
+```{r table-df_list-Rcpp, echo=FALSE}
 tibble::tribble(
             ~R,       ~Rcpp,
   "data.frame", "DataFrame",
@@ -408,8 +408,8 @@ sum_of_squares_R <- function(v) {
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double sum_of_squares_rcpp(NumericVector& v){
-  int sum_of_elems = 0;
+double sum_of_squares_rcpp(NumericVector v){
+  double sum_of_elems = 0;
   
   // primeiro for multiplicando cada elemento consigo mesmo
   for(int i=0; i < v.size(); i++){
@@ -423,7 +423,7 @@ double sum_of_squares_rcpp(NumericVector& v){
 }
 
 // [[Rcpp::export]]
-double sum_of_squares_cpp20(const NumericVector& v){
+double sum_of_squares_cpp20(const NumericVector v){
   
   return transform_reduce(v.cbegin(),
                           v.cend(),
@@ -520,9 +520,9 @@ Aqui eu escolhi um número primo bem grande, 7189, e um número aleatório próx
 
 ## `{Rcpp}` e Rmarkdown
 
-Para usar o `{Rcpp}` em documentos markdown basta colocar `Rcpp` no chunk ao invés de `r`. Sendo que no Rmarkdown não é necessário incluir as instruções do `{Rcpp}` -- o `#include <Rcpp.h>` ou `using namespace Rcpp;`, isto já é feito automático para você.
+Para usar o `{Rcpp}` em documentos rmarkdown basta colocar `Rcpp` no chunk ao invés de `r`. Sendo que no Rmarkdown não é necessário incluir as instruções do `{Rcpp}` -- o `#include <Rcpp.h>` ou `using namespace Rcpp;`, isto já é feito automático para você.
 
-```{r rcpp-rmarkdown, fig.cap='`{Rcpp}` no Rmarkdown'}
+```{r rcpp-rmarkdown, echo=FALSE, fig.cap='`{Rcpp}` no Rmarkdown'}
 knitr::include_graphics("images/rcpp-rmarkdown.png")
 ```
 
@@ -544,7 +544,7 @@ Para adicionar `{Rcpp}` a um pacote existente, coloque seus arquivos C++ no dire
 
 A maneira mais fácil de configurar isso automaticamente é usar a função [`usethis::use_rcpp()`](https://usethis.r-lib.org/reference/use_rcpp.html).
 
-Antes de dar `build` do pacote, você precisará executar `Rcpp::compileAttributes()`. Esta função verifica os arquivos C++ em busca de atributos `Rcpp::export` e gera o código necessário para disponibilizar as funções em R. Execute novamente `compileAttributes()` sempre que as funções forem adicionadas, removidas ou seus nomes forem alterados. Isso é feito automaticamente pelo pacote `devtools` e pelo Rstudio.
+Antes de dar `build` do pacote, você precisará executar `Rcpp::compileAttributes()`. Esta função verifica os arquivos C++ em busca de atributos `Rcpp::export` e gera o código necessário para disponibilizar as funções em R. Execute novamente `compileAttributes()` sempre que as funções forem adicionadas, removidas ou seus nomes forem alterados. Isso é feito automaticamente pelo pacote `{devtools}` e pelo Rstudio.
 
 Para obter mais detalhes, consulte a vinheta do pacote `{Rcpp}`, `vignette("Rcpp-package")`.
 

@@ -5,7 +5,7 @@ description: |
 base_url: https://storopoli.io/Rcpp
 google_analytics: "UA-186284914-4"
 theme: "theme.css"
-exclude: ["*.md"]
+exclude: ["README.md", "README_files", "README.html"]
 output_dir: "docs"
 alt_formats: true
 navbar:
