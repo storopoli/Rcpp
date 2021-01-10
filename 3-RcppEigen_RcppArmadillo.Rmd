@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE,
 <!--Academicons Icons-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
-Imagine Álgebra Linear. Adição, Multiplição de Matrizes. Sistemas de Equações Lineares. Inversões de Matrizes. Decomposições de Matrizes. Autovalores, Autovetores e Valores Singulares. Eu pessoalmente acredito que o inferno deve ser um lugar que as pessoas são obrigadas a fazer cálculos de álgebra linear na mão! POR TODA A ETERNIDADE!^[apesar de eu achar Álgebra Linear fascinante e ter trocado alguns e-mails com Gilbert Strang].
+Imagine Álgebra Linear. Adição, Multiplição de Matrizes. Sistemas de Equações Lineares. Inversões de Matrizes. Decomposições de Matrizes. Autovalores, Autovetores e Valores Singulares. Eu pessoalmente acredito que o inferno deve ser um lugar que as pessoas são obrigadas a fazer cálculos de álgebra linear na mão! POR TODA A ETERNIDADE!^[apesar de eu achar Álgebra Linear fascinante e ter trocado alguns e-mails com Gilbert Strang.].
 
 Caso você não saiba, o computador não foi criado ~~para assistir pornografia~~ para envio de e-mails, navegação na internet, ou games. Mas sim para operações e manipulações de matrizes! Shayle Searle no livro
 [Matrix Algebra Useful for Statistics](https://www.wiley.com/en-us/Matrix+Algebra+Useful+for+Statistics%2C+2nd+Edition-p-9781118935149) recorda que, durante seus anos de estudante de doutorado em 1959 na Cornell University, ele e seus colegas ficaram impressionados quando conseguiram inverter uma matriz de dimensão 10 x 10 em 7 minutos num computador. Searle também recorda que um ano antes, um colega inverteu uma matriz de dimensão 40 x 40 usando uma calculadora elétrica. Ele demorou 6 semanas!
@@ -39,7 +39,7 @@ knitr::include_graphics("images/algebra-linear.jpg")
 
 ## `Armadillo`
 
-`Armadillo` é uma biblioteca de álgebra linear de alta qualidade para a linguagem C ++, visando um bom equilíbrio entre velocidade e facilidade de uso. Ela fornece sintaxe deliberadamente semelhante ao `Matlab`. Caso você tenha experiência prévia com `Matlab`, use `Armadillo` e seja feliz. Veja em seu site mais informações sobre a biblioteca `Armadillo`[http://arma.sourceforge.net]. Além disso, recomendo as seguintes referências sobre `Armadillo`:
+`Armadillo` é uma biblioteca de álgebra linear de alta qualidade para a linguagem C++, visando um bom equilíbrio entre velocidade e facilidade de uso. Ela fornece sintaxe deliberadamente semelhante ao `Matlab`. Caso você tenha experiência prévia com `Matlab`, use `Armadillo` e seja feliz. Veja em seu site mais informações sobre a biblioteca [`Armadillo`](http://arma.sourceforge.net). Além disso, recomendo as seguintes referências sobre `Armadillo`:
 
 1. [*Cheatsheet* de síntaxe `Armadillo` vs `Matlab` / `Octave`](http://arma.sourceforge.net/docs.html#syntax) feita pela própria equipe da `Armadillo`.
 2. [Site do pacote `{RcppArmadillo}`](http://dirk.eddelbuettel.com/code/rcpp.armadillo.html) que faz a interface entre `Rcpp` e `Armadillo`.
@@ -90,15 +90,15 @@ knitr::include_graphics("images/algebra-linear.jpg")
 
 ### Como usar `Armadillo` com `{Rcpp}` -- `{RcppArmadillo}`
 
-Primeiro, certifique-se que você possui a biblioteca `Armadillo` instalada:
+**Primeiro**, certifique-se que você possui a biblioteca `Armadillo` instalada:
 
 * Linux: `sudo apt-get install make libopenblas-dev liblapack-dev libarpack2-dev libsuperlu-dev`
 * MacOS: `brew install armadillo`
 * Windows: baixe no [site do `Armadillo`](http://arma.sourceforge.net/download.html)
 
-Segundo, installe o pacote `{RcppArmadillo}` para R.
+**Segundo**, installe o pacote `{RcppArmadillo}` para R.
 
-Terceiro, coloque em toda função que deseja usar o `Armadillo` com `{Rcpp}` a seguinte síntaxe:
+**Terceiro**, coloque em todo código que deseja usar o `Armadillo` com `{Rcpp}` a seguinte síntaxe:
 
 ```cpp
 #include <RcppArmadillo.h>
@@ -154,31 +154,251 @@ using namespace arma;
 // [[Rcpp::depends(RcppArmadillo)]]
 
 // [[Rcpp::export]]
-sp_mat sqrt_(sp_mat X) {
+sp_mat sqrt_arma(sp_mat& X) {
   return sqrt(X);
 }
 ```
 
-```{r sqrt_}
+```{r sqrt_arma}
 i <- c(1,3:8)
 p <- c(2,9,6:10)
 x <- 7 * (1:7)
 A <- sparseMatrix(i, p, x = x)
-sqrt_(A)
+sqrt_arma(A)
 ```
 
 ## `Eigen`
+
+`Eigen` é uma biblioteca de C++ para álgebra linear: matrizes, vetores, solucionadores numéricos e algoritmos relacionados. Ela suporta matrizes densas e esparsas em números inteiros (`int`), de ponto flutuante (`float` e `double`) e complexos (`complex`), decomposições de matrizes e soluções de sistemas lineares. Seu desempenho em muitos algoritmos é comparável a algumas das melhores implementações baseadas em LAPACK e BLAS (exemplo `Armadillo`).
+
+`Eigen` não tem nenhuma dependência externa, apenas da biblioteca padrão C++11 STL (que todo compilador C++ dá suporte). Além disso, `Eigen` usa o sistema de *build* `CMake`, mas apenas para construir a documentação e os testes de unidade, e para automatizar a instalação. Se você deseja apenas usar o `Eigen`, pode usar os arquivos header imediatamente. Não há biblioteca binária para vincular e nenhum arquivo header configurado. Eigen é uma biblioteca pura definida nos headers.
+
+Por conta dessa simplicidade, facilidade de instalação (virtualmente sem dependências) e alta compatibilidade, eu prefiro `Eigen` ao invés de `Armadillo`. Além disso, nos meus benchmarks quase sempre `Eigen` é mais rápida que `Armadillo`^[quando não é porque eu fiz alguma besteira não eficiente em `Eigen` e quando corrijo fica mais rápida.].
+
+Para `Eigen` recomendo as seguintes referências (todas do site do `Eigen`):
+
+1. [*Getting Started*](https://eigen.tuxfamily.org/dox/GettingStarted.html)
+2. [Referência Rápida de Matrizes/Vetores Densos](https://eigen.tuxfamily.org/dox/group__QuickRefPage.html)
+3. [Documentação das Decomposições e Soluções Lineares de Matrizes/Vetores Densos](https://eigen.tuxfamily.org/dox/group__DenseLinearSolvers__chapter.html)
+4. [Referência Rápida de Matrizes/Vetores Esparsas](https://eigen.tuxfamily.org/dox/group__SparseQuickRefPage.html)
+5. [Catálogo de Operações Matemáticas de Elementos de Matrizes/Vetores Densos](http://eigen.tuxfamily.org/dox/group__CoeffwiseMathFunctions.html)
+
+### Classes do `Eigen`
+
+Na mesma pegada do `Armadillo`, `Eigen` possui algumas categorias de classes para representar diferentes objetos de álgebra linear.
+
+A classe [`Matrix`](http://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html) lida com matrizes e vetores densos, não-esparsos. E a classe [`SparseMatrix`](http://eigen.tuxfamily.org/dox/classEigen_1_1SparseMatrix.html) lida com matrizes e vetores esparsos. Matrizes densas e vetores são arranjos comuns de elementos. Todos os elementos são armazenados em uma matriz contígua comum. Isso é diferente de matrizes e vetores esparsos, onde os elementos são armazenados como uma lista de elementos diferentes de zero.
+
+`Eigen` é muito mais simples: tudo é `Matrix` ou `SparseMatrix`/`SparseVector`. [`Matrix`](http://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html) aceita três argumentos de template (o que vai entre `<>`):
+
+- **tipo de escalar** (ex, `double`)
+- **número de linhas** (um `int` ou `Eigen::Dynamic`)
+- **número de colunas** (um `int` ou `Eigen::Dynamic`)
+
+[`SparseMatrix`](http://eigen.tuxfamily.org/dox/classEigen_1_1SparseMatrix.html) e [`SparseVector`](http://eigen.tuxfamily.org/dox/classEigen_1_1SparseVector.html) também aceitam três argumentos de template (o que vai entre `<>`):
+
+- **tipo de escalar** (ex, `double`)
+- **lógica de armazenamento** (`ColMajor` ou `RowMajor`, o default é `ColMajor`)
+- **tipo de índice interno** (default é `int`).
+
+Além disso `Eigen` tem uma síntaxe bem elegante para atalhos de matrizes. A lógica desses atalhos é a seguinte Classe-Numero_de_Elementos-Tipo_Escalar. Veja alguns exemplos abaixo:
+
+```cpp
+// Matrizes Densas - Tamanho Fixo
+Matrix<double, 3, 3> // Especificação Completa
+Matrix3d             // Atalho
+
+// Matrizes Densas - Tamanho Dinâmico
+Matrix<double, Dynamic, Dynamic> // Especificação Completa
+MatrixXd                         // Atalho
+
+// Matrizes Esparsas (Sem Atalhos e sem Fixo/Dinâmico)
+SparseMatrix<double>
+
+// Vetores em Eigen são apenas Matrizes 1-D
+// Vetores Densos - Tamanho Fixo
+Matrix<double, 3, 1> // Vetor Coluna - Especificação Completa
+Matrix<double, 1, 3> // Vetor Linha - Especificação Completa
+Vector3d             // Vetor Coluna - Atalho
+RowVector3d          // Vetor Linha - Atalho
+
+// Vetores Densos - Tamanho Dinâmico
+Matrix<double, Dynamic, 1> // Vetor Coluna - Especificação Completa
+Matrix<double, 1, Dynamic> // Vetor Linha - Especificação Completa
+VectorXd                   // Vetor Coluna - Atalho
+RowVectorXd                // Vetor Linha - Atalho
+
+// Vetores Esparsas (Sem Atalhos e sem Fixo/Dinâmico)
+Eigen::SparseVector<double>
+
+// Alguns exemplos extras para entender a lógica dos Atalhos
+Matrix<float,Dynamic,Dynamic>  =   MatrixXf
+Matrix<double,Dynamic,1>       =   VectorXd
+Matrix<int,1,Dynamic>          =   RowVectorXi
+Matrix<float,3,3>              =   Matrix3f
+Matrix<float,4,1>              =   Vector4f
+```
+
+#### Tamanho Fixo vs Dinâmico
+
+Internamente, uma **matriz `Eigen` de tamanho fixo** é apenas um array simples de C++ alocada na pilha (*stack*) e tem custo zero de tempo de execução. Em contraste, o array C++ de uma **matriz `Eigen` de tamanho dinâmico** é sempre alocada na *heap* e armazena seu número de linhas e colunas como variáveis de membro (*member variables*).
+
+Para **tamanhos grandes o suficiente, digamos, para tamanhos maiores que (aproximadamente) 32, o benefício de desempenho de usar tamanhos fixos torna-se insignificante**. Pior, tentar criar uma matriz muito grande usando tamanhos fixos dentro de uma função pode resultar em um **_stack overflow_**, já que `Eigen` tentará alocar o array automaticamente como uma variável local, e isso normalmente é feito na pilha (*stack*). Finalmente, dependendo das circunstâncias, **`Eigen` também pode ser mais agressivo tentando vetorizar (usar instruções SIMD) quando tamanhos dinâmicos são usados**.
+
+Meu conselho: **use sempre matrizes e vetores de tamanho dinâmico e seja feliz sabendo que na maioria das vezes eles serão mais rápidos que os de tamanho fixo**.
+
+#### Acessando e Modificando Elementos
+
+O principal meio de acessar elementos e modificar do `Eigen` é pelo operador `()`. Para matrizes use dois índices `(linha, coluna)` e para vetores apenas use um índice `(índice)`. Geralmente `m` é uma matriz e `v` é um vetor.
+
+```cpp
+m(0,0) = 3;
+v(0)   = 4;
+```
+
+#### Fatiando (Slice) Matrizes e Vetores
+
+Tem várias maneiras de fatiar (slice) matrizes e vetores. Veja alguns exemplos:
+
+```cpp
+// Vetores
+v.head(n)
+v.tail(n)
+v.segment(pos,n)
+
+// Matriz
+m.block(i,j,rows,cols)
+
+// Matriz - Cantos (Corners)
+m.topLeftCorner(rows,cols) 
+m.topRightCorner(rows,cols)
+m.bottomLeftCorner(rows,cols)
+m.bottomRightCorner(rows,cols)
+m.topRows(rows)
+m.bottomRows(rows)
+m.leftCols(cols)
+m.rightCols(cols)
+```
+
+#### Inicializando Matrizes e Vetores
+
+Por padrão os elementos de uma matriz não são inicializados na sua criação. Há algumas maneiras de inicializar os elementos de uma matriz ou vetor em `Eigen`:
+
+* Inicialização usando a vírgula (*Comma Initialization*)
+  ```cpp
+  Matrix3f m;  // pode ser também MatrixXd
+
+  m << 1, 2, 3,
+       4, 5, 6,
+       7, 8, 9;
+  ```
+* Matrizes especiais. Existem alguns métodos estáticos para todas as classes `Matrix`. Eles são apenas para tamanhos fixos.
+  ```cpp
+  // Matriz com Zeros
+  Matrix2d::Zero()
+  
+  // Matrizes Aleatórias
+  Matrix2i::Random()
+  
+  // Matriz Identidade
+  Matrix3d::Identity()
+  
+  // Vetores Espaçados Linearmente (size, low, high)
+  // tipo um seq() do R
+  VectorXf v;
+  v.setLinSpaced(5,0.5f,1.5f);
+  ```
+
+#### Tamanho e Dimensões
+
+O tamanho atual de uma matriz pode ser recuperado por `.rows()`, `.cols()` e `.size()`. Esses métodos retornam o número de linhas, o número de colunas e o número de elementos, respectivamente. O redimensionamento de uma matriz de tamanho dinâmico é feito pelo método `.resize()`.
+
+```cpp
+m.cols();
+m.rows();
+m.resize(4,4);
+```
+
+#### Operações Aritméticas com Matrizes e Vetores
+
+Todos os vetores e matrizes de `Eigen` aceitam adição, subtração, multiplicação, divisão: `+`,`-`, `*`, `/`. Além disso, tem MUITAS outras operações e decomposições que podem ser feitas. Não vou listar todas aqui, consulte a [documentação do `Eigen`](http://eigen.tuxfamily.org/dox/index.html).
+
+### Como usar `Eigen` com `{Rcpp}` -- `{RcppEigen}`
+
+**Primeiro**, certifique-se que você possui a biblioteca `Eigen` instalada:
 
 * Linux: `sudo apt install libeigen3-dev`
 * MacOS: `brew install eigen`
 * Windows: baixe no [site do `Eigen`](http://eigen.tuxfamily.org/index.php?title=Main_Page#Download)
 
+**Segundo**, installe o pacote `{RcppEigen}` para R.
+
+**Terceiro**, coloque em todo código que deseja usar o `Eigen` com `{Rcpp}` a seguinte síntaxe:
+
+```cpp
+#include <RcppEigen.h>
+using namespace Eigen;
+
+// [[Rcpp::depends(RcppEigen)]]
+```
+
+**Atenção!**: não usar o header do `{Rcpp}` (`#include <Rcpp.h>`), pois ele conflita com o header do `{RcppEigen}` (`#include <RcppEigen.h>`).
+
+Pronto! É isso.
+
+#### Conversões do `{RcppEigen}`
+
+O `{RcppEigen}` automaticamente converterá os tipos de retorno das funções na seguinte lógica:
+
+```{r Eigen-conversion-table, echo=FALSE}
+library(gt)
+library(dplyr)
+tibble::tribble(
+  ~`Tipo de Objeto R`,      ~`Classe Eigen`,
+       "numeric matrix",             "MatrixXd",
+       "integer matrix",             "MatrixXi",
+       "complex matrix",            "MatrixXcd",
+       "numeric vector",             "VectorXd",
+       "integer vector",             "VectorXi",
+       "complex vector",            "VectorXcd",
+    "Matrix::dgCMatrix", "SparseMatrix<double>"
+  ) %>% 
+  mutate_all(~stringr::str_glue("`{.}`")) %>% 
+  gt() %>% 
+  fmt_markdown(everything())
+```
+
+
+### Como usar Matrizes Esparsas no `{RcppEigen}`
+
+Para que `{RcppEigen}` nos retorne um objeto `dgCMatrix`, é simples: basta a função retornar um objeto `Eigen::SparseMatrix<double>`. Vou usar o mesmo exemplo de operação com matriz esparsa do `{RcppArmadillo}`:
+
+```{Rcpp eigenEx-Rcpp}
+#include <RcppEigen.h>
+using namespace Rcpp;
+using namespace Eigen;
+
+// [[Rcpp::depends(RcppEigen)]]
+
+// [[Rcpp::export]]
+SparseMatrix<double> sqrt_eigen(SparseMatrix<double>& X) {
+  return X.cwiseSqrt();
+}
+```
+
+```{r sqrt_eigen}
+i <- c(1,3:8)
+p <- c(2,9,6:10)
+x <- 7 * (1:7)
+A <- sparseMatrix(i, p, x = x)
+sqrt_eigen(A)
+```
 
 ## Benchmarks
 
-Está na hora de mais uma vez colocarmos o que vimos em prática.
+Está na hora de mais uma vez colocarmos o que vimos em prática. Além disso fazer alguns benchmarks de `Eigen` vs `Armadillo`.
 
-### Exemplo -- 
+### Exemplo -- Multiplicação de Matrizes
 
 Nesse caso vamos comparar multiplicar duas matrizes em C++ usando o `{Rcpp}`, `{RcppArmadillo}` e `{RcppEigen}`
 
@@ -238,9 +458,22 @@ bench::mark(
 
 No meu computador `{RcppEigen}` é mais rápido que `{RcppArmadillo}`, mas ambos são mais lentos que uma implementação simples com `{Rcpp}`. 
 
-### Exemplo --
+### Exemplo -- Matriz Esparsa
 
-Dirk Eddelbuettel na [vinheta introdutória do `{Rcpp}`](https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-introduction.pdf)
+Vamos usar `mat_sparse` criada que possui dimensão `r format(dim(mat_sparse)[1], big.mark = ".", decimal.mark = ",")` x `r format(dim(mat_sparse)[2], big.mark = ".", decimal.mark = ",")` e tomar a raiz quadrada de todos os elementos.
+
+```{r bench-sparse_sqrt}
+bench::mark(
+  arma = sqrt_eigen(mat_sparse),
+  eigen = sqrt_eigen(mat_sparse)
+)
+```
+
+Novamente `Eigen` é um pouco mais rápida que `Armadillo`, mas a diferença é pequena.
+
+### Exemplo -- Regressão Linear `fast_lm()`
+
+Esse exemplo, originalmente do criador dos pacotes do ecossistema `{Rcpp}` Dirk Eddelbuettel na [vinheta introdutória do `{Rcpp}`](https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-introduction.pdf), é bem interessante. Aqui vamos aplicar uma regressão linear tanto em `Armadillo` quando em `Eigen`. Ambos usam o `solve()` que é um solucionador de sistemas de equações lineares^[por debaixo dos panos há uma inversão otimizada de matriz.].
 
 ```{Rcpp fast_lm_arm}
 #include <RcppArmadillo.h>
@@ -288,7 +521,7 @@ Rcpp::List fast_lm_eigen(const VectorXd& y, const MatrixXd& X) {
 
 	double sig2 = resid.squaredNorm() / (n - k);
  
-  VectorXd stderrest = (sig2 * ((X.transpose() * X).inverse()).diagonal()).array().sqrt();
+  VectorXd stderrest = (sig2 * ((X.transpose() * X).inverse()).diagonal()).array().cwiseSqrt();
 	
 	return Rcpp::List::create(Rcpp::Named("coefficients") = coef,
                             Rcpp::Named("stderr")       = stderrest);
@@ -306,7 +539,14 @@ bench::mark(
 )
 ```
 
+Tanto `Eigen` quanto `Armadillo` são rápidos! Quase 100x mais rápidos. Novamente a diferença entre `Eigen` e `Armadillo` é pequena.
+
 ## Usar `{RcppArmadillo}` ou `{RcppEigen}` no seu Pacote R
+
+Eu recomendo usar o pacote `{usethis}` e seguir as instruções.
+
+* [`usethis::use_rcpp_armadillo()`](https://usethis.r-lib.org/reference/use_rcpp.html)
+* [`usethis::use_rcpp_eigen()`](https://usethis.r-lib.org/reference/use_rcpp.html)
 
 ## Ambiente
 

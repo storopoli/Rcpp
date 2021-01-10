@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" version="1.0">
   <url>
     <loc>https://storopoli.io/Rcpp/1-Porque_CPP.html</loc>
-    <lastmod>2021-01-09T17:11:37-03:00</lastmod>
+    <lastmod>2021-01-10T05:21:40-03:00</lastmod>
   </url>
   <url>
     <loc>https://storopoli.io/Rcpp/2-Rcpp.html</loc>
@@ -10,11 +10,11 @@
   </url>
   <url>
     <loc>https://storopoli.io/Rcpp/3-RcppEigen_RcppArmadillo.html</loc>
-    <lastmod>2021-01-09T20:14:43-03:00</lastmod>
+    <lastmod>2021-01-10T05:47:40-03:00</lastmod>
   </url>
   <url>
     <loc>https://storopoli.io/Rcpp/4-RcppParallel.html</loc>
-    <lastmod>2021-01-09T17:11:56-03:00</lastmod>
+    <lastmod>2021-01-10T05:48:32-03:00</lastmod>
   </url>
   <url>
     <loc>https://storopoli.io/Rcpp/5-cpp11.html</loc>
@@ -26,6 +26,6 @@
   </url>
   <url>
     <loc>https://storopoli.io/Rcpp/Tutorial_Rcpp.html</loc>
-    <lastmod>2021-01-09T18:45:31-03:00</lastmod>
+    <lastmod>2021-01-10T05:32:12-03:00</lastmod>
   </url>
 </urlset>

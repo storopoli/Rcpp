@@ -168,7 +168,7 @@ O padrão C++11 é importante, tanto que foi seu nome oficial é "o novo padrão
 
 Os principais tipos de variáveis de R e sua correspondência em C++ na tabela abaixo. Note que os nomes são bem similares.
 
-```{r table_R_Cpp, echo =FALSE}
+```{r table_R_Cpp, echo=FALSE}
 library(gt)
 library(dplyr)
 tibble::tribble(

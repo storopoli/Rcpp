@@ -2407,8 +2407,19 @@ Tutoriais
 <li><a href="#como-usar-armadillo-com-rcpp-rcpparmadillo">Como usar <code>Armadillo</code> com <code>{Rcpp}</code> – <code>{RcppArmadillo}</code></a></li>
 <li><a href="#como-usar-matrizes-esparsas-no-rcpparmadillo">Como usar Matrizes Esparsas no <code>{RcppArmadillo}</code></a></li>
 </ul></li>
-<li><a href="#eigen"><code>Eigen</code></a></li>
-<li><a href="#benchmarks">Benchmarks</a></li>
+<li><a href="#eigen"><code>Eigen</code></a>
+<ul>
+<li><a href="#classes-do-eigen">Classes do <code>Eigen</code></a></li>
+<li><a href="#como-usar-eigen-com-rcpp-rcppeigen">Como usar <code>Eigen</code> com <code>{Rcpp}</code> – <code>{RcppEigen}</code></a></li>
+<li><a href="#como-usar-matrizes-esparsas-no-rcppeigen">Como usar Matrizes Esparsas no <code>{RcppEigen}</code></a></li>
+</ul></li>
+<li><a href="#benchmarks">Benchmarks</a>
+<ul>
+<li><a href="#exemplo-multiplicação-de-matrizes">Exemplo – Multiplicação de Matrizes</a></li>
+<li><a href="#exemplo-matriz-esparsa">Exemplo – Matriz Esparsa</a></li>
+<li><a href="#exemplo-regressão-linear-fast_lm">Exemplo – Regressão Linear <code>fast_lm()</code></a></li>
+</ul></li>
+<li><a href="#usar-rcpparmadillo-ou-rcppeigen-no-seu-pacote-r">Usar <code>{RcppArmadillo}</code> ou <code>{RcppEigen}</code> no seu Pacote R</a></li>
 <li><a href="#ambiente">Ambiente</a></li>
 </ul>
 </nav>
@@ -2432,7 +2443,7 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 </div>
 </div>
 <h2 id="armadillo"><code>Armadillo</code></h2>
-<p><code>Armadillo</code> é uma biblioteca de álgebra linear de alta qualidade para a linguagem C ++, visando um bom equilíbrio entre velocidade e facilidade de uso. Ela fornece sintaxe deliberadamente semelhante ao <code>Matlab</code>. Caso você tenha experiência prévia com <code>Matlab</code>, use <code>Armadillo</code> e seja feliz. Veja em seu site mais informações sobre a biblioteca <code>Armadillo</code>[<a href="http://arma.sourceforge.net" class="uri">http://arma.sourceforge.net</a>]. Além disso, recomendo as seguintes referências sobre <code>Armadillo</code>:</p>
+<p><code>Armadillo</code> é uma biblioteca de álgebra linear de alta qualidade para a linguagem C++, visando um bom equilíbrio entre velocidade e facilidade de uso. Ela fornece sintaxe deliberadamente semelhante ao <code>Matlab</code>. Caso você tenha experiência prévia com <code>Matlab</code>, use <code>Armadillo</code> e seja feliz. Veja em seu site mais informações sobre a biblioteca <a href="http://arma.sourceforge.net"><code>Armadillo</code></a>. Além disso, recomendo as seguintes referências sobre <code>Armadillo</code>:</p>
 <ol type="1">
 <li><a href="http://arma.sourceforge.net/docs.html#syntax"><em>Cheatsheet</em> de síntaxe <code>Armadillo</code> vs <code>Matlab</code> / <code>Octave</code></a> feita pela própria equipe da <code>Armadillo</code>.</li>
 <li><a href="http://dirk.eddelbuettel.com/code/rcpp.armadillo.html">Site do pacote <code>{RcppArmadillo}</code></a> que faz a interface entre <code>Rcpp</code> e <code>Armadillo</code>.</li>
@@ -2477,14 +2488,14 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>sp_cx_fmat  =   SpMat&lt;cx_float&gt;   <span class="co">// cx_ é Complex Numbers</span></span></code></pre></div></li>
 </ul>
 <h3 id="como-usar-armadillo-com-rcpp-rcpparmadillo">Como usar <code>Armadillo</code> com <code>{Rcpp}</code> – <code>{RcppArmadillo}</code></h3>
-<p>Primeiro, certifique-se que você possui a biblioteca <code>Armadillo</code> instalada:</p>
+<p><strong>Primeiro</strong>, certifique-se que você possui a biblioteca <code>Armadillo</code> instalada:</p>
 <ul>
 <li>Linux: <code>sudo apt-get install make libopenblas-dev liblapack-dev libarpack2-dev libsuperlu-dev</code></li>
 <li>MacOS: <code>brew install armadillo</code></li>
 <li>Windows: baixe no <a href="http://arma.sourceforge.net/download.html">site do <code>Armadillo</code></a></li>
 </ul>
-<p>Segundo, installe o pacote <code>{RcppArmadillo}</code> para R.</p>
-<p>Terceiro, coloque em toda função que deseja usar o <code>Armadillo</code> com <code>{Rcpp}</code> a seguinte síntaxe:</p>
+<p><strong>Segundo</strong>, installe o pacote <code>{RcppArmadillo}</code> para R.</p>
+<p><strong>Terceiro</strong>, coloque em todo código que deseja usar o <code>Armadillo</code> com <code>{Rcpp}</code> a seguinte síntaxe:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppArmadillo.h&gt;</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> arma;</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2566,7 +2577,7 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppArmadillo)]]</span></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>sp_mat <span class="va">sqrt_</span>(sp_mat X) {</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>sp_mat sqrt_arma(sp_mat&amp; X) {</span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> sqrt(X);</span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
@@ -2576,7 +2587,7 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 <span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>,<span class='fl'>9</span>,<span class='fl'>6</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fl'>7</span> <span class='op'>*</span> <span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>7</span><span class='op'>)</span>
 <span class='va'>A</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/sparseMatrix.html'>sparseMatrix</a></span><span class='op'>(</span><span class='va'>i</span>, <span class='va'>p</span>, x <span class='op'>=</span> <span class='va'>x</span><span class='op'>)</span>
-<span class='fu'>sqrt_</span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span>
+<span class='fu'>sqrt_arma</span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>8 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
@@ -2591,51 +2602,610 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 [8,] . .   . . . .   .   .   .   7</code></pre>
 </div>
 <h2 id="eigen"><code>Eigen</code></h2>
+<p><code>Eigen</code> é uma biblioteca de C++ para álgebra linear: matrizes, vetores, solucionadores numéricos e algoritmos relacionados. Ela suporta matrizes densas e esparsas em números inteiros (<code>int</code>), de ponto flutuante (<code>float</code> e <code>double</code>) e complexos (<code>complex</code>), decomposições de matrizes e soluções de sistemas lineares. Seu desempenho em muitos algoritmos é comparável a algumas das melhores implementações baseadas em LAPACK e BLAS (exemplo <code>Armadillo</code>).</p>
+<p><code>Eigen</code> não tem nenhuma dependência externa, apenas da biblioteca padrão C++11 STL (que todo compilador C++ dá suporte). Além disso, <code>Eigen</code> usa o sistema de <em>build</em> <code>CMake</code>, mas apenas para construir a documentação e os testes de unidade, e para automatizar a instalação. Se você deseja apenas usar o <code>Eigen</code>, pode usar os arquivos header imediatamente. Não há biblioteca binária para vincular e nenhum arquivo header configurado. Eigen é uma biblioteca pura definida nos headers.</p>
+<p>Por conta dessa simplicidade, facilidade de instalação (virtualmente sem dependências) e alta compatibilidade, eu prefiro <code>Eigen</code> ao invés de <code>Armadillo</code>. Além disso, nos meus benchmarks quase sempre <code>Eigen</code> é mais rápida que <code>Armadillo</code><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<p>Para <code>Eigen</code> recomendo as seguintes referências (todas do site do <code>Eigen</code>):</p>
+<ol type="1">
+<li><a href="https://eigen.tuxfamily.org/dox/GettingStarted.html"><em>Getting Started</em></a></li>
+<li><a href="https://eigen.tuxfamily.org/dox/group__QuickRefPage.html">Referência Rápida de Matrizes/Vetores Densos</a></li>
+<li><a href="https://eigen.tuxfamily.org/dox/group__DenseLinearSolvers__chapter.html">Documentação das Decomposições e Soluções Lineares de Matrizes/Vetores Densos</a></li>
+<li><a href="https://eigen.tuxfamily.org/dox/group__SparseQuickRefPage.html">Referência Rápida de Matrizes/Vetores Esparsas</a></li>
+<li><a href="http://eigen.tuxfamily.org/dox/group__CoeffwiseMathFunctions.html">Catálogo de Operações Matemáticas de Elementos de Matrizes/Vetores Densos</a></li>
+</ol>
+<h3 id="classes-do-eigen">Classes do <code>Eigen</code></h3>
+<p>Na mesma pegada do <code>Armadillo</code>, <code>Eigen</code> possui algumas categorias de classes para representar diferentes objetos de álgebra linear.</p>
+<p>A classe <a href="http://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html"><code>Matrix</code></a> lida com matrizes e vetores densos, não-esparsos. E a classe <a href="http://eigen.tuxfamily.org/dox/classEigen_1_1SparseMatrix.html"><code>SparseMatrix</code></a> lida com matrizes e vetores esparsos. Matrizes densas e vetores são arranjos comuns de elementos. Todos os elementos são armazenados em uma matriz contígua comum. Isso é diferente de matrizes e vetores esparsos, onde os elementos são armazenados como uma lista de elementos diferentes de zero.</p>
+<p><code>Eigen</code> é muito mais simples: tudo é <code>Matrix</code> ou <code>SparseMatrix</code>/<code>SparseVector</code>. <a href="http://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html"><code>Matrix</code></a> aceita três argumentos de template (o que vai entre <code>&lt;&gt;</code>):</p>
+<ul>
+<li><strong>tipo de escalar</strong> (ex, <code>double</code>)</li>
+<li><strong>número de linhas</strong> (um <code>int</code> ou <code>Eigen::Dynamic</code>)</li>
+<li><strong>número de colunas</strong> (um <code>int</code> ou <code>Eigen::Dynamic</code>)</li>
+</ul>
+<p><a href="http://eigen.tuxfamily.org/dox/classEigen_1_1SparseMatrix.html"><code>SparseMatrix</code></a> e <a href="http://eigen.tuxfamily.org/dox/classEigen_1_1SparseVector.html"><code>SparseVector</code></a> também aceitam três argumentos de template (o que vai entre <code>&lt;&gt;</code>):</p>
+<ul>
+<li><strong>tipo de escalar</strong> (ex, <code>double</code>)</li>
+<li><strong>lógica de armazenamento</strong> (<code>ColMajor</code> ou <code>RowMajor</code>, o default é <code>ColMajor</code>)</li>
+<li><strong>tipo de índice interno</strong> (default é <code>int</code>).</li>
+</ul>
+<p>Além disso <code>Eigen</code> tem uma síntaxe bem elegante para atalhos de matrizes. A lógica desses atalhos é a seguinte Classe-Numero_de_Elementos-Tipo_Escalar. Veja alguns exemplos abaixo:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Matrizes Densas - Tamanho Fixo</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">double</span>, <span class="dv">3</span>, <span class="dv">3</span>&gt; <span class="co">// Especificação Completa</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>Matrix3d             <span class="co">// Atalho</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Matrizes Densas - Tamanho Dinâmico</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">double</span>, Dynamic, Dynamic&gt; <span class="co">// Especificação Completa</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>MatrixXd                         <span class="co">// Atalho</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Matrizes Esparsas (Sem Atalhos e sem Fixo/Dinâmico)</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>SparseMatrix&lt;<span class="dt">double</span>&gt;</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">// Vetores em Eigen são apenas Matrizes 1-D</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Vetores Densos - Tamanho Fixo</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">double</span>, <span class="dv">3</span>, <span class="dv">1</span>&gt; <span class="co">// Vetor Coluna - Especificação Completa</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">double</span>, <span class="dv">1</span>, <span class="dv">3</span>&gt; <span class="co">// Vetor Linha - Especificação Completa</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>Vector3d             <span class="co">// Vetor Coluna - Atalho</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>RowVector3d          <span class="co">// Vetor Linha - Atalho</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">// Vetores Densos - Tamanho Dinâmico</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">double</span>, Dynamic, <span class="dv">1</span>&gt; <span class="co">// Vetor Coluna - Especificação Completa</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">double</span>, <span class="dv">1</span>, Dynamic&gt; <span class="co">// Vetor Linha - Especificação Completa</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>VectorXd                   <span class="co">// Vetor Coluna - Atalho</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>RowVectorXd                <span class="co">// Vetor Linha - Atalho</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">// Vetores Esparsas (Sem Atalhos e sem Fixo/Dinâmico)</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>Eigen::SparseVector&lt;<span class="dt">double</span>&gt;</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">// Alguns exemplos extras para entender a lógica dos Atalhos</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">float</span>,Dynamic,Dynamic&gt;  =   MatrixXf</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">double</span>,Dynamic,<span class="dv">1</span>&gt;       =   VectorXd</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">int</span>,<span class="dv">1</span>,Dynamic&gt;          =   RowVectorXi</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">float</span>,<span class="dv">3</span>,<span class="dv">3</span>&gt;              =   Matrix3f</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>Matrix&lt;<span class="dt">float</span>,<span class="dv">4</span>,<span class="dv">1</span>&gt;              =   Vector4f</span></code></pre></div>
+<h4 id="tamanho-fixo-vs-dinâmico">Tamanho Fixo vs Dinâmico</h4>
+<p>Internamente, uma <strong>matriz <code>Eigen</code> de tamanho fixo</strong> é apenas um array simples de C++ alocada na pilha (<em>stack</em>) e tem custo zero de tempo de execução. Em contraste, o array C++ de uma <strong>matriz <code>Eigen</code> de tamanho dinâmico</strong> é sempre alocada na <em>heap</em> e armazena seu número de linhas e colunas como variáveis de membro (<em>member variables</em>).</p>
+<p>Para <strong>tamanhos grandes o suficiente, digamos, para tamanhos maiores que (aproximadamente) 32, o benefício de desempenho de usar tamanhos fixos torna-se insignificante</strong>. Pior, tentar criar uma matriz muito grande usando tamanhos fixos dentro de uma função pode resultar em um <strong><em>stack overflow</em></strong>, já que <code>Eigen</code> tentará alocar o array automaticamente como uma variável local, e isso normalmente é feito na pilha (<em>stack</em>). Finalmente, dependendo das circunstâncias, <strong><code>Eigen</code> também pode ser mais agressivo tentando vetorizar (usar instruções SIMD) quando tamanhos dinâmicos são usados</strong>.</p>
+<p>Meu conselho: <strong>use sempre matrizes e vetores de tamanho dinâmico e seja feliz sabendo que na maioria das vezes eles serão mais rápidos que os de tamanho fixo</strong>.</p>
+<h4 id="acessando-e-modificando-elementos">Acessando e Modificando Elementos</h4>
+<p>O principal meio de acessar elementos e modificar do <code>Eigen</code> é pelo operador <code>()</code>. Para matrizes use dois índices <code>(linha, coluna)</code> e para vetores apenas use um índice <code>(índice)</code>. Geralmente <code>m</code> é uma matriz e <code>v</code> é um vetor.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m(<span class="dv">0</span>,<span class="dv">0</span>) = <span class="dv">3</span>;</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>v(<span class="dv">0</span>)   = <span class="dv">4</span>;</span></code></pre></div>
+<h4 id="fatiando-slice-matrizes-e-vetores">Fatiando (Slice) Matrizes e Vetores</h4>
+<p>Tem várias maneiras de fatiar (slice) matrizes e vetores. Veja alguns exemplos:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Vetores</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>v.head(n)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>v.tail(n)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>v.segment(pos,n)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Matriz</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>m.block(i,j,rows,cols)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Matriz - Cantos (Corners)</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>m.topLeftCorner(rows,cols) </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>m.topRightCorner(rows,cols)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>m.bottomLeftCorner(rows,cols)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>m.bottomRightCorner(rows,cols)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>m.topRows(rows)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>m.bottomRows(rows)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>m.leftCols(cols)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>m.rightCols(cols)</span></code></pre></div>
+<h4 id="inicializando-matrizes-e-vetores">Inicializando Matrizes e Vetores</h4>
+<p>Por padrão os elementos de uma matriz não são inicializados na sua criação. Há algumas maneiras de inicializar os elementos de uma matriz ou vetor em <code>Eigen</code>:</p>
+<ul>
+<li><p>Inicialização usando a vírgula (<em>Comma Initialization</em>)</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>Matrix3f m;  <span class="co">// pode ser também MatrixXd</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>m &lt;&lt; <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>     <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>     <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>;</span></code></pre></div></li>
+<li><p>Matrizes especiais. Existem alguns métodos estáticos para todas as classes <code>Matrix</code>. Eles são apenas para tamanhos fixos.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Matriz com Zeros</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>Matrix2d::Zero()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Matrizes Aleatórias</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>Matrix2i::Random()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Matriz Identidade</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>Matrix3d::Identity()</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Vetores Espaçados Linearmente (size, low, high)</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">// tipo um seq() do R</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>VectorXf v;</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>v.setLinSpaced(<span class="dv">5</span>,<span class="fl">0.5</span><span class="bu">f</span>,<span class="fl">1.5</span><span class="bu">f</span>);</span></code></pre></div></li>
+</ul>
+<h4 id="tamanho-e-dimensões">Tamanho e Dimensões</h4>
+<p>O tamanho atual de uma matriz pode ser recuperado por <code>.rows()</code>, <code>.cols()</code> e <code>.size()</code>. Esses métodos retornam o número de linhas, o número de colunas e o número de elementos, respectivamente. O redimensionamento de uma matriz de tamanho dinâmico é feito pelo método <code>.resize()</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>m.cols();</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>m.rows();</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>m.resize(<span class="dv">4</span>,<span class="dv">4</span>);</span></code></pre></div>
+<h4 id="operações-aritméticas-com-matrizes-e-vetores">Operações Aritméticas com Matrizes e Vetores</h4>
+<p>Todos os vetores e matrizes de <code>Eigen</code> aceitam adição, subtração, multiplicação, divisão: <code>+</code>,<code>-</code>, <code>*</code>, <code>/</code>. Além disso, tem MUITAS outras operações e decomposições que podem ser feitas. Não vou listar todas aqui, consulte a <a href="http://eigen.tuxfamily.org/dox/index.html">documentação do <code>Eigen</code></a>.</p>
+<h3 id="como-usar-eigen-com-rcpp-rcppeigen">Como usar <code>Eigen</code> com <code>{Rcpp}</code> – <code>{RcppEigen}</code></h3>
+<p><strong>Primeiro</strong>, certifique-se que você possui a biblioteca <code>Eigen</code> instalada:</p>
 <ul>
 <li>Linux: <code>sudo apt install libeigen3-dev</code></li>
 <li>MacOS: <code>brew install eigen</code></li>
 <li>Windows: baixe no <a href="http://eigen.tuxfamily.org/index.php?title=Main_Page#Download">site do <code>Eigen</code></a></li>
 </ul>
+<p><strong>Segundo</strong>, installe o pacote <code>{RcppEigen}</code> para R.</p>
+<p><strong>Terceiro</strong>, coloque em todo código que deseja usar o <code>Eigen</code> com <code>{Rcpp}</code> a seguinte síntaxe:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppEigen.h&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen;</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span></code></pre></div>
+<p><strong>Atenção!</strong>: não usar o header do <code>{Rcpp}</code> (<code>#include &lt;Rcpp.h&gt;</code>), pois ele conflita com o header do <code>{RcppEigen}</code> (<code>#include &lt;RcppEigen.h&gt;</code>).</p>
+<p>Pronto! É isso.</p>
+<h4 id="conversões-do-rcppeigen">Conversões do <code>{RcppEigen}</code></h4>
+<p>O <code>{RcppEigen}</code> automaticamente converterá os tipos de retorno das funções na seguinte lógica:</p>
+<div class="layout-chunk" data-layout="l-body">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#bwlmvbnigf .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#bwlmvbnigf .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#bwlmvbnigf .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#bwlmvbnigf .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#bwlmvbnigf .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#bwlmvbnigf .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#bwlmvbnigf .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#bwlmvbnigf .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#bwlmvbnigf .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#bwlmvbnigf .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#bwlmvbnigf .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#bwlmvbnigf .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#bwlmvbnigf .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#bwlmvbnigf .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bwlmvbnigf .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bwlmvbnigf .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#bwlmvbnigf .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#bwlmvbnigf .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bwlmvbnigf .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#bwlmvbnigf .gt_left {
+  text-align: left;
+}
+
+#bwlmvbnigf .gt_center {
+  text-align: center;
+}
+
+#bwlmvbnigf .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#bwlmvbnigf .gt_font_normal {
+  font-weight: normal;
+}
+
+#bwlmvbnigf .gt_font_bold {
+  font-weight: bold;
+}
+
+#bwlmvbnigf .gt_font_italic {
+  font-style: italic;
+}
+
+#bwlmvbnigf .gt_super {
+  font-size: 65%;
+}
+
+#bwlmvbnigf .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="bwlmvbnigf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Tipo de Objeto R</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Classe Eigen</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>numeric matrix</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>MatrixXd</code></p>
+</div></td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>integer matrix</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>MatrixXi</code></p>
+</div></td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>complex matrix</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>MatrixXcd</code></p>
+</div></td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>numeric vector</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>VectorXd</code></p>
+</div></td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>integer vector</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>VectorXi</code></p>
+</div></td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>complex vector</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>VectorXcd</code></p>
+</div></td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>Matrix::dgCMatrix</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>SparseMatrix&lt;double&gt;</code></p>
+</div></td>
+    </tr>
+  </tbody>
+  
+  
+</table></div>
+</div>
+<h3 id="como-usar-matrizes-esparsas-no-rcppeigen">Como usar Matrizes Esparsas no <code>{RcppEigen}</code></h3>
+<p>Para que <code>{RcppEigen}</code> nos retorne um objeto <code>dgCMatrix</code>, é simples: basta a função retornar um objeto <code>Eigen::SparseMatrix&lt;double&gt;</code>. Vou usar o mesmo exemplo de operação com matriz esparsa do <code>{RcppArmadillo}</code>:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb20"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppEigen.h&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen;</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>SparseMatrix&lt;<span class="dt">double</span>&gt; sqrt_eigen(SparseMatrix&lt;<span class="dt">double</span>&gt;&amp; X) {</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> X.cwiseSqrt();</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='va'>i</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>3</span><span class='op'>:</span><span class='fl'>8</span><span class='op'>)</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>,<span class='fl'>9</span>,<span class='fl'>6</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fl'>7</span> <span class='op'>*</span> <span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>7</span><span class='op'>)</span>
+<span class='va'>A</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/sparseMatrix.html'>sparseMatrix</a></span><span class='op'>(</span><span class='va'>i</span>, <span class='va'>p</span>, x <span class='op'>=</span> <span class='va'>x</span><span class='op'>)</span>
+<span class='fu'>sqrt_eigen</span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>8 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+                                  
+[1,] . 2.6 . . . .   .   .   .   .
+[2,] . .   . . . .   .   .   .   .
+[3,] . .   . . . .   .   .   3.7 .
+[4,] . .   . . . 4.6 .   .   .   .
+[5,] . .   . . . .   5.3 .   .   .
+[6,] . .   . . . .   .   5.9 .   .
+[7,] . .   . . . .   .   .   6.5 .
+[8,] . .   . . . .   .   .   .   7</code></pre>
+</div>
 <h2 id="benchmarks">Benchmarks</h2>
-<p>Está na hora de mais uma vez colocarmos o que vimos em prática. Nesse caso vamos comparar multiplicar duas matrizes em C++ usando o <code>{Rcpp}</code>, <code>{RcppArmadillo}</code> e <code>{RcppEigen}</code></p>
+<p>Está na hora de mais uma vez colocarmos o que vimos em prática. Além disso fazer alguns benchmarks de <code>Eigen</code> vs <code>Armadillo</code>.</p>
+<h3 id="exemplo-multiplicação-de-matrizes">Exemplo – Multiplicação de Matrizes</h3>
+<p>Nesse caso vamos comparar multiplicar duas matrizes em C++ usando o <code>{Rcpp}</code>, <code>{RcppArmadillo}</code> e <code>{RcppEigen}</code></p>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>NumericVector mat_mul(<span class="at">const</span> NumericVector&amp; A, <span class="at">const</span> NumericVector&amp; B) {</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  NumericVector C = A * B;</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// dimensões para Vector virar Matrix no R</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> dim = sqrt(A.length());</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  C.attr(<span class="st">&quot;dim&quot;</span>) = Dimension(dim, dim);</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> C;</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>NumericVector mat_mul(<span class="at">const</span> NumericVector&amp; A, <span class="at">const</span> NumericVector&amp; B) {</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  NumericVector C = A * B;</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// dimensões para Vector virar Matrix no R</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> dim = sqrt(A.length());</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  C.attr(<span class="st">&quot;dim&quot;</span>) = Dimension(dim, dim);</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> C;</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppArmadillo.h&gt;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> arma;</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppArmadillo)]]</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>mat mat_mul_arma(<span class="at">const</span> mat&amp; A, <span class="at">const</span> mat&amp; B) {</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> A * B;</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppArmadillo.h&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> arma;</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppArmadillo)]]</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>mat mat_mul_arma(<span class="at">const</span> mat&amp; A, <span class="at">const</span> mat&amp; B) {</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> A * B;</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppEigen.h&gt;</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen;</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>MatrixXd mat_mul_eigen(<span class="at">const</span> MatrixXd&amp; A, <span class="at">const</span> MatrixXd&amp; B){</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> A * B;</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppEigen.h&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen;</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>MatrixXd mat_mul_eigen(<span class="at">const</span> MatrixXd&amp; A, <span class="at">const</span> MatrixXd&amp; B){</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> A * B;</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2653,80 +3223,107 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 <pre><code># A tibble: 3 x 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 Rcpp         1.15ms   1.21ms    662.      7.63MB     116.
-2 arma       621.66ms 621.66ms      1.61    7.63MB       0 
-3 eigen      139.41ms 141.59ms      7.08    7.63MB       0 </code></pre>
+1 Rcpp         1.12ms   1.18ms    735.      7.63MB     131.
+2 arma       635.28ms 635.28ms      1.57    7.63MB       0 
+3 eigen       145.2ms 153.66ms      6.54    7.63MB       0 </code></pre>
 </div>
 <p>No meu computador <code>{RcppEigen}</code> é mais rápido que <code>{RcppArmadillo}</code>, mas ambos são mais lentos que uma implementação simples com <code>{Rcpp}</code>.</p>
-<p>Dirk Eddelbuettel na <a href="https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-introduction.pdf">vinheta introdutória do <code>{Rcpp}</code></a></p>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb17"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppArmadillo.h&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> arma;</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppArmadillo)]]</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>Rcpp::List fast_lm_arma(<span class="at">const</span> vec&amp; y, <span class="at">const</span> mat&amp; X) {</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n = X.n_rows, k = X.n_cols;</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  colvec coef  = solve(X, y); </span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  colvec resid = y - X*coef; </span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sig2 = as_scalar(trans(resid)*resid/(n-k));</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  colvec stderrest = sqrt(sig2 * diagvec(inv(trans(X)*X)));</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> Rcpp::List::create(Rcpp::Named(<span class="st">&quot;coefficients&quot;</span>) = coef,</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>                            Rcpp::Named(<span class="st">&quot;stderr&quot;</span>)       = stderrest);</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-</div>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb18"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppEigen.h&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen;</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>Rcpp::List fast_lm_eigen(<span class="at">const</span> VectorXd&amp; y, <span class="at">const</span> MatrixXd&amp; X) {</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n = X.rows(), k = X.cols();</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Usando SVD Decomposition</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">//VectorXd coef = X.bdcSvd(ComputeThinU | ComputeThinV).solve(y);</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Usando QR Decomposition</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">//VectorXd coef = X.colPivHouseholderQr().solve(y);</span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Usando Normal Equations com LDL Decomposition (mais rápida)</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    VectorXd coef = (X.transpose() * X).ldlt().solve(X.transpose() * y);</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    VectorXd resid = y - X*coef;</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> sig2 = resid.squaredNorm() / (n - k);</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>  VectorXd stderrest = (sig2 * ((X.transpose() * X).inverse()).diagonal()).array().sqrt();</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Rcpp::List::create(Rcpp::Named(<span class="st">&quot;coefficients&quot;</span>) = coef,</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>                            Rcpp::Named(<span class="st">&quot;stderr&quot;</span>)       = stderrest);</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-</div>
+<h3 id="exemplo-matriz-esparsa">Exemplo – Matriz Esparsa</h3>
+<p>Vamos usar <code>mat_sparse</code> criada que possui dimensão 1.000 x 1.000 e tomar a raiz quadrada de todos os elementos.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>trees</span><span class='op'>$</span><span class='va'>Volume</span><span class='op'>)</span>
-<span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>trees</span><span class='op'>$</span><span class='va'>Girth</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
-  arma <span class='op'>=</span> <span class='fu'>fast_lm_arma</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>X</span><span class='op'>)</span>,
-  eigen <span class='op'>=</span> <span class='fu'>fast_lm_eigen</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>X</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>
+<pre><code><span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+  arma <span class='op'>=</span> <span class='fu'>sqrt_eigen</span><span class='op'>(</span><span class='va'>mat_sparse</span><span class='op'>)</span>,
+  eigen <span class='op'>=</span> <span class='fu'>sqrt_eigen</span><span class='op'>(</span><span class='va'>mat_sparse</span><span class='op'>)</span>
 <span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code># A tibble: 2 x 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 arma         5.66µs   6.21µs   144198.    2.49KB     14.4
-2 eigen        5.24µs   6.89µs   143963.    2.49KB      0  </code></pre>
+1 arma         1.07ms   1.17ms      794.    1.16MB     17.7
+2 eigen        1.08ms   1.16ms      843.    1.15MB     22.6</code></pre>
 </div>
+<p>Novamente <code>Eigen</code> é um pouco mais rápida que <code>Armadillo</code>, mas a diferença é pequena.</p>
+<h3 id="exemplo-regressão-linear-fast_lm">Exemplo – Regressão Linear <code>fast_lm()</code></h3>
+<p>Esse exemplo, originalmente do criador dos pacotes do ecossistema <code>{Rcpp}</code> Dirk Eddelbuettel na <a href="https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-introduction.pdf">vinheta introdutória do <code>{Rcpp}</code></a>, é bem interessante. Aqui vamos aplicar uma regressão linear tanto em <code>Armadillo</code> quando em <code>Eigen</code>. Ambos usam o <code>solve()</code> que é um solucionador de sistemas de equações lineares<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppArmadillo.h&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> arma;</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppArmadillo)]]</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>Rcpp::List fast_lm_arma(<span class="at">const</span> vec&amp; y, <span class="at">const</span> mat&amp; X) {</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n = X.n_rows, k = X.n_cols;</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  colvec coef  = solve(X, y); </span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  colvec resid = y - X*coef; </span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sig2 = as_scalar(trans(resid)*resid/(n-k));</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  colvec stderrest = sqrt(sig2 * diagvec(inv(trans(X)*X)));</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> Rcpp::List::create(Rcpp::Named(<span class="st">&quot;coefficients&quot;</span>) = coef,</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                            Rcpp::Named(<span class="st">&quot;stderr&quot;</span>)       = stderrest);</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppEigen.h&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen;</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>Rcpp::List fast_lm_eigen(<span class="at">const</span> VectorXd&amp; y, <span class="at">const</span> MatrixXd&amp; X) {</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n = X.rows(), k = X.cols();</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Usando SVD Decomposition</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">//VectorXd coef = X.bdcSvd(ComputeThinU | ComputeThinV).solve(y);</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Usando QR Decomposition</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">//VectorXd coef = X.colPivHouseholderQr().solve(y);</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Usando Normal Equations com LDL Decomposition (mais rápida)</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    VectorXd coef = (X.transpose() * X).ldlt().solve(X.transpose() * y);</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>    VectorXd resid = y - X*coef;</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> sig2 = resid.squaredNorm() / (n - k);</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  VectorXd stderrest = (sig2 * ((X.transpose() * X).inverse()).diagonal()).array().cwiseSqrt();</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Rcpp::List::create(Rcpp::Named(<span class="st">&quot;coefficients&quot;</span>) = coef,</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>                            Rcpp::Named(<span class="st">&quot;stderr&quot;</span>)       = stderrest);</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>trees</span><span class='op'>$</span><span class='va'>Volume</span><span class='op'>)</span>
+<span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>trees</span><span class='op'>$</span><span class='va'>Girth</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+  R <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>X</span><span class='op'>)</span>,
+  arma <span class='op'>=</span> <span class='fu'>fast_lm_arma</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>X</span><span class='op'>)</span>,
+  eigen <span class='op'>=</span> <span class='fu'>fast_lm_eigen</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>X</span><span class='op'>)</span>,
+  check <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code># A tibble: 3 x 6
+  expression      min   median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
+1 R          461.06µs 491.65µs     1932.  476.36KB     4.08
+2 arma         5.57µs    6.1µs   146428.    2.49KB     0   
+3 eigen        5.11µs   6.81µs   150070.    2.49KB     0   </code></pre>
+</div>
+<p>Tanto <code>Eigen</code> quanto <code>Armadillo</code> são rápidos! Quase 100x mais rápidos. Novamente a diferença entre <code>Eigen</code> e <code>Armadillo</code> é pequena.</p>
+<h2 id="usar-rcpparmadillo-ou-rcppeigen-no-seu-pacote-r">Usar <code>{RcppArmadillo}</code> ou <code>{RcppEigen}</code> no seu Pacote R</h2>
+<p>Eu recomendo usar o pacote <code>{usethis}</code> e seguir as instruções.</p>
+<ul>
+<li><a href="https://usethis.r-lib.org/reference/use_rcpp.html"><code>usethis::use_rcpp_armadillo()</code></a></li>
+<li><a href="https://usethis.r-lib.org/reference/use_rcpp.html"><code>usethis::use_rcpp_eigen()</code></a></li>
+</ul>
 <h2 id="ambiente">Ambiente</h2>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2782,11 +3379,13 @@ loaded via a namespace (and not attached):
 [53] rmarkdown_2.6            rstudioapi_0.13         
 [55] R6_2.5.0                 compiler_4.0.3          </code></pre>
 </div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>apesar de eu achar Álgebra Linear fascinante e ter trocado alguns e-mails com Gilbert Strang<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>apesar de eu achar Álgebra Linear fascinante e ter trocado alguns e-mails com Gilbert Strang.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>quando não é porque eu fiz alguma besteira não eficiente em <code>Eigen</code> e quando corrijo fica mais rápida.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>por debaixo dos panos há uma inversão otimizada de matriz.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 <!--radix_placeholder_article_footer-->

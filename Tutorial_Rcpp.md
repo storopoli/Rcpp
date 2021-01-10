@@ -1,10 +1,3 @@
-
-4. Manipulação de Matrizes -- RcppEigen e RcppArmadillo
-  * Descrever Eigen
-  * Classes Eigen
-  * [`usethis::use_rcpp_armadillo()`](https://usethis.r-lib.org/reference/use_rcpp.html)
-  * [`usethis::use_rcpp_eigen()`](https://usethis.r-lib.org/reference/use_rcpp.html)
-	* Sparse Matrix Eigen
 5. RcppParallel -- Paralelização
 Exemplo usando sum_of_squares_rcpp()
 6. cpp11 -- Nova Interface do pessoal do RStudio
