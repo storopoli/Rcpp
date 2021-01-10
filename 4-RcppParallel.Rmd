@@ -21,6 +21,201 @@ knitr::opts_chunk$set(echo = TRUE,
 <!--Academicons Icons-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
+Vimos que o `{Rcpp}` faz o seu código R ficar muito mais rápido. Tudo o que mostramos até agora foi usando apenas um único core/processador (*single thread*) do computador^[tecnicamente, `Eigen` e `Armadillo` podem, dependendo da configuração do sistema operacional, automaticamente se beneficiar de paralelizações usando o `OpenMP`.]. Agora imaginem o quão rápido seu código R pode ficar se você conseguir rodar `{Rcpp}` em paralelo `r emo::ji("exploding_head")`!
+
+```{r gif-hurricane, echo=FALSE, fig.cap='Código `{Rcpp}` rodando em paralelo: muito rápido!'}
+knitr::include_graphics("images/hurricane.gif")
+```
+
+## C++ em Paralelo -- Biblioteca Intel `TBB`
+
+O Pacote `{RcppParallel}` usa a biblioteca `TBB` da Intel. [`TBB` (**T**hreading **B**uilding **B**locks)](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onetbb.html) é uma biblioteca de C++ desenvolvida pela Intel para programação paralela em processadores multi-core. Usando `TBB`, um cálculo é dividido em tarefas que podem ser executadas em paralelo. A biblioteca gerencia e agenda threads para executar essas tarefas.
+
+## Como usar `{Rcpp}` em paralelo -- `{RcppParallel}`
+
+**Primeiro**, certifique-se que você possui a biblioteca `TBB` da Intel instalada:
+
+* Linux: `sudo apt install libtbb-dev`
+* MacOS: `brew install tbb`
+* Windows: baixe no [site da Intel](https://software.intel.com/content/www/us/en/develop/articles/get-started-with-tbb.html)
+
+**Segundo**, installe o pacote `{RcppParallel}` para R.
+
+**Terceiro**, coloque em todo código que deseja paralelizar com `{RcppParallel}` a seguinte síntaxe:
+
+```cpp
+#include <Rcpp.h>
+#include <RcppParallel.h>
+using namespace Rcpp;
+using namespace RcppParallel;
+
+//[[Rcpp::depends(RcppParallel)]]
+```
+
+Pronto! É isso.
+
+## Como usar `{RcppParallel}`
+
+É possível implementar paralelização em diversas partes do seu código `{Rcpp}` com o `{RcppParallel}`. Aqui eu vou cobrir apenas os dois algoritmos paralelos do `{RcppParallel}`^[a biblioteca `TBB` tem muito mais algoritmos complexos caso necessario. Recomendo você olhar este [link da documentação do `{RcppParallel}`](http://rcppcore.github.io/RcppParallel/tbb.html).]:
+
+* `parallelFor`: Este aqui é fácil de explicar. Qualquer loop `for` do seu código pode ser um bom candidato à paralelização.
+* `parallelReduce`: `Reduce` é um algoritmo bem conhecido em ciências da computação. `Reduce` aplica um operação binária (como adição) em uma sequência definida de elementos, resultando em um único valor. O exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) é uma aplicação de um `Reduce`^[tecnicamente é um `MapReduce`.]. Toda vez que você tiver essa situação você pode paralelizar com `parallelReduce`.
+
+Ambos os algortimos usam o `struct` `Worker` definido no código do `{RcppParallel}` que é uma interface para a biblioteca `TBB`.
+
+Além disso `{RcppParallel}` usa duas classes, uma para vetores e outra para matrizes:
+
+* `RVector<T>` -- onde `T` é o tipo de variável (`double`, `int` etc.)
+* `RMatrix<T>` -- onde `T` é o tipo de variável (`double`, `int` etc.)
+
+### Quantos Threads?
+
+Ao carregar o `{RcppParallel}` é importante você designar o número de threads/cores que deseja que o código `{RcppParallel}` use para paralelização. Caso queira usar todos os seus threads/cores disponíveis, coloque como argumento `parallel::detectCores()` que retorna um número inteiro com todos os threads/cores disponíveis no seu computador. Aqui estou usando todos os threads/cores disponíveis: `r parallel::detectCores()` threads/cores.
+
+Se não especificado, por padrão `{RcppParallel}` usa todos os threads/cores disponíveis.
+
+```{r}
+library(Rcpp)
+library(RcppParallel)
+setThreadOptions(parallel::detectCores())
+print(parallel::detectCores())
+```
+
+### `parallelFor` -- Paralelizando Loops `for`
+
+Para usar o `parallelFor` você deve criar um objeto `Worker` e definir um operador `operator()` desse objeto que será invocado pelo `{RcppParallel}` e roda em paralelo. Isso cria uma função com com o nome do objeto `Worker` que você criou^[mais questões técnicas: quando você define um operador `operator()` de um objeto em C++ você dá um *overload* no operador parenthesis do objeto e o resultado é uma síntaxe similar à uma função com o nome do objeto.]. Essa função toma como argumento um intervalo `[começo, fim)` e lida com todas as questões de segurança e travas de threads que são ~~um porre~~ bem complicadas de maneira automática. Note que o elemento `fim` do intervalo não é incluído no intervalo (mesmo padrão de comportamento dos iteradores `end` da biblioteca padrão C++11 STL).
+
+Para mais detalhes, consulte a [documentação do `parallelFor` no site do `{RcppParallel}`](http://rcppcore.github.io/RcppParallel/index.html#parallelfor).
+
+#### Exemplo `parallelFor` -- Raiz Quadrada de Elementos da Matriz.
+
+Aqui vou usar o exemplo da [documentação do `parallelFor` no site do `{RcppParallel}`](http://rcppcore.github.io/RcppParallel/index.html#parallelfor), mas vou adicionar alguns comentários para você entender o que está sendo feito.
+
+```{Rcpp parallelFor}
+#include <Rcpp.h>
+#include <RcppParallel.h>
+#include <algorithm>
+
+using namespace Rcpp;
+using namespace RcppParallel;
+using std::transform;
+
+// [[Rcpp::depends(RcppParallel)]]
+
+// [[Rcpp::plugins("cpp11")]]
+// [[Rcpp::plugins("cpp2a")]]
+
+// Criando um objeto Worker chamado SquareRoot
+struct SquareRoot : public Worker
+{
+   // Variáveis Membro públicas
+   const RMatrix<double> input;
+   RMatrix<double> output;
+   
+   // Construtor do Objeto Worker SquareRoot
+   // [[Rcpp::export]]
+   SquareRoot(const Rcpp::NumericMatrix input, Rcpp::NumericMatrix output) 
+      : input(input), output(output) {}
+   
+   // Overload do operador ()
+   void operator()(std::size_t begin, std::size_t end) {
+      std::transform(input.begin() + begin, 
+                     input.begin() + end, 
+                     output.begin() + begin, 
+                     ::sqrt);
+   }
+};
+
+// Função que chama o Objeto Worker SquareRoot
+// [[Rcpp::export]]
+NumericMatrix parallelMatrixSqrt(NumericMatrix x) {
+  
+  // Variável local output inicializada
+  NumericMatrix output(x.nrow(), x.ncol());
+  
+  // Invocação do operador() do Objeto Worker SquareRoot
+  SquareRoot squareRoot(x, output);
+  
+  // Paralelização do loop for
+  parallelFor(0, x.length(), squareRoot);
+  
+  return output;
+}
+```
+
+
+
+
+### `parallelReduce` -- Paralelizando operações `Reduce`
+
+`Reduce` é um algoritmo bem conhecido em ciências da computação. `Reduce` aplica um operação binária (como adição) em uma sequência definida de elementos, resultando em um único valor. O exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) é uma aplicação de um `Reduce`^[tecnicamente é um `MapReduce`.]. Toda vez que você tiver essa situação você pode paralelizar com `parallelReduce`.
+
+A lógica do `parallelReduce` é similar ao `parallelFor`. Primeiro ambos usam um `Worker`
+
+Para mais detalhes, consulte a [documentação do `parallelReduce` no site do `{RcppParallel}`](http://rcppcore.github.io/RcppParallel/index.html#parallelreduce)
+
+#### Exemplo `parallelReduce` -- Soma dos Quadrados
+
+Vamos reutilizar o exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html).
+
+Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos  no [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) com dois loops `for`. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado:
+
+```{Rcpp parallelReduce}
+#include <RcppParallel.h>
+using namespace RcppParallel;
+
+// Criando um objeto Worker
+struct sum_of_squares : public Worker
+{
+  // Variáveis Membro públicas
+  const RVector<double> input;
+  double output;
+  
+  // Construtor do Objeto Worker
+  sum_of_squares(const NumericVector input, double output) 
+    : input(input), output(output) {}
+  
+  // Overload do operador ()
+  void operator()(std::size_t cbegin, std::size_t cend) {
+      std::transform(input.begin() + begin, 
+                     input.begin() + end, 
+                     output.begin() + begin, 
+                     ::sqrt);
+   }
+}
+```
+
+## Usar `{RcppParallel}` no seu Pacote R
+
+As instruções abaixo foram retiradas da documentação do [`{RcppParallel}`](http://rcppcore.github.io/RcppParallel/#r_packages).
+
+
+Se você deseja usar `{RcppParallel}` de dentro de um pacote R, você precisa editar vários arquivos para criar os links de construção e tempo de execução necessários. As seguintes adições devem ser feitas:
+
+* No `DESCRIPTION`:
+  ```
+  Imports: RcppParallel
+  LinkingTo: RcppParallel
+  SystemRequirements: GNU make
+  ```
+* No `NAMESPACE`:
+  ```
+  importFrom(RcppParallel, RcppParallelLibs)
+  ```
+* No `src\Makevars`:
+  ```
+  CXX_STD = CXX11
+  PKG_LIBS += $(shell ${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()")
+  ```
+* No `src\Makevars.win`:
+  ```
+  CXX_STD = CXX11
+  PKG_CXXFLAGS += -DRCPP_PARALLEL_USE_TBB=1
+
+  PKG_LIBS += $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" \
+                -e "RcppParallel::RcppParallelLibs()")
+  ```
+
 ## Ambiente
 
 ```{r SessionInfo}

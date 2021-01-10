@@ -539,7 +539,7 @@ bench::mark(
 )
 ```
 
-Tanto `Eigen` quanto `Armadillo` são rápidos! Quase 100x mais rápidos. Novamente a diferença entre `Eigen` e `Armadillo` é pequena.
+Tanto `Eigen` quanto `Armadillo` são rápidos! Quase 100x mais rápidos `r emo::ji("exploding_head")`. Novamente a diferença entre `Eigen` e `Armadillo` é pequena.
 
 ## Usar `{RcppArmadillo}` ou `{RcppEigen}` no seu Pacote R
 
