@@ -1,0 +1,188 @@
+---
+title: "Usando `{Rcpp}` na GPU com `CUDA`"
+description: |
+  Como fazer seu código `{Rcpp}` rodar na GPU com NVIDIA `CUDA`
+author:
+  - name: Jose Storopoli
+    url: https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en
+    affiliation: UNINOVE
+    affiliation_url: https://www.uninove.br
+    orcid_id: 0000-0002-0559-5176
+date: February 2, 2021
+citation_url: https://storopoli.github.io/Rcpp/6-Rcpp_CUDA.html
+slug: storopoli2021rcppgpu
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center")
+```
+
+<!--Academicons Icons-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+Além de paralelização nos vários threads/cores da sua CPU, você pode paralelizar na sua placa gráfica GPU (se ela for NVIDIA e tiver o protocolo `CUDA`). Isso é possível pela biblioteca `Thrust` da NVIDIA.
+
+```{r CUDA, echo=FALSE, fig.cap='Código `{Rcpp}` rodando em paralelo na GPU'}
+knitr::include_graphics("images/CUDA.jpg")
+```
+
+## Biblioteca `Thrust` da NVIDIA
+
+`Thrust` é uma biblioteca de algoritmos paralelos que se assemelha à biblioteca padrão C++ STL. `Thrust` usa a interface `CUDA` da NVIDIA. `CUDA`, sigla para **C**ompute **U**nified **D**evice **A**rchitecture, é uma extensão para a linguagem de programação C, a qual possibilita o uso de computação paralela. A ideia por trás disso tudo é que programadores possam usar os poderes da unidade de processamento gráfico (GPU) para realizar algumas operações mais rapidamente. 
+
+Para quase tudo da STL, é só você mudar alguns headers e o `namespace` de `std::` para `thrust::`. `Thrust` fornece dois contêineres de `vetor`, `thrust::host_vector` e `thrust::device_vector`. Como os nomes sugerem, `thrust::host_vector` é armazenado na memória da CPU, enquanto `thrust::device_vector` vive na memória do dispositivo GPU. Os contêineres de vetor da Thrust são como `std::vector` no C++ STL. Como `std::vector`, `thrust::host_vector` e `thrust::device_vector` são recipientes genéricos (capazes de armazenar qualquer tipo de dados) que podem ser redimensionados dinamicamente.
+
+## Instalando e Habilitando o `Thrust`
+
+O **primeiro passo** é instalar o `Thrust`. Ele vem automaticamente quando você instala o `CUDA` Toolkit da NVIDIA. Como vocês podem ver nesse Ubuntu eu tenho `CUDA` versão 11.0 (sendo que precisei instalar o `g++-9` versão 9 que dá suporte ao `nvcc` da NVIDIA) e uma GeForce RTX 2060 com 6GB de RAM. Veja como instalar `Thrust` na [documentação da NVIDIA-CUDA](https://docs.nvidia.com/cuda/thrust/index.html). 
+
+```{bash nvidia}
+nvidia-smi
+```
+
+O **segundo passo** é criar um plugin no `{Rcpp}`. Para isso, vamos ver o caminho do `nvcc` no meu sistema.
+
+```{bash nvcc}
+which nvcc
+```
+
+Com esse caminho eu crio um plugin para `{Rcpp}` com a função `registerPlugin()`. Notem que estou usando o padrão C++17 (mais recente que `g++-9` dá suporte).
+
+```{r Rcpp-plugins}
+library(Rcpp)
+thrust = function() {
+  list(
+    env = list(
+      MAKEFLAGS = paste(
+        "CXX=/usr/bin/nvcc",
+        "CXXFLAGS=-x\\ cu\\ -g\\ -G\\ -O3 --std=c++17",
+        "CXXPICFLAGS=-Xcompiler\\ -fpic\\ -Xcudafe\\ --diag_suppress=code_is_unreachable",
+        "LDFLAGS="
+      ),
+      PKG_CXXFLAGS = paste0("-I", here::here())
+    )
+  )
+}
+
+Rcpp::registerPlugin("thrust", thrust)
+ls(envir=Rcpp:::.plugins)
+```
+
+**Terceiro passo** é colocar em qualquer parte do código `CUDA` o seguinte texto indicando que `{Rcpp}` deve usar o plugin `thrust`.
+
+```cpp
+// [[Rcpp::plugins(thrust)]]
+```
+
+É isso! Um pouco mais difícil que os outros plugins que usamos até aqui porque tivemos que criá-lo do zero. Mas nada impossível.
+
+## Exemplo -- Soma dos Quadrados
+
+Vamos reutilizar o exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html), agora comparando `{RcppParallel}` com a biblioteca `Thrust` da NVIDIA.
+
+Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos  no [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) com dois loops `for`. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado.
+
+Aqui vamos inserir um [`std::accumulate()`](https://en.cppreference.com/w/cpp/algorithm/accumulate) do header [`<numeric>`](https://en.cppreference.com/w/cpp/header/numeric).
+
+### Soma dos Quadrados usando `Thrust`
+
+Novamente vou incluir comentários para o entendimento do que estamos fazendo no `{RcppParallel}`.
+
+```{r RcppParallel, warning=FALSE}
+library(RcppParallel)
+setThreadOptions(parallel::detectCores())
+print(parallel::detectCores())
+```
+
+```{Rcpp parallelReduce}
+#include <Rcpp.h>
+#include <RcppParallel.h>
+#include <algorithm>
+using namespace RcppParallel;
+using namespace Rcpp;
+
+// [[Rcpp::depends(RcppParallel)]]
+
+// [[Rcpp::plugins("cpp11")]]
+// [[Rcpp::plugins("cpp2a")]]
+
+// Criando um objeto Worker chamado sum_of_squares
+struct sum_of_squares : public Worker
+{
+  // Variáveis Membro públicas
+  const RVector<double> input;
+  double value;
+  
+  // Construtor padrão do Objeto Worker
+  sum_of_squares(const NumericVector input) : input(input), value(0) {}
+  
+  // Construtor "divisor"
+  sum_of_squares(const sum_of_squares& sum, Split) : input(sum.input), value(0) {}
+  
+  // Overload do operador ()  -- functor
+  void operator()(std::size_t begin, std::size_t end) {
+      value += std::accumulate(input.begin() + begin,
+                               input.begin() + end,
+                               0.0,
+                               [] (auto i, auto j) {return i + (j * j);});
+   }
+  
+  void join(const sum_of_squares& rhs) { 
+      value += rhs.value; 
+   }
+};
+
+// Função que chama o Objeto Worker sum_of_squares
+// [[Rcpp::export]]
+double parallel_sum_of_squares(NumericVector x) {
+   // variável local inicializada
+   sum_of_squares sum(x);
+   
+   // Paralelização do Reduce
+   parallelReduce(0, x.length(), sum);
+   
+   return sum.value;
+}
+```
+
+### Soma dos Quadrados usando `Thrust`
+
+No arquivo `SS_Thrust.cpp` usamos os headers `<thrust>` e também chamamos os objetos `Thrust` com o `namespace` `thrust::`. `std::acummulate()` vira `thrust::transform_reduce()`.
+
+```{r cppTrustshow}
+writeLines(readLines("SS_Thrust.cpp"))
+```
+
+```{r cppTrust}
+sourceCpp("SS_Thrust.cpp")
+```
+
+
+```{r bench-parallel, warning=FALSE, message=FALSE}
+set.seed(123)
+b1 <- bench::press(
+  n = 10^c(6:8),
+  {
+    v = rnorm(n)
+    bench::mark(
+      RcppParallel = parallel_sum_of_squares(v),
+      Thrust = thrust_sum_of_squares(v),
+      check = FALSE,
+      relative = TRUE
+    )
+  })
+b1
+```
+
+```{r figsumofsquares, echo=FALSE, fig.cap='Benchmarks de Soma dos Quadrados: `RcppParallel` vs CUDA'}
+ggplot2::autoplot(b1, "violin")
+```
+
+Nesse caso específico, `Thrust` é 20-30x mais lento que `{RcppParallel}`, mas em outros contextos um código altamente paralelizável ao ser executado na GPU com `CUDA` pode ser que o cenário se inverta.
+
+## Ambiente
+
+```{r SessionInfo}
+sessionInfo()
+```

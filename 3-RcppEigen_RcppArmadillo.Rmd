@@ -444,17 +444,26 @@ MatrixXd mat_mul_eigen(const MatrixXd& A, const MatrixXd& B){
 }
 ```
 
-```{r bench-mat_mul}
-n <- 10^3
-X <- matrix(rnorm(n * n), nrow = n)
-
-bench::mark(
-  Rcpp = mat_mul(X, X),
-  arma = mat_mul_arma(X, X),
-  eigen = mat_mul_eigen(X, X),
-  check = FALSE
-)
+```{r bench-mat_mul, message=FALSE, warning=FALSE}
+b1 <- bench::press(
+  n = 10^c(1:3),
+  {
+    X = matrix(rnorm(n * n), nrow = n)
+    bench::mark(
+      Rcpp = mat_mul(X, X),
+      arma = mat_mul_arma(X, X),
+      eigen = mat_mul_eigen(X, X),
+      check = FALSE,
+      relative = TRUE
+    )
+})
+b1
 ```
+
+```{r figmatmul, echo=FALSE, fig.cap='Benchmarks de Multiplicação de Matriz: `Rcpp` vs `Armadillo` vs `Eigen`'}
+ggplot2::autoplot(b1, "violin")
+```
+
 
 No meu computador `{RcppEigen}` é mais rápido que `{RcppArmadillo}`, mas ambos são mais lentos que uma implementação simples com `{Rcpp}`. 
 
@@ -462,11 +471,16 @@ No meu computador `{RcppEigen}` é mais rápido que `{RcppArmadillo}`, mas ambos
 
 Vamos usar `mat_sparse` criada que possui dimensão `r format(dim(mat_sparse)[1], big.mark = ".", decimal.mark = ",")` x `r format(dim(mat_sparse)[2], big.mark = ".", decimal.mark = ",")` e tomar a raiz quadrada de todos os elementos.
 
-```{r bench-sparse_sqrt}
-bench::mark(
+```{r bench-sparse_sqrt, warning=FALSE, message=FALSE}
+b2 <- bench::mark(
   arma = sqrt_eigen(mat_sparse),
-  eigen = sqrt_eigen(mat_sparse)
+  eigen = sqrt_eigen(mat_sparse),
+  relative = TRUE
 )
+b2
+```
+```{r figsparsesqrt, echo=FALSE, fig.cap='Benchmarks de Matriz Esparsa: `Armadillo` vs `Eigen`'}
+ggplot2::autoplot(b2, "violin")
 ```
 
 Novamente `Eigen` é um pouco mais rápida que `Armadillo`, mas a diferença é pequena.
@@ -528,15 +542,21 @@ Rcpp::List fast_lm_eigen(const VectorXd& y, const MatrixXd& X) {
 }
 ```
 
-```{r bench-fast_lm}
+```{r bench-fast_lm, warning=FALSE, message=FALSE}
 y <- log(trees$Volume)
 X <- cbind(1, log(trees$Girth))
-bench::mark(
+b3 <- bench::mark(
   R = lm(y ~ X),
   arma = fast_lm_arma(y, X),
   eigen = fast_lm_eigen(y, X),
-  check = FALSE
+  check = FALSE,
+  relative = TRUE
 )
+b3
+```
+
+```{r figfastlm, echo=FALSE, fig.cap='Benchmarks de Regressão Linear: R vs `Armadillo` vs `Eigen`'}
+ggplot2::autoplot(b3, "violin")
 ```
 
 Tanto `Eigen` quanto `Armadillo` são rápidos! Quase 100x mais rápidos `r emo::ji("exploding_head")`. Novamente a diferença entre `Eigen` e `Armadillo` é pequena.

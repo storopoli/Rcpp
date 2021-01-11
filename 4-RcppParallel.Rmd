@@ -74,7 +74,7 @@ Ao carregar o `{RcppParallel}` é importante você designar o número de threads
 
 Se não especificado, por padrão `{RcppParallel}` usa todos os threads/cores disponíveis.
 
-```{r}
+```{r RcppParallel, warning=FALSE}
 library(Rcpp)
 library(RcppParallel)
 setThreadOptions(parallel::detectCores())
@@ -112,7 +112,7 @@ struct SquareRoot : public Worker
    SquareRoot(const Rcpp::NumericMatrix input, Rcpp::NumericMatrix output) 
       : input(input), output(output) {}
    
-   // Overload do operador ()
+   // Overload do operador () -- functor
    void operator()(std::size_t begin, std::size_t end) {
       std::transform(input.begin() + begin, 
                      input.begin() + end, 
@@ -146,18 +146,27 @@ NumericMatrix matrixSqrt(NumericMatrix orig) {
 }
 ```
 
-```{r bench-mat_MatrixSqrt}
-n <- 10^3
-X <- matrix(rnorm(n * n), nrow = n)
-
-bench::mark(
-  Rcpp = matrixSqrt(X),
-  RcppParallel = parallelMatrixSqrt(X),
-  check = FALSE
-)
+```{r bench-mat_MatrixSqrt, message=FALSE, warning=FALSE}
+set.seed(123)
+b1 <- bench::press(
+  n = 10^c(2:3),
+  {
+    X = matrix(rnorm(n * n), nrow = n)
+    bench::mark(
+      Rcpp = matrixSqrt(X),
+      RcppParallel = parallelMatrixSqrt(X),
+      check = FALSE,
+      relative = TRUE
+    )
+})
+b1
 ```
 
-Um ganho de 3x em paralelização para uma matriz de dimensão `r format(n, big.mark = ".", decimal.mark = ",")` x `r format(n, big.mark = ".", decimal.mark = ",")`!
+```{r figmatmul, echo=FALSE, fig.cap='Benchmarks de Raiz Quadrada de Elementos de Matriz: `Rcpp` vs `RcppParallel`'}
+ggplot2::autoplot(b1, "violin")
+```
+
+Um ganho de 3x com paralelização.
 
 ### `parallelReduce` -- Paralelizando operações `Reduce`
 
@@ -176,6 +185,8 @@ Para mais detalhes, consulte a [documentação do `parallelReduce` no site do `{
 Vamos reutilizar o exemplo `sum_of_squares` do [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html).
 
 Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos  no [tutorial 2. Como incorporar C++ no R - {Rcpp}](2-Rcpp.html) com dois loops `for`. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ `double` / R `numeric`) e computa a soma de todos os elementos do vetor elevados ao quadrado.
+
+Aqui vamos inserir um [`std::accumulate()`](https://en.cppreference.com/w/cpp/algorithm/accumulate) do header [`<numeric>`](https://en.cppreference.com/w/cpp/header/numeric).
 
 Novamente vou incluir comentários para o entendimento do que estamos fazendo no `{RcppParallel}`. Além disso, há uma versão single-thread também que vamos testar desempenho.
 
@@ -240,18 +251,26 @@ double sum_of_squares(NumericVector x) {
 
 ```
 
-```{r bench-sum_of_squares}
-set.seed(123)
-n <- 1e6
-v <- rnorm(n)
-bench::mark(
-  Rcpp = sum_of_squares(v),
-  RcppParallel = parallel_sum_of_squares(v),
-  check = FALSE,
-)
+```{r bench-sum_of_squares, warning=FALSE, message=FALSE}
+b2 <- bench::press(
+  n = 10^c(4:6),
+  {
+    v = rnorm(n)
+    bench::mark(
+      Rcpp = sum_of_squares(v),
+      RcppParallel = parallel_sum_of_squares(v),
+      check = FALSE,
+      relative = TRUE
+    )
+  })
+b2
 ```
 
-Mais um sucesso! Ganho de 9x `r emo::ji("exploding_head")` para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos!
+```{r figsumofsquares, echo=FALSE, fig.cap='Benchmarks de Soma dos Quadrados: `Rcpp` vs `RcppParallel`'}
+ggplot2::autoplot(b2, "violin")
+```
+
+Mais um sucesso! Ganho de 8x `r emo::ji("exploding_head")` com paralelização.
 
 ## Usar `{RcppParallel}` no seu Pacote R
 

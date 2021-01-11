@@ -23,7 +23,6 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -2327,7 +2326,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Como incorporar C++ no R -- `{Rcpp}`","description":"Como usar o `{Rcpp}` para funções em C++ no R","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000+00:00","citationText":"Storopoli, 2021"}
+{"title":"Como incorporar C++ no R -- `{Rcpp}`","description":"Como usar o `{Rcpp}` para funções em C++ no R","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000-03:00","citationText":"Storopoli, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2352,6 +2351,7 @@ Tutoriais
 <a href="3-RcppEigen_RcppArmadillo.html">3. Manipulação de Matrizes - {RcppEigen} e {RcppArmadillo}</a>
 <a href="4-RcppParallel.html">4. Paralelização - {RcppParallel}</a>
 <a href="5-cpp11.html">5. {cpp11} - Nova Interface do pessoal do RStudio</a>
+<a href="6-Rcpp_CUDA.html">6. Usando {Rcpp} na GPU com CUDA</a>
 </div>
 </div>
 <input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
@@ -2414,6 +2414,7 @@ Tutoriais
 <li><a href="#rcpp-matrix"><code>{Rcpp}</code> – <code>Matrix</code></a></li>
 <li><a href="#rcpp-list"><code>{Rcpp}</code> – <code>List</code></a></li>
 <li><a href="#rcpp-dataframe"><code>{Rcpp}</code> – <code>DataFrame</code></a></li>
+<li><a href="#rcpp-tibble"><code>{Rcpp}</code> <code>tibble</code></a></li>
 </ul></li>
 <li><a href="#rcpp-sugar"><code>{Rcpp}</code> Sugar</a></li>
 <li><a href="#exemplo-multiplicação-de-matrizes">Exemplo – Multiplicação de Matrizes</a></li>
@@ -2612,7 +2613,7 @@ void teste_print(){
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#bunpecitcb .gt_table {
+#rmgdhydhru .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2637,7 +2638,7 @@ void teste_print(){
   border-left-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_heading {
+#rmgdhydhru .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2649,7 +2650,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_title {
+#rmgdhydhru .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2659,7 +2660,7 @@ void teste_print(){
   border-bottom-width: 0;
 }
 
-#bunpecitcb .gt_subtitle {
+#rmgdhydhru .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2669,13 +2670,13 @@ void teste_print(){
   border-top-width: 0;
 }
 
-#bunpecitcb .gt_bottom_border {
+#rmgdhydhru .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_col_headings {
+#rmgdhydhru .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2690,7 +2691,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_col_heading {
+#rmgdhydhru .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2710,7 +2711,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#bunpecitcb .gt_column_spanner_outer {
+#rmgdhydhru .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2722,15 +2723,15 @@ void teste_print(){
   padding-right: 4px;
 }
 
-#bunpecitcb .gt_column_spanner_outer:first-child {
+#rmgdhydhru .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bunpecitcb .gt_column_spanner_outer:last-child {
+#rmgdhydhru .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bunpecitcb .gt_column_spanner {
+#rmgdhydhru .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2742,7 +2743,7 @@ void teste_print(){
   width: 100%;
 }
 
-#bunpecitcb .gt_group_heading {
+#rmgdhydhru .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2764,7 +2765,7 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#bunpecitcb .gt_empty_group_heading {
+#rmgdhydhru .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2779,15 +2780,15 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#bunpecitcb .gt_from_md > :first-child {
+#rmgdhydhru .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bunpecitcb .gt_from_md > :last-child {
+#rmgdhydhru .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bunpecitcb .gt_row {
+#rmgdhydhru .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2806,7 +2807,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#bunpecitcb .gt_stub {
+#rmgdhydhru .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2818,7 +2819,7 @@ void teste_print(){
   padding-left: 12px;
 }
 
-#bunpecitcb .gt_summary_row {
+#rmgdhydhru .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2828,7 +2829,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#bunpecitcb .gt_first_summary_row {
+#rmgdhydhru .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2838,7 +2839,7 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_grand_summary_row {
+#rmgdhydhru .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2848,7 +2849,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#bunpecitcb .gt_first_grand_summary_row {
+#rmgdhydhru .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2858,11 +2859,11 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_striped {
+#rmgdhydhru .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bunpecitcb .gt_table_body {
+#rmgdhydhru .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2871,7 +2872,7 @@ void teste_print(){
   border-bottom-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_footnotes {
+#rmgdhydhru .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2885,13 +2886,13 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_footnote {
+#rmgdhydhru .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#bunpecitcb .gt_sourcenotes {
+#rmgdhydhru .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2905,46 +2906,46 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#bunpecitcb .gt_sourcenote {
+#rmgdhydhru .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#bunpecitcb .gt_left {
+#rmgdhydhru .gt_left {
   text-align: left;
 }
 
-#bunpecitcb .gt_center {
+#rmgdhydhru .gt_center {
   text-align: center;
 }
 
-#bunpecitcb .gt_right {
+#rmgdhydhru .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bunpecitcb .gt_font_normal {
+#rmgdhydhru .gt_font_normal {
   font-weight: normal;
 }
 
-#bunpecitcb .gt_font_bold {
+#rmgdhydhru .gt_font_bold {
   font-weight: bold;
 }
 
-#bunpecitcb .gt_font_italic {
+#rmgdhydhru .gt_font_italic {
   font-style: italic;
 }
 
-#bunpecitcb .gt_super {
+#rmgdhydhru .gt_super {
   font-size: 65%;
 }
 
-#bunpecitcb .gt_footnote_marks {
+#rmgdhydhru .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="bunpecitcb" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="rmgdhydhru" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -2953,6 +2954,7 @@ void teste_print(){
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Vetor Rcpp</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Matriz Rcpp</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Escalar Rcpp</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Missing Rcpp</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Escalar C++</th>
     </tr>
   </thead>
@@ -2968,6 +2970,8 @@ void teste_print(){
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
 </div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>NA_LOGICAL</code></p>
+</div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>bool</code></p>
 </div></td>
     </tr>
@@ -2981,6 +2985,8 @@ void teste_print(){
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>IntegerMatrix</code></p>
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>NA_INTEGER</code></p>
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>int</code></p>
 </div></td>
@@ -2996,6 +3002,8 @@ void teste_print(){
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
 </div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>NA_REAL</code></p>
+</div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>double</code></p>
 </div></td>
     </tr>
@@ -3010,6 +3018,8 @@ void teste_print(){
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>Rcomplex</code></p>
 </div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
+</div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>complex</code></p>
 </div></td>
     </tr>
@@ -3023,6 +3033,8 @@ void teste_print(){
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>CharacterMatrix (StringMatrix)</code></p>
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>String</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>NA_STRING</code></p>
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>std::string</code></p>
 </div></td>
@@ -3040,6 +3052,8 @@ void teste_print(){
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
 </div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
+</div></td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>Datetime</code></p>
@@ -3051,6 +3065,8 @@ void teste_print(){
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>Datetime</code></p>
+</div></td>
+      <td class="gt_row gt_center"><div class='gt_from_md'><p><code>-</code></p>
 </div></td>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>time_t</code></p>
 </div></td>
@@ -3066,7 +3082,7 @@ void teste_print(){
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ldldbaquca .gt_table {
+#rnxrsfdjnd .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3091,7 +3107,7 @@ void teste_print(){
   border-left-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_heading {
+#rnxrsfdjnd .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3103,7 +3119,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_title {
+#rnxrsfdjnd .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3113,7 +3129,7 @@ void teste_print(){
   border-bottom-width: 0;
 }
 
-#ldldbaquca .gt_subtitle {
+#rnxrsfdjnd .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3123,13 +3139,13 @@ void teste_print(){
   border-top-width: 0;
 }
 
-#ldldbaquca .gt_bottom_border {
+#rnxrsfdjnd .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_col_headings {
+#rnxrsfdjnd .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3144,7 +3160,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_col_heading {
+#rnxrsfdjnd .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3164,7 +3180,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#ldldbaquca .gt_column_spanner_outer {
+#rnxrsfdjnd .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3176,15 +3192,15 @@ void teste_print(){
   padding-right: 4px;
 }
 
-#ldldbaquca .gt_column_spanner_outer:first-child {
+#rnxrsfdjnd .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ldldbaquca .gt_column_spanner_outer:last-child {
+#rnxrsfdjnd .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ldldbaquca .gt_column_spanner {
+#rnxrsfdjnd .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3196,7 +3212,7 @@ void teste_print(){
   width: 100%;
 }
 
-#ldldbaquca .gt_group_heading {
+#rnxrsfdjnd .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3218,7 +3234,7 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#ldldbaquca .gt_empty_group_heading {
+#rnxrsfdjnd .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3233,15 +3249,15 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#ldldbaquca .gt_from_md > :first-child {
+#rnxrsfdjnd .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ldldbaquca .gt_from_md > :last-child {
+#rnxrsfdjnd .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ldldbaquca .gt_row {
+#rnxrsfdjnd .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3260,7 +3276,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#ldldbaquca .gt_stub {
+#rnxrsfdjnd .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3272,7 +3288,7 @@ void teste_print(){
   padding-left: 12px;
 }
 
-#ldldbaquca .gt_summary_row {
+#rnxrsfdjnd .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3282,7 +3298,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#ldldbaquca .gt_first_summary_row {
+#rnxrsfdjnd .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3292,7 +3308,7 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_grand_summary_row {
+#rnxrsfdjnd .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3302,7 +3318,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#ldldbaquca .gt_first_grand_summary_row {
+#rnxrsfdjnd .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3312,11 +3328,11 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_striped {
+#rnxrsfdjnd .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ldldbaquca .gt_table_body {
+#rnxrsfdjnd .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3325,7 +3341,7 @@ void teste_print(){
   border-bottom-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_footnotes {
+#rnxrsfdjnd .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3339,13 +3355,13 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_footnote {
+#rnxrsfdjnd .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ldldbaquca .gt_sourcenotes {
+#rnxrsfdjnd .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3359,46 +3375,46 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#ldldbaquca .gt_sourcenote {
+#rnxrsfdjnd .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ldldbaquca .gt_left {
+#rnxrsfdjnd .gt_left {
   text-align: left;
 }
 
-#ldldbaquca .gt_center {
+#rnxrsfdjnd .gt_center {
   text-align: center;
 }
 
-#ldldbaquca .gt_right {
+#rnxrsfdjnd .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ldldbaquca .gt_font_normal {
+#rnxrsfdjnd .gt_font_normal {
   font-weight: normal;
 }
 
-#ldldbaquca .gt_font_bold {
+#rnxrsfdjnd .gt_font_bold {
   font-weight: bold;
 }
 
-#ldldbaquca .gt_font_italic {
+#rnxrsfdjnd .gt_font_italic {
   font-style: italic;
 }
 
-#ldldbaquca .gt_super {
+#rnxrsfdjnd .gt_super {
   font-size: 65%;
 }
 
-#ldldbaquca .gt_footnote_marks {
+#rnxrsfdjnd .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ldldbaquca" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="rnxrsfdjnd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3514,44 +3530,72 @@ void teste_print(){
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Criação atribuindo nomes às colunas de DataFrame df</span></span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>DataFrame df = DataFrame::create( Named(<span class="st">&quot;V1&quot;</span>) = v1 , _[<span class="st">&quot;V2&quot;</span>] = v2 );</span></code></pre></div>
+<h3 id="rcpp-tibble"><code>{Rcpp}</code> <code>tibble</code></h3>
+<p>Para retornar uma <code>tibble</code> do <code>{tidyverse}</code> com o <code>{Rcpp}</code> é só você notar que uma <code>tibble</code> não é nada mais que um <code>data.frame</code> com algumas classes extras:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[1] &quot;tbl_df&quot;     &quot;tbl&quot;        &quot;data.frame&quot;</code></pre>
+</div>
+<p>E aí é só adicionar essas classes num <code>DataFrame</code> do <code>{Rcpp}</code>:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>DataFrame df = DataFrame::create( Named(<span class="st">&quot;V1&quot;</span>) = v1 , _[<span class="st">&quot;V2&quot;</span>] = v2 );</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>df.attr(<span class="st">&quot;class&quot;</span>) = CharacterVector::create(<span class="st">&quot;tbl_df&quot;</span>, <span class="st">&quot;tbl&quot;</span>, <span class="st">&quot;data.frame&quot;</span>);</span></code></pre></div>
+<p>Pronto seu objeto <code>DataFrame</code> quando for retornado ao R será uma <code>tibble</code> do <code>{tidyverse}</code>.</p>
 <h2 id="rcpp-sugar"><code>{Rcpp}</code> Sugar</h2>
 <p>Além dos tipos de dados, <code>{Rcpp}</code> também tem uma ampla gama de “açúcares” sintáticos (<em>syntactic sugar</em>) para as mais variadas operações e funções. Antes de tentar criar algo do zero veja se não há um <a href="http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf"><code>{Rccp}</code> Sugar para isso já implementado na vinheta</a>.</p>
 <h2 id="exemplo-multiplicação-de-matrizes">Exemplo – Multiplicação de Matrizes</h2>
 <p>Está na hora de colocarmos o que vimos em prática. Nesse caso vamos comparar multiplicar duas matrizes usando o R (operador <code>%*%</code>) e usando o C++ com <code>{Rcpp}</code>.</p>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb21"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>NumericVector mat_mul(<span class="at">const</span> NumericVector&amp; A, <span class="at">const</span> NumericVector&amp; B) {</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  NumericVector C = A * B;</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// dimensões para Vector virar Matrix no R</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> dim = sqrt(A.length());</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  C.attr(<span class="st">&quot;dim&quot;</span>) = Dimension(dim, dim);</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> C;</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>NumericVector mat_mul(<span class="at">const</span> NumericVector&amp; A, <span class="at">const</span> NumericVector&amp; B) {</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  NumericVector C = A * B;</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// dimensões para Vector virar Matrix no R</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> dim = sqrt(A.length());</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  C.attr(<span class="st">&quot;dim&quot;</span>) = Dimension(dim, dim);</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> C;</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>^</span><span class='fl'>3</span>
-<span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
-
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
-  R <span class='op'>=</span> <span class='va'>X</span> <span class='op'>%*%</span> <span class='va'>X</span>,
-  Cpp <span class='op'>=</span> <span class='fu'>mat_mul</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>
+<pre><code><span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>,
+  <span class='op'>{</span>
+    <span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+    <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+      R <span class='op'>=</span> <span class='va'>X</span> <span class='op'>%*%</span> <span class='va'>X</span>,
+      Cpp <span class='op'>=</span> <span class='fu'>mat_mul</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
+      check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+      relative <span class='op'>=</span> <span class='cn'>TRUE</span>
+  <span class='op'>)</span><span class='op'>}</span>
 <span class='op'>)</span>
+<span class='va'>b1</span>
 </code></pre>
 </div>
-<pre><code># A tibble: 2 x 6
-  expression      min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 R          888.58ms 888.58ms      1.13    7.63MB       0 
-2 Cpp          1.17ms   1.63ms    402.      7.63MB     103.</code></pre>
+<pre><code># A tibble: 4 x 7
+  expression     n   min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 R            100  73.1   72.3       1        1         1  
+2 Cpp          100   1      1        70.9      1.03     72.9
+3 R           1000 382.   212.        1        1       NaN  
+4 Cpp         1000   1      1       218.       1.00    Inf  </code></pre>
 </div>
-<p>Sucesso! Ganho de 700x 🤯 para uma matriz de dimensão 1.000 x 1.000!</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figmatmul"></span>
+<img src="2-Rcpp_files/figure-html5/figmatmul-1.png" alt="Benchmarks de Multiplicação de Matriz: R vs C++" width="624" />
+<p class="caption">
+Figure 1: Benchmarks de Multiplicação de Matriz: R vs C++
+</p>
+</div>
+</div>
+<p>Sucesso! Ganho de 200x 🤯</p>
 <h2 id="usando-a-biblioteca-padrão-c11-stl-no-rcpp">Usando a biblioteca padrão C++11 STL no <code>{Rcpp}</code></h2>
 <p>Caso queira usufruir da biblioteca padrão C++11 STL no <code>{Rcpp}</code> é simples: basta incluir <code>// [[Rcpp::plugins("cpp11")]]</code> em qualquer parte do seu código C++.</p>
 <p>Caso queira usufruir da biblioteca padrão C++20 STL no <code>{Rcpp}</code> é também simples: basta incluir <code>// [[Rcpp::plugins("cpp2a")]]</code><a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> em qualquer parte do código C++.</p>
@@ -3573,70 +3617,95 @@ void teste_print(){
 </div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp11&quot;)]]</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp2a&quot;)]]</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;numeric&gt;</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp(NumericVector v){</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sum_of_elems = <span class="dv">0</span>;</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// primeiro for multiplicando cada elemento consigo mesmo</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i &lt; v.size(); i++){</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    v[i] = v[i] * v[i];</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">// segundo for somando todos os elementos</span></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="kw">auto</span> it = v.cbegin(); it != v.cend(); ++it)</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    sum_of_elems += *it;</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> sum_of_elems;</span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp20(<span class="at">const</span> NumericVector v){</span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> transform_reduce(v.cbegin(),</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>                          v.cend(),</span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">0</span><span class="bu">L</span>,</span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>                          <span class="bu">std::</span>plus{},</span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>                          [] (<span class="kw">auto</span> i) {<span class="cf">return</span> i * i;});</span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp_sugar(NumericVector v){</span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span>(sum(v*v));</span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp11&quot;)]]</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp2a&quot;)]]</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;numeric&gt;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp(NumericVector v){</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sum_of_elems = <span class="dv">0</span>;</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// primeiro for multiplicando cada elemento consigo mesmo</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i &lt; v.size(); i++){</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    v[i] = v[i] * v[i];</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">// segundo for somando todos os elementos</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="kw">auto</span> it = v.cbegin(); it != v.cend(); ++it)</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    sum_of_elems += *it;</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> sum_of_elems;</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp20(<span class="at">const</span> NumericVector v){</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> transform_reduce(v.cbegin(),</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>                          v.cend(),</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">0</span><span class="bu">L</span>,</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>                          <span class="bu">std::</span>plus{},</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>                          [] (<span class="kw">auto</span> i) {<span class="cf">return</span> i * i;});</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp_sugar(NumericVector v){</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span>(sum(v*v));</span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
-<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1000</span>
-<span class='va'>v</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
-  R <span class='op'>=</span> <span class='fu'>sum_of_squares_R</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  rcpp <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  rcpp20 <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp20</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  rcppsugar <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp_sugar</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  time_unit <span class='op'>=</span> <span class='st'>"us"</span>
-<span class='op'>)</span>
+
+<span class='va'>b2</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>)</span>,
+  <span class='op'>{</span>
+    <span class='va'>v</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
+    <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+      R <span class='op'>=</span> <span class='fu'>sum_of_squares_R</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      rcpp <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      rcpp20 <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp20</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      rcppsugar <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp_sugar</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+      relative <span class='op'>=</span> <span class='cn'>TRUE</span>
+    <span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>b2</span>
 </code></pre>
 </div>
-<pre><code># A tibble: 4 x 6
-  expression   min median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 R           2.04   5.05   176950.    7.86KB     17.7
-2 rcpp        5.90   6.36   130299.    2.49KB     13.0
-3 rcpp20      5.35   5.81   148543.    2.49KB     14.9
-4 rcppsugar   2.25   2.50   362223.    2.49KB      0  </code></pre>
+<pre><code># A tibble: 16 x 7
+   expression     n   min median `itr/sec` mem_alloc `gc/sec`
+   &lt;bch:expr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+ 1 R             10  1      1         1.57    NaN         NaN
+ 2 rcpp          10  1.77   1.67      1       Inf         NaN
+ 3 rcpp20        10  1.69   1.61      1.06    Inf         Inf
+ 4 rcppsugar     10  1.68   1.57      1.06    Inf         NaN
+ 5 R            100  1      1         1.78      1         Inf
+ 6 rcpp         100  1.88   1.81      1         3.01      NaN
+ 7 rcpp20       100  1.39   1.37      1.26      3.01      Inf
+ 8 rcppsugar    100  1.43   1.42      1.28      3.01      NaN
+ 9 R           1000  1.16   1.18      2.92      3.15      Inf
+10 rcpp        1000  3.49   3.45      1         1         Inf
+11 rcpp20      1000  1      1         3.33      1         Inf
+12 rcppsugar   1000  1.24   1.22      2.79      1         NaN
+13 R          10000  2.13   2.10      3.91     31.4       Inf
+14 rcpp       10000  8.87   8.34      1         1         NaN
+15 rcpp20     10000  1      1         8.43      1         Inf
+16 rcppsugar  10000  1.75   1.63      5.13      1         Inf</code></pre>
 </div>
-<p>Aqui vemos como a vetorização do R funciona muito bem. É mais rápida que quase todas as implementações em <code>{Rcpp}</code>, exceto quando usamos o <a href="http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf"><code>{Rcpp}</code> Sugar</a> já que temos um ganho de 2x para um vetor com 1.000 elementos.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figss"></span>
+<img src="2-Rcpp_files/figure-html5/figss-1.png" alt="Benchmarks de Soma dos Quadrados: R vs alternativas C++" width="624" />
+<p class="caption">
+Figure 2: Benchmarks de Soma dos Quadrados: R vs alternativas C++
+</p>
+</div>
+</div>
+<p>Aqui vemos como a vetorização do R funciona muito bem. É mais rápida que quase todas as implementações em <code>{Rcpp}</code>, exceto quando usamos o <a href="http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf"><code>{Rcpp}</code> Sugar</a> já que temos um ganho de 2x.</p>
 <h2 id="rcpp-e-boost"><code>{Rcpp}</code> e Boost</h2>
 <p><a href="https://www.boost.org">Boost</a> é um conjunto de bibliotecas para a linguagem de programação C++ que fornece suporte para tarefas e estruturas como álgebra linear, geração de números pseudo-aleatórios, multithreading, processamento de imagem, expressões regulares e teste de unidade. Ele contém <del>uma porrada</del> 164 bibliotecas individuais (versão 1.75) e sua versão inicial foi lançada em 1999.</p>
-<p>A maioria das bibliotecas Boost são licenciadas sob a Licença de Software Boost, projetada para permitir que Boost seja usado com projetos de software proprietários e gratuitos. Muitos dos fundadores da Boost estão no comitê internacional de padrões C++, e várias bibliotecas Boost foram aceitas para incorporação no padrão C++11 (por exemplo, smart pointers, <code>thread</code>, <code>regex</code>, <code>random</code>, <code>ratio</code>, <code>tuple</code>) e no padrão C ++ 17 (por exemplo, <code>filesystem</code>, <code>any</code>, <code>optional</code>, <code>variant</code>, <code>string_view</code>).</p>
+<p>A maioria das bibliotecas Boost são licenciadas sob a Licença de Software Boost, projetada para permitir que Boost seja usado com projetos de software proprietários e gratuitos. Muitos dos fundadores da Boost estão no comitê internacional de padrões C++, e várias bibliotecas Boost foram aceitas para incorporação no padrão C++11 (por exemplo, smart pointers, <code>thread</code>, <code>regex</code>, <code>random</code>, <code>ratio</code>, <code>tuple</code>) e no padrão C++17 (por exemplo, <code>filesystem</code>, <code>any</code>, <code>optional</code>, <code>variant</code>, <code>string_view</code>).</p>
 <p>Antes de usar o Boost no <code>{Rcpp}</code> certifique-se que você tem o Boost instalado no seu sistema operacional:</p>
 <ul>
 <li>Linux: <code>sudo apt-get install libboost-all-dev</code></li>
@@ -3670,42 +3739,52 @@ void teste_print(){
 </div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb25"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp11&quot;)]]</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp17&quot;)]]</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(BH)]]</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;numeric&gt;</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;boost/integer/common_factor_rt.hpp&gt;</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> cppGCD(<span class="dt">int</span>&amp; a, <span class="dt">int</span>&amp; b){</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">std::</span>gcd(a, b);</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> boostGCD(<span class="dt">int</span>&amp; a, <span class="dt">int</span>&amp; b) {</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">boost::</span>integer<span class="ex">::</span>gcd(a, b);</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp11&quot;)]]</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp17&quot;)]]</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(BH)]]</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;numeric&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;boost/integer/common_factor_rt.hpp&gt;</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> cppGCD(<span class="dt">int</span>&amp; a, <span class="dt">int</span>&amp; b){</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">std::</span>gcd(a, b);</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> boostGCD(<span class="dt">int</span>&amp; a, <span class="dt">int</span>&amp; b) {</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">boost::</span>integer<span class="ex">::</span>gcd(a, b);</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre><code><span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fl'>7919</span>
 <span class='va'>b</span> <span class='op'>&lt;-</span> <span class='fl'>7412</span>
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+<span class='va'>b3</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
   R <span class='op'>=</span> <span class='fu'>rGCD</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span>,
   cpp <span class='op'>=</span> <span class='fu'>cppGCD</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span>,
-  boost <span class='op'>=</span> <span class='fu'>boostGCD</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span>
+  boost <span class='op'>=</span> <span class='fu'>boostGCD</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span>,
+  relative <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
+<span class='va'>b3</span>
 </code></pre>
 </div>
 <pre><code># A tibble: 3 x 6
-  expression      min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 R            7.13µs   8.85µs    86435.   15.69KB     8.64
-2 cpp           1.5µs   2.48µs   287827.    2.49KB     0   
-3 boost        1.43µs    1.8µs   412353.    2.49KB    41.2 </code></pre>
+  expression   min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 R           3.95   4.04      1         6.29      Inf
+2 cpp         1.02   1.03      3.80      1         NaN
+3 boost       1      1         3.86      1         Inf</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figGCD"></span>
+<img src="2-Rcpp_files/figure-html5/figGCD-1.png" alt="Benchmarks de Máximo Divisor Comum: R vs C++" width="624" />
+<p class="caption">
+Figure 3: Benchmarks de Máximo Divisor Comum: R vs C++
+</p>
+</div>
 </div>
 <p>Aqui eu escolhi um número primo bem grande, 7189, e um número aleatório próximo dele, 7412. Como vocês podem ver a solução usando a biblioteca <code>boost::integer</code> é 4,5x mais rápida que uma implementação em R e similar com a implementação de C++17.</p>
 <h2 id="rcpp-e-rmarkdown"><code>{Rcpp}</code> e Rmarkdown</h2>
@@ -3714,7 +3793,7 @@ void teste_print(){
 <div class="figure" style="text-align: center"><span id="fig:rcpp-rmarkdown"></span>
 <img src="images/rcpp-rmarkdown.png" alt="`{Rcpp}` no Rmarkdown" width="202" />
 <p class="caption">
-Figure 1: <code>{Rcpp}</code> no Rmarkdown
+Figure 4: <code>{Rcpp}</code> no Rmarkdown
 </p>
 </div>
 </div>
@@ -3749,15 +3828,20 @@ importFrom(Rcpp, sourceCpp)</code></pre></li>
 </code></pre>
 </div>
 <pre><code>R version 4.0.3 (2020-10-10)
-Platform: x86_64-apple-darwin17.0 (64-bit)
-Running under: macOS Big Sur 10.16
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.10
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
 
 locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods  
@@ -3767,25 +3851,27 @@ other attached packages:
 [1] dplyr_1.0.2 gt_0.2.2    Rcpp_1.0.5 
 
 loaded via a namespace (and not attached):
- [1] highr_0.8         pillar_1.4.7      compiler_4.0.3   
- [4] tools_4.0.3       digest_0.6.27     downlit_0.2.1    
- [7] lubridate_1.7.9.2 evaluate_0.14     lifecycle_0.2.0  
-[10] tibble_3.0.4      gtable_0.3.0      checkmate_2.0.0  
-[13] png_0.1-7         pkgconfig_2.0.3   rlang_0.4.10     
-[16] bench_1.1.1       cli_2.2.0         commonmark_1.7   
-[19] distill_1.1       yaml_2.2.1        parallel_4.0.3   
-[22] xfun_0.20         emo_0.0.0.9000    stringr_1.4.0    
-[25] knitr_1.30        generics_0.1.0    vctrs_0.3.6      
-[28] sass_0.2.0        grid_4.0.3        tidyselect_1.1.0 
-[31] glue_1.4.2        R6_2.5.0          BH_1.72.0-3      
-[34] fansi_0.4.1       profmem_0.6.0     rmarkdown_2.6    
-[37] purrr_0.3.4       ggplot2_3.3.3     magrittr_2.0.1   
-[40] scales_1.1.1      backports_1.2.1   ellipsis_0.3.1   
-[43] htmltools_0.5.0   assertthat_0.2.1  colorspace_2.0-0 
-[46] utf8_1.1.4        stringi_1.5.3     munsell_0.5.0    
-[49] crayon_1.3.4     </code></pre>
+ [1] tidyselect_1.1.0  xfun_0.20         purrr_0.3.4      
+ [4] colorspace_2.0-0  vctrs_0.3.6       generics_0.1.0   
+ [7] htmltools_0.5.0   emo_0.0.0.9000    yaml_2.2.1       
+[10] utf8_1.1.4        rlang_0.4.10      pillar_1.4.7     
+[13] glue_1.4.2        jpeg_0.1-8.1      lifecycle_0.2.0  
+[16] stringr_1.4.0     munsell_0.5.0     commonmark_1.7   
+[19] gtable_0.3.0      bench_1.1.1       evaluate_0.14    
+[22] knitr_1.30        parallel_4.0.3    fansi_0.4.1      
+[25] profmem_0.6.0     highr_0.8         scales_1.1.1     
+[28] backports_1.2.1   checkmate_2.0.0   jsonlite_1.7.2   
+[31] farver_2.0.3      distill_1.1       ggplot2_3.3.3    
+[34] png_0.1-7         digest_0.6.27     stringi_1.5.3    
+[37] bookdown_0.21     grid_4.0.3        rprojroot_2.0.2  
+[40] BH_1.72.0-3       cli_2.2.0         tools_4.0.3      
+[43] magrittr_2.0.1    sass_0.2.0        tibble_3.0.4     
+[46] crayon_1.3.4      tidyr_1.1.2       pkgconfig_2.0.3  
+[49] downlit_0.2.1     ellipsis_0.3.1    lubridate_1.7.9.2
+[52] rstudioapi_0.13   assertthat_0.2.1  rmarkdown_2.6    
+[55] R6_2.5.0          compiler_4.0.3   </code></pre>
 </div>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
@@ -3825,7 +3911,7 @@ loaded via a namespace (and not attached):
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
 <div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2021 <a href="https://github.com/storopoli/Rcpp">Jose Storopoli</a>.</p>
+<p>© Copyright 2021 <a href="https://storopoli.io/Rcpp">Jose Storopoli</a>.</p>
 <p>Content licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->

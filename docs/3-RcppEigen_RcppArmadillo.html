@@ -23,7 +23,6 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -2327,7 +2326,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`","description":"Como usar as bibliotecas C++ `Eigen` e `Armadillo` para poderosa Álgebra Linear","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000+00:00","citationText":"Storopoli, 2021"}
+{"title":"Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`","description":"Como usar as bibliotecas C++ `Eigen` e `Armadillo` para poderosa Álgebra Linear","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000-03:00","citationText":"Storopoli, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2352,6 +2351,7 @@ Tutoriais
 <a href="3-RcppEigen_RcppArmadillo.html">3. Manipulação de Matrizes - {RcppEigen} e {RcppArmadillo}</a>
 <a href="4-RcppParallel.html">4. Paralelização - {RcppParallel}</a>
 <a href="5-cpp11.html">5. {cpp11} - Nova Interface do pessoal do RStudio</a>
+<a href="6-Rcpp_CUDA.html">6. Usando {Rcpp} na GPU com CUDA</a>
 </div>
 </div>
 <input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
@@ -3209,40 +3209,68 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>^</span><span class='fl'>3</span>
-<span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
-
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
-  Rcpp <span class='op'>=</span> <span class='fu'>mat_mul</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
-  arma <span class='op'>=</span> <span class='fu'>mat_mul_arma</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
-  eigen <span class='op'>=</span> <span class='fu'>mat_mul_eigen</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
+<pre><code><span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>,
+  <span class='op'>{</span>
+    <span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+    <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+      Rcpp <span class='op'>=</span> <span class='fu'>mat_mul</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
+      arma <span class='op'>=</span> <span class='fu'>mat_mul_arma</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
+      eigen <span class='op'>=</span> <span class='fu'>mat_mul_eigen</span><span class='op'>(</span><span class='va'>X</span>, <span class='va'>X</span><span class='op'>)</span>,
+      check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+      relative <span class='op'>=</span> <span class='cn'>TRUE</span>
+    <span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>b1</span>
 </code></pre>
 </div>
-<pre><code># A tibble: 3 x 6
-  expression      min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 Rcpp         1.12ms   1.18ms    735.      7.63MB     131.
-2 arma       635.28ms 635.28ms      1.57    7.63MB       0 
-3 eigen       145.2ms 153.66ms      6.54    7.63MB       0 </code></pre>
+<pre><code># A tibble: 9 x 7
+  expression     n    min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 Rcpp          10   1      1         1.24         1     1.24
+2 arma          10   1.27   1.25      1            1     1   
+3 eigen         10   1.15   1.14      1.11         1     1.11
+4 Rcpp         100   1      1        57.8          1    64.6 
+5 arma         100  73.4   71.9       1            1     1   
+6 eigen        100  20.3   19.5       3.67         1     4.17
+7 Rcpp        1000   1      1       219.           1   Inf   
+8 arma        1000 860.   597.        1            1   Inf   
+9 eigen       1000 196.   138.        4.34         1   NaN   </code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figmatmul"></span>
+<img src="3-RcppEigen_RcppArmadillo_files/figure-html5/figmatmul-1.png" alt="Benchmarks de Multiplicação de Matriz: `Rcpp` vs `Armadillo` vs `Eigen`" width="624" />
+<p class="caption">
+Figure 2: Benchmarks de Multiplicação de Matriz: <code>Rcpp</code> vs <code>Armadillo</code> vs <code>Eigen</code>
+</p>
+</div>
 </div>
 <p>No meu computador <code>{RcppEigen}</code> é mais rápido que <code>{RcppArmadillo}</code>, mas ambos são mais lentos que uma implementação simples com <code>{Rcpp}</code>.</p>
 <h3 id="exemplo-matriz-esparsa">Exemplo – Matriz Esparsa</h3>
 <p>Vamos usar <code>mat_sparse</code> criada que possui dimensão 1.000 x 1.000 e tomar a raiz quadrada de todos os elementos.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+<pre><code><span class='va'>b2</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
   arma <span class='op'>=</span> <span class='fu'>sqrt_eigen</span><span class='op'>(</span><span class='va'>mat_sparse</span><span class='op'>)</span>,
-  eigen <span class='op'>=</span> <span class='fu'>sqrt_eigen</span><span class='op'>(</span><span class='va'>mat_sparse</span><span class='op'>)</span>
+  eigen <span class='op'>=</span> <span class='fu'>sqrt_eigen</span><span class='op'>(</span><span class='va'>mat_sparse</span><span class='op'>)</span>,
+  relative <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
+<span class='va'>b2</span>
 </code></pre>
 </div>
 <pre><code># A tibble: 2 x 6
-  expression      min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 arma         1.07ms   1.17ms      794.    1.16MB     17.7
-2 eigen        1.08ms   1.16ms      843.    1.15MB     22.6</code></pre>
+  expression   min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 arma        1      1         1.00      1.00     1   
+2 eigen       1.03   1.01      1         1        1.13</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figsparsesqrt"></span>
+<img src="3-RcppEigen_RcppArmadillo_files/figure-html5/figsparsesqrt-1.png" alt="Benchmarks de Matriz Esparsa: `Armadillo` vs `Eigen`" width="624" />
+<p class="caption">
+Figure 3: Benchmarks de Matriz Esparsa: <code>Armadillo</code> vs <code>Eigen</code>
+</p>
+</div>
 </div>
 <p>Novamente <code>Eigen</code> é um pouco mais rápida que <code>Armadillo</code>, mas a diferença é pequena.</p>
 <h3 id="exemplo-regressão-linear-fast_lm">Exemplo – Regressão Linear <code>fast_lm()</code></h3>
@@ -3302,22 +3330,32 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 <div class="sourceCode">
 <pre><code><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>trees</span><span class='op'>$</span><span class='va'>Volume</span><span class='op'>)</span>
 <span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>trees</span><span class='op'>$</span><span class='va'>Girth</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+<span class='va'>b3</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
   R <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>X</span><span class='op'>)</span>,
   arma <span class='op'>=</span> <span class='fu'>fast_lm_arma</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>X</span><span class='op'>)</span>,
   eigen <span class='op'>=</span> <span class='fu'>fast_lm_eigen</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>X</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>
+  check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  relative <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
+<span class='va'>b3</span>
 </code></pre>
 </div>
 <pre><code># A tibble: 3 x 6
-  expression      min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 R          461.06µs 491.65µs     1932.  476.36KB     4.08
-2 arma         5.57µs    6.1µs   146428.    2.49KB     0   
-3 eigen        5.11µs   6.81µs   150070.    2.49KB     0   </code></pre>
+  expression    min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 R          118.   115.         1        191.      Inf
+2 arma         1.55   1.55      72.5        1       NaN
+3 eigen        1      1        112.         1       Inf</code></pre>
 </div>
-<p>Tanto <code>Eigen</code> quanto <code>Armadillo</code> são rápidos! Quase 100x mais rápidos. Novamente a diferença entre <code>Eigen</code> e <code>Armadillo</code> é pequena.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figfastlm"></span>
+<img src="3-RcppEigen_RcppArmadillo_files/figure-html5/figfastlm-1.png" alt="Benchmarks de Regressão Linear: R vs `Armadillo` vs `Eigen`" width="624" />
+<p class="caption">
+Figure 4: Benchmarks de Regressão Linear: R vs <code>Armadillo</code> vs <code>Eigen</code>
+</p>
+</div>
+</div>
+<p>Tanto <code>Eigen</code> quanto <code>Armadillo</code> são rápidos! Quase 100x mais rápidos 🤯. Novamente a diferença entre <code>Eigen</code> e <code>Armadillo</code> é pequena.</p>
 <h2 id="usar-rcpparmadillo-ou-rcppeigen-no-seu-pacote-r">Usar <code>{RcppArmadillo}</code> ou <code>{RcppEigen}</code> no seu Pacote R</h2>
 <p>Eu recomendo usar o pacote <code>{usethis}</code> e seguir as instruções.</p>
 <ul>
@@ -3331,23 +3369,27 @@ Figure 1: Qualquer escolha entre <code>Armadillo</code> e <code>Eigen</code> sã
 </code></pre>
 </div>
 <pre><code>R version 4.0.3 (2020-10-10)
-Platform: x86_64-apple-darwin17.0 (64-bit)
-Running under: macOS Big Sur 10.16
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.10
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
 
 locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods  
 [7] base     
 
 other attached packages:
-[1] Matrix_1.3-2   magrittr_2.0.1 dplyr_1.0.2    gt_0.2.2      
-[5] Rcpp_1.0.5    
+[1] Matrix_1.3-2 dplyr_1.0.2  gt_0.2.2     Rcpp_1.0.5  
 
 loaded via a namespace (and not attached):
  [1] RcppEigen_0.3.3.9.1      tidyselect_1.1.0        
@@ -3361,23 +3403,25 @@ loaded via a namespace (and not attached):
 [17] lifecycle_0.2.0          stringr_1.4.0           
 [19] munsell_0.5.0            commonmark_1.7          
 [21] gtable_0.3.0             bench_1.1.1             
-[23] evaluate_0.14            RcppArmadillo_0.10.1.2.0
+[23] evaluate_0.14            RcppArmadillo_0.10.1.2.2
 [25] knitr_1.30               parallel_4.0.3          
 [27] fansi_0.4.1              profmem_0.6.0           
 [29] highr_0.8                scales_1.1.1            
 [31] backports_1.2.1          checkmate_2.0.0         
-[33] jsonlite_1.7.2           distill_1.1             
-[35] ggplot2_3.3.3            png_0.1-7               
-[37] digest_0.6.27            stringi_1.5.3           
-[39] bookdown_0.21            grid_4.0.3              
-[41] rprojroot_2.0.2          BH_1.72.0-3             
-[43] cli_2.2.0                tools_4.0.3             
-[45] sass_0.2.0               tibble_3.0.4            
-[47] crayon_1.3.4             pkgconfig_2.0.3         
-[49] downlit_0.2.1            ellipsis_0.3.1          
-[51] lubridate_1.7.9.2        assertthat_0.2.1        
-[53] rmarkdown_2.6            rstudioapi_0.13         
-[55] R6_2.5.0                 compiler_4.0.3          </code></pre>
+[33] jsonlite_1.7.2           farver_2.0.3            
+[35] distill_1.1              ggplot2_3.3.3           
+[37] png_0.1-7                digest_0.6.27           
+[39] stringi_1.5.3            bookdown_0.21           
+[41] grid_4.0.3               rprojroot_2.0.2         
+[43] BH_1.72.0-3              cli_2.2.0               
+[45] tools_4.0.3              magrittr_2.0.1          
+[47] sass_0.2.0               tibble_3.0.4            
+[49] crayon_1.3.4             tidyr_1.1.2             
+[51] pkgconfig_2.0.3          downlit_0.2.1           
+[53] ellipsis_0.3.1           lubridate_1.7.9.2       
+[55] rstudioapi_0.13          assertthat_0.2.1        
+[57] rmarkdown_2.6            R6_2.5.0                
+[59] compiler_4.0.3          </code></pre>
 </div>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
@@ -3418,7 +3462,7 @@ loaded via a namespace (and not attached):
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
 <div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2021 <a href="https://github.com/storopoli/Rcpp">Jose Storopoli</a>.</p>
+<p>© Copyright 2021 <a href="https://storopoli.io/Rcpp">Jose Storopoli</a>.</p>
 <p>Content licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->

@@ -38,6 +38,7 @@ knitr::include_graphics("images/12-parsecs.gif")
 3. [Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`](3-RcppEigen_RcppArmadillo.html)
 4. [Paralelização -- `{RcppParallel}`](4-RcppParallel.html)
 5. [`{cpp11}` -- Nova Interface do pessoal do RStudio](5-cpp11.html)
+6. [Usando `{Rcpp}` na GPU com `CUDA`](6-Rcpp_CUDA.html)
 
 ## Como Configurar um Ambiente para `{Rcpp}`
 

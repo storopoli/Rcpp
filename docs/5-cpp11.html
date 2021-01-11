@@ -23,7 +23,6 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -2327,7 +2326,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"`{cpp11}`","description":"Nova Interface C++11 STL do pessoal do RStudio","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000+00:00","citationText":"Storopoli, 2021"}
+{"title":"`{cpp11}`","description":"Nova Interface C++11 STL do pessoal do RStudio","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000-03:00","citationText":"Storopoli, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2352,6 +2351,7 @@ Tutoriais
 <a href="3-RcppEigen_RcppArmadillo.html">3. Manipulação de Matrizes - {RcppEigen} e {RcppArmadillo}</a>
 <a href="4-RcppParallel.html">4. Paralelização - {RcppParallel}</a>
 <a href="5-cpp11.html">5. {cpp11} - Nova Interface do pessoal do RStudio</a>
+<a href="6-Rcpp_CUDA.html">6. Usando {Rcpp} na GPU com CUDA</a>
 </div>
 </div>
 <input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
@@ -2446,7 +2446,7 @@ Tutoriais
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#speuftczej .gt_table {
+#dpubofyylh .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2471,7 +2471,7 @@ Tutoriais
   border-left-color: #D3D3D3;
 }
 
-#speuftczej .gt_heading {
+#dpubofyylh .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2483,7 +2483,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#speuftczej .gt_title {
+#dpubofyylh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2493,7 +2493,7 @@ Tutoriais
   border-bottom-width: 0;
 }
 
-#speuftczej .gt_subtitle {
+#dpubofyylh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2503,13 +2503,13 @@ Tutoriais
   border-top-width: 0;
 }
 
-#speuftczej .gt_bottom_border {
+#dpubofyylh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#speuftczej .gt_col_headings {
+#dpubofyylh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2524,7 +2524,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#speuftczej .gt_col_heading {
+#dpubofyylh .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2544,7 +2544,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#speuftczej .gt_column_spanner_outer {
+#dpubofyylh .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2556,15 +2556,15 @@ Tutoriais
   padding-right: 4px;
 }
 
-#speuftczej .gt_column_spanner_outer:first-child {
+#dpubofyylh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#speuftczej .gt_column_spanner_outer:last-child {
+#dpubofyylh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#speuftczej .gt_column_spanner {
+#dpubofyylh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2576,7 +2576,7 @@ Tutoriais
   width: 100%;
 }
 
-#speuftczej .gt_group_heading {
+#dpubofyylh .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2598,7 +2598,7 @@ Tutoriais
   vertical-align: middle;
 }
 
-#speuftczej .gt_empty_group_heading {
+#dpubofyylh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2613,15 +2613,15 @@ Tutoriais
   vertical-align: middle;
 }
 
-#speuftczej .gt_from_md > :first-child {
+#dpubofyylh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#speuftczej .gt_from_md > :last-child {
+#dpubofyylh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#speuftczej .gt_row {
+#dpubofyylh .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2640,7 +2640,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#speuftczej .gt_stub {
+#dpubofyylh .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2652,7 +2652,7 @@ Tutoriais
   padding-left: 12px;
 }
 
-#speuftczej .gt_summary_row {
+#dpubofyylh .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2662,7 +2662,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#speuftczej .gt_first_summary_row {
+#dpubofyylh .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2672,7 +2672,7 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#speuftczej .gt_grand_summary_row {
+#dpubofyylh .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2682,7 +2682,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#speuftczej .gt_first_grand_summary_row {
+#dpubofyylh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2692,11 +2692,11 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#speuftczej .gt_striped {
+#dpubofyylh .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#speuftczej .gt_table_body {
+#dpubofyylh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2705,7 +2705,7 @@ Tutoriais
   border-bottom-color: #D3D3D3;
 }
 
-#speuftczej .gt_footnotes {
+#dpubofyylh .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2719,13 +2719,13 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#speuftczej .gt_footnote {
+#dpubofyylh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#speuftczej .gt_sourcenotes {
+#dpubofyylh .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2739,46 +2739,46 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#speuftczej .gt_sourcenote {
+#dpubofyylh .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#speuftczej .gt_left {
+#dpubofyylh .gt_left {
   text-align: left;
 }
 
-#speuftczej .gt_center {
+#dpubofyylh .gt_center {
   text-align: center;
 }
 
-#speuftczej .gt_right {
+#dpubofyylh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#speuftczej .gt_font_normal {
+#dpubofyylh .gt_font_normal {
   font-weight: normal;
 }
 
-#speuftczej .gt_font_bold {
+#dpubofyylh .gt_font_bold {
   font-weight: bold;
 }
 
-#speuftczej .gt_font_italic {
+#dpubofyylh .gt_font_italic {
   font-style: italic;
 }
 
-#speuftczej .gt_super {
+#dpubofyylh .gt_super {
   font-size: 65%;
 }
 
-#speuftczej .gt_footnote_marks {
+#dpubofyylh .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="speuftczej" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="dpubofyylh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -2930,7 +2930,7 @@ Tutoriais
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#pyysgngyrg .gt_table {
+#ddzxxqkucs .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2955,7 +2955,7 @@ Tutoriais
   border-left-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_heading {
+#ddzxxqkucs .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2967,7 +2967,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_title {
+#ddzxxqkucs .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2977,7 +2977,7 @@ Tutoriais
   border-bottom-width: 0;
 }
 
-#pyysgngyrg .gt_subtitle {
+#ddzxxqkucs .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2987,13 +2987,13 @@ Tutoriais
   border-top-width: 0;
 }
 
-#pyysgngyrg .gt_bottom_border {
+#ddzxxqkucs .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_col_headings {
+#ddzxxqkucs .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3008,7 +3008,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_col_heading {
+#ddzxxqkucs .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3028,7 +3028,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#pyysgngyrg .gt_column_spanner_outer {
+#ddzxxqkucs .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3040,15 +3040,15 @@ Tutoriais
   padding-right: 4px;
 }
 
-#pyysgngyrg .gt_column_spanner_outer:first-child {
+#ddzxxqkucs .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#pyysgngyrg .gt_column_spanner_outer:last-child {
+#ddzxxqkucs .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#pyysgngyrg .gt_column_spanner {
+#ddzxxqkucs .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3060,7 +3060,7 @@ Tutoriais
   width: 100%;
 }
 
-#pyysgngyrg .gt_group_heading {
+#ddzxxqkucs .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3082,7 +3082,7 @@ Tutoriais
   vertical-align: middle;
 }
 
-#pyysgngyrg .gt_empty_group_heading {
+#ddzxxqkucs .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3097,15 +3097,15 @@ Tutoriais
   vertical-align: middle;
 }
 
-#pyysgngyrg .gt_from_md > :first-child {
+#ddzxxqkucs .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#pyysgngyrg .gt_from_md > :last-child {
+#ddzxxqkucs .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#pyysgngyrg .gt_row {
+#ddzxxqkucs .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3124,7 +3124,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#pyysgngyrg .gt_stub {
+#ddzxxqkucs .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3136,7 +3136,7 @@ Tutoriais
   padding-left: 12px;
 }
 
-#pyysgngyrg .gt_summary_row {
+#ddzxxqkucs .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3146,7 +3146,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#pyysgngyrg .gt_first_summary_row {
+#ddzxxqkucs .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3156,7 +3156,7 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_grand_summary_row {
+#ddzxxqkucs .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3166,7 +3166,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#pyysgngyrg .gt_first_grand_summary_row {
+#ddzxxqkucs .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3176,11 +3176,11 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_striped {
+#ddzxxqkucs .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#pyysgngyrg .gt_table_body {
+#ddzxxqkucs .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3189,7 +3189,7 @@ Tutoriais
   border-bottom-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_footnotes {
+#ddzxxqkucs .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3203,13 +3203,13 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_footnote {
+#ddzxxqkucs .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#pyysgngyrg .gt_sourcenotes {
+#ddzxxqkucs .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3223,46 +3223,46 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#pyysgngyrg .gt_sourcenote {
+#ddzxxqkucs .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#pyysgngyrg .gt_left {
+#ddzxxqkucs .gt_left {
   text-align: left;
 }
 
-#pyysgngyrg .gt_center {
+#ddzxxqkucs .gt_center {
   text-align: center;
 }
 
-#pyysgngyrg .gt_right {
+#ddzxxqkucs .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#pyysgngyrg .gt_font_normal {
+#ddzxxqkucs .gt_font_normal {
   font-weight: normal;
 }
 
-#pyysgngyrg .gt_font_bold {
+#ddzxxqkucs .gt_font_bold {
   font-weight: bold;
 }
 
-#pyysgngyrg .gt_font_italic {
+#ddzxxqkucs .gt_font_italic {
   font-style: italic;
 }
 
-#pyysgngyrg .gt_super {
+#ddzxxqkucs .gt_super {
   font-size: 65%;
 }
 
-#pyysgngyrg .gt_footnote_marks {
+#ddzxxqkucs .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="pyysgngyrg" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="ddzxxqkucs" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3307,7 +3307,7 @@ Tutoriais
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#srzbsbevjh .gt_table {
+#azxflegqez .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3332,7 +3332,7 @@ Tutoriais
   border-left-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_heading {
+#azxflegqez .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3344,7 +3344,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_title {
+#azxflegqez .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3354,7 +3354,7 @@ Tutoriais
   border-bottom-width: 0;
 }
 
-#srzbsbevjh .gt_subtitle {
+#azxflegqez .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3364,13 +3364,13 @@ Tutoriais
   border-top-width: 0;
 }
 
-#srzbsbevjh .gt_bottom_border {
+#azxflegqez .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_col_headings {
+#azxflegqez .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3385,7 +3385,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_col_heading {
+#azxflegqez .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3405,7 +3405,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#srzbsbevjh .gt_column_spanner_outer {
+#azxflegqez .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3417,15 +3417,15 @@ Tutoriais
   padding-right: 4px;
 }
 
-#srzbsbevjh .gt_column_spanner_outer:first-child {
+#azxflegqez .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#srzbsbevjh .gt_column_spanner_outer:last-child {
+#azxflegqez .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#srzbsbevjh .gt_column_spanner {
+#azxflegqez .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3437,7 +3437,7 @@ Tutoriais
   width: 100%;
 }
 
-#srzbsbevjh .gt_group_heading {
+#azxflegqez .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3459,7 +3459,7 @@ Tutoriais
   vertical-align: middle;
 }
 
-#srzbsbevjh .gt_empty_group_heading {
+#azxflegqez .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3474,15 +3474,15 @@ Tutoriais
   vertical-align: middle;
 }
 
-#srzbsbevjh .gt_from_md > :first-child {
+#azxflegqez .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#srzbsbevjh .gt_from_md > :last-child {
+#azxflegqez .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#srzbsbevjh .gt_row {
+#azxflegqez .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3501,7 +3501,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#srzbsbevjh .gt_stub {
+#azxflegqez .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3513,7 +3513,7 @@ Tutoriais
   padding-left: 12px;
 }
 
-#srzbsbevjh .gt_summary_row {
+#azxflegqez .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3523,7 +3523,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#srzbsbevjh .gt_first_summary_row {
+#azxflegqez .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3533,7 +3533,7 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_grand_summary_row {
+#azxflegqez .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3543,7 +3543,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#srzbsbevjh .gt_first_grand_summary_row {
+#azxflegqez .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3553,11 +3553,11 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_striped {
+#azxflegqez .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#srzbsbevjh .gt_table_body {
+#azxflegqez .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3566,7 +3566,7 @@ Tutoriais
   border-bottom-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_footnotes {
+#azxflegqez .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3580,13 +3580,13 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_footnote {
+#azxflegqez .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#srzbsbevjh .gt_sourcenotes {
+#azxflegqez .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3600,46 +3600,46 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#srzbsbevjh .gt_sourcenote {
+#azxflegqez .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#srzbsbevjh .gt_left {
+#azxflegqez .gt_left {
   text-align: left;
 }
 
-#srzbsbevjh .gt_center {
+#azxflegqez .gt_center {
   text-align: center;
 }
 
-#srzbsbevjh .gt_right {
+#azxflegqez .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#srzbsbevjh .gt_font_normal {
+#azxflegqez .gt_font_normal {
   font-weight: normal;
 }
 
-#srzbsbevjh .gt_font_bold {
+#azxflegqez .gt_font_bold {
   font-weight: bold;
 }
 
-#srzbsbevjh .gt_font_italic {
+#azxflegqez .gt_font_italic {
   font-style: italic;
 }
 
-#srzbsbevjh .gt_super {
+#azxflegqez .gt_super {
   font-size: 65%;
 }
 
-#srzbsbevjh .gt_footnote_marks {
+#azxflegqez .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="srzbsbevjh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="azxflegqez" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3714,31 +3714,50 @@ Tutoriais
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
-<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1e6</span>
-<span class='va'>v</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
-  Rcpp <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  cpp11 <span class='op'>=</span> <span class='fu'>sum_of_squares_cpp11</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  Rcppsugar <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp_sugar</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+<span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>)</span>,
+  <span class='op'>{</span>
+    <span class='va'>v</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
+    <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+      Rcpp <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      cpp11 <span class='op'>=</span> <span class='fu'>sum_of_squares_cpp11</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      Rcppsugar <span class='op'>=</span> <span class='fu'>sum_of_squares_rcpp_sugar</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+      relative <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
+  <span class='op'>}</span><span class='op'>)</span>
+<span class='va'>b1</span>
 </code></pre>
 </div>
-<pre><code># A tibble: 3 x 6
-  expression      min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 Rcpp         1.05ms   1.09ms      829.    2.49KB        0
-2 cpp11        1.08ms   1.13ms      801.        0B        0
-3 Rcppsugar    1.03ms    1.1ms      768.    2.49KB        0</code></pre>
+<pre><code># A tibble: 9 x 7
+  expression       n   min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 Rcpp         10000  1      1.08      1.13       Inf      Inf
+2 cpp11        10000  1.21   1.21      1          NaN      NaN
+3 Rcppsugar    10000  1.00   1         1.20       Inf      NaN
+4 Rcpp        100000  1.00   1.00      1.08       Inf      NaN
+5 cpp11       100000  1.03   1.07      1          NaN      NaN
+6 Rcppsugar   100000  1      1         1.07       Inf      NaN
+7 Rcpp       1000000  1.00   1.00      1.05       Inf      NaN
+8 cpp11      1000000  1.02   1.07      1          NaN      NaN
+9 Rcppsugar  1000000  1      1         1.07       Inf      NaN</code></pre>
 </div>
-<p>Quando usada a biblioteca padrão C++11 STL tanto <code>{cpp11}</code> quanto <code>{Rcpp}</code> e <code>{Rcpp}</code> Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com 1.000.000 elementos. É claro que solução do <code>{Rcpp}</code> Sugar é muito mais elegante e simples com uma única linhana função.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figsumofsquars"></span>
+<img src="5-cpp11_files/figure-html5/figsumofsquars-1.png" alt="Benchmarks de Soma dos Quadrados: `Rcpp` vs `cpp11`" width="624" />
+<p class="caption">
+Figure 1: Benchmarks de Soma dos Quadrados: <code>Rcpp</code> vs <code>cpp11</code>
+</p>
+</div>
+</div>
+<p>Quando usada a biblioteca padrão C++11 STL tanto <code>{cpp11}</code> quanto <code>{Rcpp}</code> e <code>{Rcpp}</code> Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com function () , {, length(peek_mask(“n()”)$current_rows()), } elementos. É claro que solução do <code>{Rcpp}</code> Sugar é muito mais elegante e simples com uma única linhana função.</p>
 <h2 id="cpp11-e-rmarkdown"><code>{cpp11}</code> e Rmarkdown</h2>
 <p>Na mesma lógica de <code>{Rcpp}</code>, para usar o <code>{cpp11}</code> em documentos rmarkdown basta colocar <code>cpp11</code> no chunk ao invés de <code>r</code>. Além disso é necessário instalar o pacote <code>{decor}</code>. Não esqueça de chamar um <code>library(cpp11)</code> no arquivo rmarkdown.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:cpp11-rmarkdown"></span>
 <img src="images/cpp11-rmarkdown.png" alt="`{cpp11}` no Rmarkdown" width="264" />
 <p class="caption">
-Figure 1: <code>{cpp11}</code> no Rmarkdown
+Figure 2: <code>{cpp11}</code> no Rmarkdown
 </p>
 </div>
 </div>
@@ -3754,45 +3773,66 @@ Figure 1: <code>{cpp11}</code> no Rmarkdown
 </code></pre>
 </div>
 <pre><code>R version 4.0.3 (2020-10-10)
-Platform: x86_64-apple-darwin17.0 (64-bit)
-Running under: macOS Big Sur 10.16
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.10
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
 
 locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods  
 [7] base     
 
 other attached packages:
-[1] gt_0.2.2    cpp11_0.2.4 dplyr_1.0.2
+[1] cpp11_0.2.4        RcppParallel_5.0.2 Matrix_1.3-2      
+[4] dplyr_1.0.2        gt_0.2.2           Rcpp_1.0.5        
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.1.0 xfun_0.20        decor_1.0.0     
- [4] purrr_0.3.4      colorspace_2.0-0 vctrs_0.3.6     
- [7] generics_0.1.0   htmltools_0.5.0  yaml_2.2.1      
-[10] utf8_1.1.4       rlang_0.4.10     pillar_1.4.7    
-[13] glue_1.4.2       lifecycle_0.2.0  stringr_1.4.0   
-[16] munsell_0.5.0    commonmark_1.7   gtable_0.3.0    
-[19] rvest_0.3.6      bench_1.1.1      evaluate_0.14   
-[22] knitr_1.30       callr_3.5.1      ps_1.5.0        
-[25] parallel_4.0.3   curl_4.3         fansi_0.4.1     
-[28] highr_0.8        profmem_0.6.0    Rcpp_1.0.5      
-[31] cranlogs_2.1.1   scales_1.1.1     backports_1.2.1 
-[34] checkmate_2.0.0  desc_1.2.0       jsonlite_1.7.2  
-[37] brio_1.1.0       distill_1.1      png_0.1-7       
-[40] ggplot2_3.3.3    digest_0.6.27    stringi_1.5.3   
-[43] processx_3.4.5   grid_4.0.3       rprojroot_2.0.2 
-[46] cli_2.2.0        tools_4.0.3      magrittr_2.0.1  
-[49] sass_0.2.0       tibble_3.0.4     crayon_1.3.4    
-[52] tidyr_1.1.2      pkgconfig_2.0.3  downlit_0.2.1   
-[55] ellipsis_0.3.1   xml2_1.3.2       assertthat_0.2.1
-[58] rmarkdown_2.6    httr_1.4.2       R6_2.5.0        
-[61] crandep_0.1.1    igraph_1.2.6     compiler_4.0.3  </code></pre>
+ [1] lubridate_1.7.9.2        lattice_0.20-41         
+ [3] tidyr_1.1.2              ps_1.5.0                
+ [5] png_0.1-7                assertthat_0.2.1        
+ [7] rprojroot_2.0.2          digest_0.6.27           
+ [9] utf8_1.1.4               R6_2.5.0                
+[11] backports_1.2.1          evaluate_0.14           
+[13] httr_1.4.2               ggplot2_3.3.3           
+[15] highr_0.8                pillar_1.4.7            
+[17] rlang_0.4.10             curl_4.3                
+[19] rstudioapi_0.13          callr_3.5.1             
+[21] checkmate_2.0.0          rmarkdown_2.6           
+[23] desc_1.2.0               stringr_1.4.0           
+[25] RcppEigen_0.3.3.9.1      igraph_1.2.6            
+[27] munsell_0.5.0            compiler_4.0.3          
+[29] xfun_0.20                pkgconfig_2.0.3         
+[31] htmltools_0.5.0          downlit_0.2.1           
+[33] tidyselect_1.1.0         tibble_3.0.4            
+[35] bookdown_0.21            emo_0.0.0.9000          
+[37] fansi_0.4.1              crayon_1.3.4            
+[39] brio_1.1.0               commonmark_1.7          
+[41] crandep_0.1.1            BH_1.72.0-3             
+[43] grid_4.0.3               jsonlite_1.7.2          
+[45] gtable_0.3.0             lifecycle_0.2.0         
+[47] magrittr_2.0.1           scales_1.1.1            
+[49] bench_1.1.1              cli_2.2.0               
+[51] stringi_1.5.3            profmem_0.6.0           
+[53] farver_2.0.3             RcppArmadillo_0.10.1.2.2
+[55] decor_1.0.0              xml2_1.3.2              
+[57] ellipsis_0.3.1           generics_0.1.0          
+[59] vctrs_0.3.6              distill_1.1             
+[61] cranlogs_2.1.1           tools_4.0.3             
+[63] glue_1.4.2               purrr_0.3.4             
+[65] jpeg_0.1-8.1             processx_3.4.5          
+[67] parallel_4.0.3           yaml_2.2.1              
+[69] colorspace_2.0-0         rvest_0.3.6             
+[71] knitr_1.30               sass_0.2.0              </code></pre>
 </div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
@@ -3832,7 +3872,7 @@ loaded via a namespace (and not attached):
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
 <div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2021 <a href="https://github.com/storopoli/Rcpp">Jose Storopoli</a>.</p>
+<p>© Copyright 2021 <a href="https://storopoli.io/Rcpp">Jose Storopoli</a>.</p>
 <p>Content licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->

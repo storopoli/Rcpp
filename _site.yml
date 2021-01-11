@@ -5,7 +5,6 @@ description: |
 base_url: https://storopoli.io/Rcpp
 google_analytics: "UA-186284914-4"
 theme: "theme.css"
-exclude: ["README.md", "README_files", "README.html"]
 output_dir: "docs"
 alt_formats: true
 navbar:
@@ -30,6 +29,8 @@ navbar:
           href: 4-RcppParallel.html
         - text: "5. {cpp11} - Nova Interface do pessoal do RStudio"
           href: 5-cpp11.html
+        - text: "6. Usando {Rcpp} na GPU com CUDA"
+          href: 6-Rcpp_CUDA.html
   right:
     - icon: fa fa-globe fa-lg
       href: https://storopoli.io/

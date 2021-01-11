@@ -2351,6 +2351,7 @@ Tutoriais
 <a href="3-RcppEigen_RcppArmadillo.html">3. Manipulação de Matrizes - {RcppEigen} e {RcppArmadillo}</a>
 <a href="4-RcppParallel.html">4. Paralelização - {RcppParallel}</a>
 <a href="5-cpp11.html">5. {cpp11} - Nova Interface do pessoal do RStudio</a>
+<a href="6-Rcpp_CUDA.html">6. Usando {Rcpp} na GPU com CUDA</a>
 </div>
 </div>
 <input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
@@ -2493,7 +2494,7 @@ Figure 1: Código <code>{Rcpp}</code> rodando em paralelo: muito rápido!
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>   SquareRoot(<span class="at">const</span> Rcpp::NumericMatrix input, Rcpp::NumericMatrix output) </span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      : input(input), output(output) {}</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>   <span class="co">// Overload do operador ()</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>   <span class="co">// Overload do operador () -- functor</span></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>   <span class="dt">void</span> <span class="kw">operator</span>()(<span class="bu">std::</span>size_t begin, <span class="bu">std::</span>size_t end) {</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      <span class="bu">std::</span>transform(input.begin() + begin, </span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                     input.begin() + end, </span>
@@ -2528,23 +2529,38 @@ Figure 1: Código <code>{Rcpp}</code> rodando em paralelo: muito rápido!
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>^</span><span class='fl'>3</span>
-<span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
-
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
-  Rcpp <span class='op'>=</span> <span class='fu'>matrixSqrt</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span>,
-  RcppParallel <span class='op'>=</span> <span class='fu'>parallelMatrixSqrt</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
+<pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>,
+  <span class='op'>{</span>
+    <span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+    <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+      Rcpp <span class='op'>=</span> <span class='fu'>matrixSqrt</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span>,
+      RcppParallel <span class='op'>=</span> <span class='fu'>parallelMatrixSqrt</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span>,
+      check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+      relative <span class='op'>=</span> <span class='cn'>TRUE</span>
+    <span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>b1</span>
 </code></pre>
 </div>
-<pre><code># A tibble: 2 x 6
-  expression        min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 Rcpp           8.75ms   9.04ms      107.    7.63MB     36.6
-2 RcppParallel   3.19ms   3.33ms      300.    7.63MB     75.8</code></pre>
+<pre><code># A tibble: 4 x 7
+  expression       n   min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 Rcpp           100  3.04   2.75      1            1     1   
+2 RcppParallel   100  1      1         2.69         1     2.51
+3 Rcpp          1000  5.36   2.69      1            1     1   
+4 RcppParallel  1000  1      1         2.65         1     2.11</code></pre>
 </div>
-<p>Um ganho de 3x em paralelização para uma matriz de dimensão 1.000 x 1.000!</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figmatmul"></span>
+<img src="4-RcppParallel_files/figure-html5/figmatmul-1.png" alt="Benchmarks de Raiz Quadrada de Elementos de Matriz: `Rcpp` vs `RcppParallel`" width="624" />
+<p class="caption">
+Figure 2: Benchmarks de Raiz Quadrada de Elementos de Matriz: <code>Rcpp</code> vs <code>RcppParallel</code>
+</p>
+</div>
+</div>
+<p>Um ganho de 3x com paralelização.</p>
 <h3 id="parallelreduce-paralelizando-operações-reduce"><code>parallelReduce</code> – Paralelizando operações <code>Reduce</code></h3>
 <p><code>Reduce</code> é um algoritmo bem conhecido em ciências da computação. <code>Reduce</code> aplica um operação binária (como adição) em uma sequência definida de elementos, resultando em um único valor. O exemplo <code>sum_of_squares</code> do <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a> é uma aplicação de um <code>Reduce</code><a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. Toda vez que você tiver essa situação você pode paralelizar com <code>parallelReduce</code>.</p>
 <p>A lógica do <code>parallelReduce</code> é similar ao <code>parallelFor</code>. Primeiro ambos usam objetos <code>Worker</code>, com algumas diferenças:</p>
@@ -2557,6 +2573,7 @@ Figure 1: Código <code>{Rcpp}</code> rodando em paralelo: muito rápido!
 <h4 id="exemplo-parallelreduce-soma-dos-quadrados">Exemplo <code>parallelReduce</code> – Soma dos Quadrados</h4>
 <p>Vamos reutilizar o exemplo <code>sum_of_squares</code> do <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a>.</p>
 <p>Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos no <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a> com dois loops <code>for</code>. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ <code>double</code> / R <code>numeric</code>) e computa a soma de todos os elementos do vetor elevados ao quadrado.</p>
+<p>Aqui vamos inserir um <a href="https://en.cppreference.com/w/cpp/algorithm/accumulate"><code>std::accumulate()</code></a> do header <a href="https://en.cppreference.com/w/cpp/header/numeric"><code>&lt;numeric&gt;</code></a>.</p>
 <p>Novamente vou incluir comentários para o entendimento do que estamos fazendo no <code>{RcppParallel}</code>. Além disso, há uma versão single-thread também que vamos testar desempenho.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
@@ -2619,23 +2636,39 @@ Figure 1: Código <code>{Rcpp}</code> rodando em paralelo: muito rápido!
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
-<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1e6</span>
-<span class='va'>v</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
-<span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
-  Rcpp <span class='op'>=</span> <span class='fu'>sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  RcppParallel <span class='op'>=</span> <span class='fu'>parallel_sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
-  check <span class='op'>=</span> <span class='cn'>FALSE</span>,
-<span class='op'>)</span>
+<pre><code><span class='va'>b2</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>)</span>,
+  <span class='op'>{</span>
+    <span class='va'>v</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
+    <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+      Rcpp <span class='op'>=</span> <span class='fu'>sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      RcppParallel <span class='op'>=</span> <span class='fu'>parallel_sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+      relative <span class='op'>=</span> <span class='cn'>TRUE</span>
+    <span class='op'>)</span>
+  <span class='op'>}</span><span class='op'>)</span>
+<span class='va'>b2</span>
 </code></pre>
 </div>
-<pre><code># A tibble: 2 x 6
-  expression        min   median `itr/sec` mem_alloc `gc/sec`
-  &lt;bch:expr&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 Rcpp            899µs    922µs     1080.    2.49KB        0
-2 RcppParallel    100µs    120µs     8310.    2.49KB        0</code></pre>
+<pre><code># A tibble: 6 x 7
+  expression         n   min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 Rcpp           10000  1.24   1         1.07         1      NaN
+2 RcppParallel   10000  1      1.06      1            1      NaN
+3 Rcpp          100000  4.85   3.88      1            1      NaN
+4 RcppParallel  100000  1      1         3.87         1      Inf
+5 Rcpp         1000000  9.01   7.86      1            1      NaN
+6 RcppParallel 1000000  1      1         7.89         1      NaN</code></pre>
 </div>
-<p>Mais um sucesso! Ganho de 9x 🤯 para um vetor com 1.000.000 elementos!</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figsumofsquares"></span>
+<img src="4-RcppParallel_files/figure-html5/figsumofsquares-1.png" alt="Benchmarks de Soma dos Quadrados: `Rcpp` vs `RcppParallel`" width="624" />
+<p class="caption">
+Figure 3: Benchmarks de Soma dos Quadrados: <code>Rcpp</code> vs <code>RcppParallel</code>
+</p>
+</div>
+</div>
+<p>Mais um sucesso! Ganho de 8x 🤯 com paralelização.</p>
 <h2 id="usar-rcppparallel-no-seu-pacote-r">Usar <code>{RcppParallel}</code> no seu Pacote R</h2>
 <p>As instruções abaixo foram retiradas da documentação do <a href="http://rcppcore.github.io/RcppParallel/#r_packages"><code>{RcppParallel}</code></a>.</p>
 <p>Se você deseja usar <code>{RcppParallel}</code> de dentro de um pacote R, você precisa editar vários arquivos para criar os links de construção e tempo de execução necessários. As seguintes adições devem ser feitas:</p>
@@ -2683,21 +2716,40 @@ attached base packages:
 [7] base     
 
 other attached packages:
-[1] RcppParallel_5.0.2 Rcpp_1.0.5        
+[1] RcppParallel_5.0.2 Matrix_1.3-2       dplyr_1.0.2       
+[4] gt_0.2.2           Rcpp_1.0.5        
 
 loaded via a namespace (and not attached):
- [1] rstudioapi_0.13   knitr_1.30        magrittr_2.0.1   
- [4] downlit_0.2.1     rlang_0.4.10      fansi_0.4.1      
- [7] stringr_1.4.0     highr_0.8         tools_4.0.3      
-[10] parallel_4.0.3    xfun_0.20         utf8_1.1.4       
-[13] cli_2.2.0         ellipsis_0.3.1    htmltools_0.5.0  
-[16] yaml_2.2.1        assertthat_0.2.1  digest_0.6.27    
-[19] lifecycle_0.2.0   tibble_3.0.4      crayon_1.3.4     
-[22] purrr_0.3.4       vctrs_0.3.6       distill_1.1      
-[25] glue_1.4.2        evaluate_0.14     rmarkdown_2.6    
-[28] emo_0.0.0.9000    bench_1.1.1       stringi_1.5.3    
-[31] pillar_1.4.7      compiler_4.0.3    generics_0.1.0   
-[34] profmem_0.6.0     lubridate_1.7.9.2 pkgconfig_2.0.3  </code></pre>
+ [1] RcppEigen_0.3.3.9.1      tidyselect_1.1.0        
+ [3] xfun_0.20                purrr_0.3.4             
+ [5] lattice_0.20-41          colorspace_2.0-0        
+ [7] vctrs_0.3.6              generics_0.1.0          
+ [9] htmltools_0.5.0          emo_0.0.0.9000          
+[11] yaml_2.2.1               utf8_1.1.4              
+[13] rlang_0.4.10             pillar_1.4.7            
+[15] glue_1.4.2               jpeg_0.1-8.1            
+[17] lifecycle_0.2.0          stringr_1.4.0           
+[19] munsell_0.5.0            commonmark_1.7          
+[21] gtable_0.3.0             bench_1.1.1             
+[23] evaluate_0.14            RcppArmadillo_0.10.1.2.2
+[25] knitr_1.30               parallel_4.0.3          
+[27] fansi_0.4.1              profmem_0.6.0           
+[29] highr_0.8                scales_1.1.1            
+[31] backports_1.2.1          checkmate_2.0.0         
+[33] jsonlite_1.7.2           farver_2.0.3            
+[35] distill_1.1              ggplot2_3.3.3           
+[37] png_0.1-7                digest_0.6.27           
+[39] stringi_1.5.3            bookdown_0.21           
+[41] grid_4.0.3               rprojroot_2.0.2         
+[43] BH_1.72.0-3              cli_2.2.0               
+[45] tools_4.0.3              magrittr_2.0.1          
+[47] sass_0.2.0               tibble_3.0.4            
+[49] crayon_1.3.4             tidyr_1.1.2             
+[51] pkgconfig_2.0.3          downlit_0.2.1           
+[53] ellipsis_0.3.1           lubridate_1.7.9.2       
+[55] rstudioapi_0.13          assertthat_0.2.1        
+[57] rmarkdown_2.6            R6_2.5.0                
+[59] compiler_4.0.3          </code></pre>
 </div>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
@@ -2740,7 +2792,7 @@ loaded via a namespace (and not attached):
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
 <div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2021 <a href="https://github.com/storopoli/Rcpp">Jose Storopoli</a>.</p>
+<p>© Copyright 2021 <a href="https://storopoli.io/Rcpp">Jose Storopoli</a>.</p>
 <p>Content licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->

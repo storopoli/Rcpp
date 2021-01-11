@@ -185,14 +185,23 @@ namespace writable = cpp11::writable;
 
 ```{r bench-sum_of_squares}
 set.seed(123)
-n <- 1e6
-v <- rnorm(n)
-bench::mark(
-  Rcpp = sum_of_squares_rcpp(v),
-  cpp11 = sum_of_squares_cpp11(v),
-  Rcppsugar = sum_of_squares_rcpp_sugar(v),
-  check = FALSE,
+b1 <- bench::press(
+  n = 10^c(4:6),
+  {
+    v = rnorm(n)
+    bench::mark(
+      Rcpp = sum_of_squares_rcpp(v),
+      cpp11 = sum_of_squares_cpp11(v),
+      Rcppsugar = sum_of_squares_rcpp_sugar(v),
+      check = FALSE,
+      relative = TRUE
 )
+  })
+b1
+```
+
+```{r figsumofsquars, echo=FALSE, fig.cap='Benchmarks de Soma dos Quadrados: `Rcpp` vs `cpp11`'}
+ggplot2::autoplot(b1, "violin")
 ```
 
 Quando usada a biblioteca padrão C++11 STL tanto `{cpp11}` quanto `{Rcpp}` e `{Rcpp}` Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos. É claro que solução do `{Rcpp}` Sugar é muito mais elegante e simples com uma única linhana função.

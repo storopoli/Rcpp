@@ -23,7 +23,6 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -2327,7 +2326,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Rcpp - A interface entre R e C++","description":"Como fazer seu código R ficar mais rápido com Rcpp","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000+00:00","citationText":"Storopoli, 2021"}
+{"title":"Rcpp - A interface entre R e C++","description":"Como fazer seu código R ficar mais rápido com Rcpp","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000-03:00","citationText":"Storopoli, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2352,6 +2351,7 @@ Tutoriais
 <a href="3-RcppEigen_RcppArmadillo.html">3. Manipulação de Matrizes - {RcppEigen} e {RcppArmadillo}</a>
 <a href="4-RcppParallel.html">4. Paralelização - {RcppParallel}</a>
 <a href="5-cpp11.html">5. {cpp11} - Nova Interface do pessoal do RStudio</a>
+<a href="6-Rcpp_CUDA.html">6. Usando {Rcpp} na GPU com CUDA</a>
 </div>
 </div>
 <input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
@@ -2427,6 +2427,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
 <li><a href="3-RcppEigen_RcppArmadillo.html">Manipulação de Matrizes – <code>{RcppEigen}</code> e <code>{RcppArmadillo}</code></a></li>
 <li><a href="4-RcppParallel.html">Paralelização – <code>{RcppParallel}</code></a></li>
 <li><a href="5-cpp11.html"><code>{cpp11}</code> – Nova Interface do pessoal do RStudio</a></li>
+<li><a href="6-Rcpp_CUDA.html">Usando <code>{Rcpp}</code> na GPU com <code>CUDA</code></a></li>
 </ol>
 <h2 id="como-configurar-um-ambiente-para-rcpp">Como Configurar um Ambiente para <code>{Rcpp}</code></h2>
 <p>Claro, que primeiro você deve instalar o <a href="https://cran.r-project.org">R pelo CRAN</a>.</p>
@@ -2441,7 +2442,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#lkzdvwraml .gt_table {
+#emzlmteulh .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2466,7 +2467,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-left-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_heading {
+#emzlmteulh .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2478,7 +2479,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_title {
+#emzlmteulh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2488,7 +2489,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-bottom-width: 0;
 }
 
-#lkzdvwraml .gt_subtitle {
+#emzlmteulh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2498,13 +2499,13 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-top-width: 0;
 }
 
-#lkzdvwraml .gt_bottom_border {
+#emzlmteulh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_col_headings {
+#emzlmteulh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2519,7 +2520,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_col_heading {
+#emzlmteulh .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2539,7 +2540,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   overflow-x: hidden;
 }
 
-#lkzdvwraml .gt_column_spanner_outer {
+#emzlmteulh .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2551,15 +2552,15 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-right: 4px;
 }
 
-#lkzdvwraml .gt_column_spanner_outer:first-child {
+#emzlmteulh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lkzdvwraml .gt_column_spanner_outer:last-child {
+#emzlmteulh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lkzdvwraml .gt_column_spanner {
+#emzlmteulh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2571,7 +2572,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   width: 100%;
 }
 
-#lkzdvwraml .gt_group_heading {
+#emzlmteulh .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2593,7 +2594,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   vertical-align: middle;
 }
 
-#lkzdvwraml .gt_empty_group_heading {
+#emzlmteulh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2608,15 +2609,15 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   vertical-align: middle;
 }
 
-#lkzdvwraml .gt_from_md > :first-child {
+#emzlmteulh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lkzdvwraml .gt_from_md > :last-child {
+#emzlmteulh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lkzdvwraml .gt_row {
+#emzlmteulh .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2635,7 +2636,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   overflow-x: hidden;
 }
 
-#lkzdvwraml .gt_stub {
+#emzlmteulh .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2647,7 +2648,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-left: 12px;
 }
 
-#lkzdvwraml .gt_summary_row {
+#emzlmteulh .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2657,7 +2658,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-right: 5px;
 }
 
-#lkzdvwraml .gt_first_summary_row {
+#emzlmteulh .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2667,7 +2668,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-top-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_grand_summary_row {
+#emzlmteulh .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2677,7 +2678,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-right: 5px;
 }
 
-#lkzdvwraml .gt_first_grand_summary_row {
+#emzlmteulh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2687,11 +2688,11 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-top-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_striped {
+#emzlmteulh .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lkzdvwraml .gt_table_body {
+#emzlmteulh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2700,7 +2701,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-bottom-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_footnotes {
+#emzlmteulh .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2714,13 +2715,13 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_footnote {
+#emzlmteulh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#lkzdvwraml .gt_sourcenotes {
+#emzlmteulh .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2734,46 +2735,46 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#lkzdvwraml .gt_sourcenote {
+#emzlmteulh .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#lkzdvwraml .gt_left {
+#emzlmteulh .gt_left {
   text-align: left;
 }
 
-#lkzdvwraml .gt_center {
+#emzlmteulh .gt_center {
   text-align: center;
 }
 
-#lkzdvwraml .gt_right {
+#emzlmteulh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lkzdvwraml .gt_font_normal {
+#emzlmteulh .gt_font_normal {
   font-weight: normal;
 }
 
-#lkzdvwraml .gt_font_bold {
+#emzlmteulh .gt_font_bold {
   font-weight: bold;
 }
 
-#lkzdvwraml .gt_font_italic {
+#emzlmteulh .gt_font_italic {
   font-style: italic;
 }
 
-#lkzdvwraml .gt_super {
+#emzlmteulh .gt_super {
   font-size: 65%;
 }
 
-#lkzdvwraml .gt_footnote_marks {
+#emzlmteulh .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="lkzdvwraml" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="emzlmteulh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
       <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Total de Downloads do CRAN</th>
@@ -2794,7 +2795,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>Rcpp</code></p>
 </div></td>
       <td class="gt_row gt_right">41,39M</td>
-      <td class="gt_row gt_right">2.313</td>
+      <td class="gt_row gt_right">2.318</td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>BH</code></p>
@@ -2806,7 +2807,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>RcppArmadillo</code></p>
 </div></td>
       <td class="gt_row gt_right">13,27M</td>
-      <td class="gt_row gt_right">846</td>
+      <td class="gt_row gt_right">851</td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>RcppEigen</code></p>
@@ -2852,7 +2853,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
             <em>3</em>
           </sup>
            
-          Total em 10/01/2021.
+          Total em 11/01/2021.
           <br />
         </p>
       </td>
@@ -2894,7 +2895,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
 <div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2021 <a href="https://github.com/storopoli/Rcpp">Jose Storopoli</a>.</p>
+<p>© Copyright 2021 <a href="https://storopoli.io/Rcpp">Jose Storopoli</a>.</p>
 <p>Content licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->

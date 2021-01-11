@@ -182,14 +182,14 @@ A tabela abaixo apresenta a correspondência dos tipos de dados entre R/`{Rcpp}`
 library(gt)
 library(dplyr)
 tibble::tribble(
-      ~`Tipo de Variável`,   ~`Vetor R`,                     ~`Vetor Rcpp`,                     ~`Matriz Rcpp`, ~`Escalar Rcpp`, ~`Escalar C++`,
-   "Lógica",   "logical",                  "LogicalVector",                  "LogicalMatrix",          "-",        "bool",
-   "Inteiro",   "integer",                  "IntegerVector",                  "IntegerMatrix",          "-",         "int",
-      "Real",   "numeric",                  "NumericVector",                  "NumericMatrix",          "-",      "double",
-   "Complexo",   "complex",                  "ComplexVector",                  "ComplexMatrix",   "Rcomplex",     "complex",
-    "String", "character", "CharacterVector (StringVector)", "CharacterMatrix (StringMatrix)",     "String",      "std::string",
-      "Date",      "Date",                     "DateVector",                              "-",       "Date",           "-",
-  "Datetime",   "POSIXct",                 "DatetimeVector",                              "-",   "Datetime",      "time_t"
+      ~`Tipo de Variável`,   ~`Vetor R`,                     ~`Vetor Rcpp`,                     ~`Matriz Rcpp`, ~`Escalar Rcpp`, ~`Missing Rcpp`, ~`Escalar C++`,
+   "Lógica",   "logical",                  "LogicalVector",                  "LogicalMatrix",          "-",        "NA_LOGICAL", "bool",
+   "Inteiro",   "integer",                  "IntegerVector",                  "IntegerMatrix",          "-",        "NA_INTEGER", "int",
+      "Real",   "numeric",                  "NumericVector",                  "NumericMatrix",          "-",      "NA_REAL", "double",
+   "Complexo",   "complex",                  "ComplexVector",                  "ComplexMatrix",   "Rcomplex",     "-", "complex",
+    "String", "character", "CharacterVector (StringVector)", "CharacterMatrix (StringMatrix)",     "String",     "NA_STRING", "std::string",
+      "Date",      "Date",                     "DateVector",                              "-",       "Date",         "-",  "-",
+  "Datetime",   "POSIXct",                 "DatetimeVector",                              "-",   "Datetime",     "-", "time_t"
   ) %>%
   mutate_all(~stringr::str_glue("`{.}`")) %>% 
   gt() %>% 
@@ -341,6 +341,24 @@ DataFrame df = DataFrame::create(v1, v2);
 DataFrame df = DataFrame::create( Named("V1") = v1 , _["V2"] = v2 );
 ```
 
+### `{Rcpp}` `tibble`
+
+Para retornar uma `tibble` do `{tidyverse}` com o `{Rcpp}` é só você notar que uma `tibble` não é nada mais que um `data.frame` com algumas classes extras:
+
+```{r tibble}
+df <- tibble::tibble()
+class(df)
+```
+
+E aí é só adicionar essas classes num `DataFrame` do `{Rcpp}`:
+
+```cpp
+DataFrame df = DataFrame::create( Named("V1") = v1 , _["V2"] = v2 );
+df.attr("class") = CharacterVector::create("tbl_df", "tbl", "data.frame");
+```
+
+Pronto seu objeto `DataFrame` quando for retornado ao R será uma `tibble` do `{tidyverse}`.
+
 ## `{Rcpp}` Sugar
 
 Além dos tipos de dados, `{Rcpp}` também tem uma ampla gama de "açúcares" sintáticos (*syntactic sugar*) para as mais variadas operações e funções. Antes de tentar criar algo do zero veja se não há um [`{Rccp}` Sugar para isso já implementado na vinheta](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf). 
@@ -365,19 +383,28 @@ NumericVector mat_mul(const NumericVector& A, const NumericVector& B) {
 }
 ```
 
-```{r bench-mat_mul}
-n <- 10^3
-X <- matrix(rnorm(n * n), nrow = n)
-
-bench::mark(
-  R = X %*% X,
-  Cpp = mat_mul(X, X),
-  check = FALSE
+```{r bench-mat_mul, message=FALSE}
+b1 <- bench::press(
+  n = 10^c(2:3),
+  {
+    X = matrix(rnorm(n * n), nrow = n)
+    bench::mark(
+      R = X %*% X,
+      Cpp = mat_mul(X, X),
+      check = FALSE,
+      relative = TRUE
+  )}
 )
+b1
 ```
 
 
-Sucesso! Ganho de 700x `r emo::ji("exploding_head")` para uma matriz de dimensão `r format(n, big.mark = ".", decimal.mark = ",")` x `r format(n, big.mark = ".", decimal.mark = ",")`!
+```{r figmatmul, echo=FALSE, fig.cap='Benchmarks de Multiplicação de Matriz: R vs C++'}
+ggplot2::autoplot(b1, "violin")
+```
+
+
+Sucesso! Ganho de 200x `r emo::ji("exploding_head")`
 
 ## Usando a biblioteca padrão C++11 STL no `{Rcpp}`
 
@@ -441,27 +468,37 @@ double sum_of_squares_rcpp_sugar(NumericVector v){
 }
 ```
 
-```{r bench_sum_of_squares}
+```{r bench-sum_of_squares, message=FALSE}
 set.seed(123)
-n <- 1000
-v <- rnorm(n)
-bench::mark(
-  R = sum_of_squares_R(v),
-  rcpp = sum_of_squares_rcpp(v),
-  rcpp20 = sum_of_squares_rcpp20(v),
-  rcppsugar = sum_of_squares_rcpp_sugar(v),
-  check = FALSE,
-  time_unit = "us"
-)
+
+b2 <- bench::press(
+  n = 10^c(1:4),
+  {
+    v = rnorm(n)
+    bench::mark(
+      R = sum_of_squares_R(v),
+      rcpp = sum_of_squares_rcpp(v),
+      rcpp20 = sum_of_squares_rcpp20(v),
+      rcppsugar = sum_of_squares_rcpp_sugar(v),
+      check = FALSE,
+      relative = TRUE
+    )
+})
+b2
 ```
 
-Aqui vemos como a vetorização do R funciona muito bem. É mais rápida que quase todas as implementações em `{Rcpp}`, exceto quando usamos o [`{Rcpp}` Sugar](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf) já que temos um ganho de 2x para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos.
+```{r figss, echo=FALSE, fig.cap='Benchmarks de Soma dos Quadrados: R vs alternativas C++'}
+ggplot2::autoplot(b2, "violin")
+```
+
+
+Aqui vemos como a vetorização do R funciona muito bem. É mais rápida que quase todas as implementações em `{Rcpp}`, exceto quando usamos o [`{Rcpp}` Sugar](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf) já que temos um ganho de 2x.
 
 ## `{Rcpp}` e Boost
 
 [Boost](https://www.boost.org) é um conjunto de bibliotecas para a linguagem de programação C++ que fornece suporte para tarefas e estruturas como álgebra linear, geração de números pseudo-aleatórios, multithreading, processamento de imagem, expressões regulares e teste de unidade. Ele contém ~~uma porrada~~ 164 bibliotecas individuais (versão 1.75) e sua versão inicial foi lançada em 1999.
 
-A maioria das bibliotecas Boost são licenciadas sob a Licença de Software Boost, projetada para permitir que Boost seja usado com projetos de software proprietários e gratuitos. Muitos dos fundadores da Boost estão no comitê internacional de padrões C++, e várias bibliotecas Boost foram aceitas para incorporação no padrão C++11 (por exemplo, smart pointers, `thread`, `regex`, `random`, `ratio`, `tuple`) e no padrão C ++ 17 (por exemplo, `filesystem`, `any`, `optional`, `variant`, `string_view`).
+A maioria das bibliotecas Boost são licenciadas sob a Licença de Software Boost, projetada para permitir que Boost seja usado com projetos de software proprietários e gratuitos. Muitos dos fundadores da Boost estão no comitê internacional de padrões C++, e várias bibliotecas Boost foram aceitas para incorporação no padrão C++11 (por exemplo, smart pointers, `thread`, `regex`, `random`, `ratio`, `tuple`) e no padrão C++17 (por exemplo, `filesystem`, `any`, `optional`, `variant`, `string_view`).
 
 Antes de usar o Boost no `{Rcpp}` certifique-se que você tem o Boost instalado no seu sistema operacional:
 
@@ -516,15 +553,22 @@ int boostGCD(int& a, int& b) {
 }
 ```
 
-```{r bench_GCD}
+```{r bench-GCD, message=FALSE}
 a <- 7919
 b <- 7412
-bench::mark(
+b3 <- bench::mark(
   R = rGCD(a, b),
   cpp = cppGCD(a, b),
-  boost = boostGCD(a, b)
+  boost = boostGCD(a, b),
+  relative = TRUE
 )
+b3
 ```
+
+```{r figGCD, echo=FALSE, fig.cap='Benchmarks de Máximo Divisor Comum: R vs C++'}
+ggplot2::autoplot(b3, "violin")
+```
+
 Aqui eu escolhi um número primo bem grande, 7189, e um número aleatório próximo dele, 7412. Como vocês podem ver a solução usando a biblioteca `boost::integer` é 4,5x mais rápida que uma implementação em R e similar com a implementação de C++17.
 
 ## `{Rcpp}` e Rmarkdown

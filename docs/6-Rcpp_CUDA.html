@@ -18,29 +18,108 @@
  <!--radix_placeholder_import_source-->
  <!--/radix_placeholder_import_source-->
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Rcpp - A interface entre R e C++: Untitled</title>
+  <title>Rcpp - A interface entre R e C++: Usando `{Rcpp}` na GPU com `CUDA`</title>
 
+  <meta property="description" itemprop="description" content="Como fazer seu código `{Rcpp}` rodar na GPU com NVIDIA `CUDA`"/>
 
   <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"/>
 
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2021-02-02"/>
+  <meta property="article:created" itemprop="dateCreated" content="2021-02-02"/>
+  <meta name="article:author" content="Jose Storopoli"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Rcpp - A interface entre R e C++: Untitled"/>
+  <meta property="og:title" content="Rcpp - A interface entre R e C++: Usando `{Rcpp}` na GPU com `CUDA`"/>
   <meta property="og:type" content="article"/>
+  <meta property="og:description" content="Como fazer seu código `{Rcpp}` rodar na GPU com NVIDIA `CUDA`"/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Rcpp - A interface entre R e C++"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Rcpp - A interface entre R e C++: Untitled"/>
+  <meta property="twitter:title" content="Rcpp - A interface entre R e C++: Usando `{Rcpp}` na GPU com `CUDA`"/>
+  <meta property="twitter:description" content="Como fazer seu código `{Rcpp}` rodar na GPU com NVIDIA `CUDA`"/>
 
+  <!--  https://scholar.google.com/intl/en/scholar/inclusion.html#indexing -->
+  <meta name="citation_title" content="Rcpp - A interface entre R e C++: Usando `{Rcpp}` na GPU com `CUDA`"/>
+  <meta name="citation_fulltext_html_url" content="https://storopoli.github.io/Rcpp/6-Rcpp_CUDA.html"/>
+  <meta name="citation_fulltext_world_readable" content=""/>
+  <meta name="citation_online_date" content="2021/02/02"/>
+  <meta name="citation_publication_date" content="2021/02/02"/>
+  <meta name="citation_author" content="Jose Storopoli"/>
+  <meta name="citation_author_institution" content="UNINOVE"/>
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{},"value":[]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","citation_url","slug"]}},"value":[{"type":"character","attributes":{},"value":["Usando `{Rcpp}` na GPU com `CUDA`"]},{"type":"character","attributes":{},"value":["Como fazer seu código `{Rcpp}` rodar na GPU com NVIDIA `CUDA`\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Jose Storopoli"]},{"type":"character","attributes":{},"value":["https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en"]},{"type":"character","attributes":{},"value":["UNINOVE"]},{"type":"character","attributes":{},"value":["https://www.uninove.br"]},{"type":"character","attributes":{},"value":["0000-0002-0559-5176"]}]}]},{"type":"character","attributes":{},"value":["February 2, 2021"]},{"type":"character","attributes":{},"value":["https://storopoli.github.io/Rcpp/6-Rcpp_CUDA.html"]},{"type":"character","attributes":{},"value":["storopoli2021rcppgpu"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2224,6 +2303,11 @@
   }</style>
   <!--/radix_placeholder_distill-->
   <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
+  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
+  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
   <script>
@@ -2242,7 +2326,7 @@
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Untitled","authors":[]}
+{"title":"Usando `{Rcpp}` na GPU com `CUDA`","description":"Como fazer seu código `{Rcpp}` rodar na GPU com NVIDIA `CUDA`","authors":[{"author":"Jose Storopoli","authorURL":"https://scholar.google.com/citations?user=xGU7H1QAAAAJ&hl=en","affiliation":"UNINOVE","affiliationURL":"https://www.uninove.br","orcidID":"0000-0002-0559-5176"}],"publishedDate":"2021-02-02T00:00:00.000-03:00","citationText":"Storopoli, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2267,6 +2351,7 @@ Tutoriais
 <a href="3-RcppEigen_RcppArmadillo.html">3. Manipulação de Matrizes - {RcppEigen} e {RcppArmadillo}</a>
 <a href="4-RcppParallel.html">4. Paralelização - {RcppParallel}</a>
 <a href="5-cpp11.html">5. {cpp11} - Nova Interface do pessoal do RStudio</a>
+<a href="6-Rcpp_CUDA.html">6. Usando {Rcpp} na GPU com CUDA</a>
 </div>
 </div>
 <input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
@@ -2299,21 +2384,314 @@ Tutoriais
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>Tutorial_Rcpp.utf8</h1>
+<h1>Usando {Rcpp} na GPU com CUDA</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-
+<p><p>Como fazer seu código <code>{Rcpp}</code> rodar na GPU com NVIDIA <code>CUDA</code></p></p>
 </div>
 
+<div class="d-byline">
+  Jose Storopoli <a href="https://scholar.google.com/citations?user=xGU7H1QAAAAJ&amp;hl=en" class="uri">https://scholar.google.com/citations?user=xGU7H1QAAAAJ&amp;hl=en</a> (UNINOVE)<a href="https://www.uninove.br" class="uri">https://www.uninove.br</a>
+  
+<br/>February 2, 2021
+</div>
 
 <div class="d-article">
-<ol start="5" type="1">
-<li>RcppParallel – Paralelização Exemplo usando sum_of_squares_rcpp()</li>
-<li>cpp11 – Nova Interface do pessoal do RStudio <a href="https://cran.r-project.org/web/packages/cpp11/vignettes/converting.html" class="uri">https://cran.r-project.org/web/packages/cpp11/vignettes/converting.html</a></li>
-</ol>
-<p>References Eigen Arma cpp11</p>
-<p>Deletar esse Tutorial_Rcpp.md Fazer README.md e colocar no exclude GitHub Pages com https</p>
-<p>Divulgar no discourse curso-r Divulgar no twitter marcando Dirk, Hadkey, Rcpp4everyone, clente, coatless.</p>
+<div class="d-contents d-contents-float">
+<nav class="l-text toc figcaption" id="TOC">
+<h3>Contents</h3>
+<ul>
+<li><a href="#biblioteca-thrust-da-nvidia">Biblioteca <code>Thrust</code> da NVIDIA</a></li>
+<li><a href="#instalando-e-habilitando-o-thrust">Instalando e Habilitando o <code>Thrust</code></a></li>
+<li><a href="#exemplo-soma-dos-quadrados">Exemplo – Soma dos Quadrados</a>
+<ul>
+<li><a href="#soma-dos-quadrados-usando-thrust">Soma dos Quadrados usando <code>Thrust</code></a></li>
+<li><a href="#soma-dos-quadrados-usando-thrust-1">Soma dos Quadrados usando <code>Thrust</code></a></li>
+</ul></li>
+<li><a href="#ambiente">Ambiente</a></li>
+</ul>
+</nav>
+</div>
+<!--Academicons Icons-->
+<p><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css"></p>
+<p>Além de paralelização nos vários threads/cores da sua CPU, você pode paralelizar na sua placa gráfica GPU (se ela for NVIDIA e tiver o protocolo <code>CUDA</code>). Isso é possível pela biblioteca <code>Thrust</code> da NVIDIA.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:CUDA"></span>
+<img src="images/CUDA.jpg" alt="Código `{Rcpp}` rodando em paralelo na GPU" width="250" />
+<p class="caption">
+Figure 1: Código <code>{Rcpp}</code> rodando em paralelo na GPU
+</p>
+</div>
+</div>
+<h2 id="biblioteca-thrust-da-nvidia">Biblioteca <code>Thrust</code> da NVIDIA</h2>
+<p><code>Thrust</code> é uma biblioteca de algoritmos paralelos que se assemelha à biblioteca padrão C++ STL. <code>Thrust</code> usa a interface <code>CUDA</code> da NVIDIA. <code>CUDA</code>, sigla para <strong>C</strong>ompute <strong>U</strong>nified <strong>D</strong>evice <strong>A</strong>rchitecture, é uma extensão para a linguagem de programação C, a qual possibilita o uso de computação paralela. A ideia por trás disso tudo é que programadores possam usar os poderes da unidade de processamento gráfico (GPU) para realizar algumas operações mais rapidamente.</p>
+<p>Para quase tudo da STL, é só você mudar alguns headers e o <code>namespace</code> de <code>std::</code> para <code>thrust::</code>. <code>Thrust</code> fornece dois contêineres de <code>vetor</code>, <code>thrust::host_vector</code> e <code>thrust::device_vector</code>. Como os nomes sugerem, <code>thrust::host_vector</code> é armazenado na memória da CPU, enquanto <code>thrust::device_vector</code> vive na memória do dispositivo GPU. Os contêineres de vetor da Thrust são como <code>std::vector</code> no C++ STL. Como <code>std::vector</code>, <code>thrust::host_vector</code> e <code>thrust::device_vector</code> são recipientes genéricos (capazes de armazenar qualquer tipo de dados) que podem ser redimensionados dinamicamente.</p>
+<h2 id="instalando-e-habilitando-o-thrust">Instalando e Habilitando o <code>Thrust</code></h2>
+<p>O <strong>primeiro passo</strong> é instalar o <code>Thrust</code>. Ele vem automaticamente quando você instala o <code>CUDA</code> Toolkit da NVIDIA. Como vocês podem ver nesse Ubuntu eu tenho <code>CUDA</code> versão 11.0 (sendo que precisei instalar o <code>g++-9</code> versão 9 que dá suporte ao <code>nvcc</code> da NVIDIA) e uma GeForce RTX 2060 com 6GB de RAM. Veja como instalar <code>Thrust</code> na <a href="https://docs.nvidia.com/cuda/thrust/index.html">documentação da NVIDIA-CUDA</a>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nvidia-smi</span></span></code></pre></div>
+<pre><code>Mon Jan 11 17:02:04 2021       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 450.102.04   Driver Version: 450.102.04   CUDA Version: 11.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  GeForce RTX 2060    Off  | 00000000:01:00.0 Off |                  N/A |
+| N/A   43C    P8     3W /  N/A |    321MiB /  5934MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|    0   N/A  N/A      3430      G   /usr/lib/xorg/Xorg                 66MiB |
+|    0   N/A  N/A      3878      G   /usr/bin/gnome-shell               10MiB |
+|    0   N/A  N/A    130028      C   ...tudio-server/bin/rsession      239MiB |
++-----------------------------------------------------------------------------+</code></pre>
+</div>
+<p>O <strong>segundo passo</strong> é criar um plugin no <code>{Rcpp}</code>. Para isso, vamos ver o caminho do <code>nvcc</code> no meu sistema.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> nvcc</span></code></pre></div>
+<pre><code>/usr/bin/nvcc</code></pre>
+</div>
+<p>Com esse caminho eu crio um plugin para <code>{Rcpp}</code> com a função <code>registerPlugin()</code>. Notem que estou usando o padrão C++17 (mais recente que <code>g++-9</code> dá suporte).</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://www.rcpp.org'>Rcpp</a></span><span class='op'>)</span>
+<span class='va'>thrust</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+    env <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+      MAKEFLAGS <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span>
+        <span class='st'>"CXX=/usr/bin/nvcc"</span>,
+        <span class='st'>"CXXFLAGS=-x\\ cu\\ -g\\ -G\\ -O3 --std=c++17"</span>,
+        <span class='st'>"CXXPICFLAGS=-Xcompiler\\ -fpic\\ -Xcudafe\\ --diag_suppress=code_is_unreachable"</span>,
+        <span class='st'>"LDFLAGS="</span>
+      <span class='op'>)</span>,
+      PKG_CXXFLAGS <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"-I"</span>, <span class='fu'>here</span><span class='fu'>::</span><span class='fu'><a href='https://here.r-lib.org//reference/here.html'>here</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+    <span class='op'>)</span>
+  <span class='op'>)</span>
+<span class='op'>}</span>
+
+<span class='fu'>Rcpp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/registerPlugin.html'>registerPlugin</a></span><span class='op'>(</span><span class='st'>"thrust"</span>, <span class='va'>thrust</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span>envir<span class='op'>=</span><span class='fu'>Rcpp</span><span class='fu'>:::</span><span class='va'>.plugins</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code> [1] &quot;cpp0x&quot;         &quot;cpp11&quot;         &quot;cpp14&quot;         &quot;cpp17&quot;        
+ [5] &quot;cpp1y&quot;         &quot;cpp1z&quot;         &quot;cpp2a&quot;         &quot;cpp98&quot;        
+ [9] &quot;openmp&quot;        &quot;thrust&quot;        &quot;unwindProtect&quot;</code></pre>
+</div>
+<p><strong>Terceiro passo</strong> é colocar em qualquer parte do código <code>CUDA</code> o seguinte texto indicando que <code>{Rcpp}</code> deve usar o plugin <code>thrust</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(thrust)]]</span></span></code></pre></div>
+<p>É isso! Um pouco mais difícil que os outros plugins que usamos até aqui porque tivemos que criá-lo do zero. Mas nada impossível.</p>
+<h2 id="exemplo-soma-dos-quadrados">Exemplo – Soma dos Quadrados</h2>
+<p>Vamos reutilizar o exemplo <code>sum_of_squares</code> do <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a>, agora comparando <code>{RcppParallel}</code> com a biblioteca <code>Thrust</code> da NVIDIA.</p>
+<p>Soma dos quadrados é algo que ocorre bastante em computação científica, especialmente quando estamos falando de regressão, mínimos quadrados, ANOVA etc. Vamos paralelizar a implementação ingênua que fizemos no <a href="2-Rcpp.html">tutorial 2. Como incorporar C++ no R - {Rcpp}</a> com dois loops <code>for</code>. Lembrando que esta implementação será uma função que aceita como parâmetro um vetor de números reais (C++ <code>double</code> / R <code>numeric</code>) e computa a soma de todos os elementos do vetor elevados ao quadrado.</p>
+<p>Aqui vamos inserir um <a href="https://en.cppreference.com/w/cpp/algorithm/accumulate"><code>std::accumulate()</code></a> do header <a href="https://en.cppreference.com/w/cpp/header/numeric"><code>&lt;numeric&gt;</code></a>.</p>
+<h3 id="soma-dos-quadrados-usando-thrust">Soma dos Quadrados usando <code>Thrust</code></h3>
+<p>Novamente vou incluir comentários para o entendimento do que estamos fazendo no <code>{RcppParallel}</code>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://rcppcore.github.io/RcppParallel'>RcppParallel</a></span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html'>setThreadOptions</a></span><span class='op'>(</span><span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[1] 12</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppParallel.h&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> RcppParallel;</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppParallel)]]</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp11&quot;)]]</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(&quot;cpp2a&quot;)]]</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">// Criando um objeto Worker chamado sum_of_squares</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> sum_of_squares : <span class="kw">public</span> Worker</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Variáveis Membro públicas</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> RVector&lt;<span class="dt">double</span>&gt; input;</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> value;</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Construtor padrão do Objeto Worker</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  sum_of_squares(<span class="at">const</span> NumericVector input) : input(input), value(<span class="dv">0</span>) {}</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Construtor &quot;divisor&quot;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  sum_of_squares(<span class="at">const</span> sum_of_squares&amp; sum, Split) : input(sum.input), value(<span class="dv">0</span>) {}</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Overload do operador ()  -- functor</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> <span class="kw">operator</span>()(<span class="bu">std::</span>size_t begin, <span class="bu">std::</span>size_t end) {</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>      value += <span class="bu">std::</span>accumulate(input.begin() + begin,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                               input.begin() + end,</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>                               <span class="fl">0.0</span>,</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>                               [] (<span class="kw">auto</span> i, <span class="kw">auto</span> j) {<span class="cf">return</span> i + (j * j);});</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> join(<span class="at">const</span> sum_of_squares&amp; rhs) { </span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>      value += rhs.value; </span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>};</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">// Função que chama o Objeto Worker sum_of_squares</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> parallel_sum_of_squares(NumericVector x) {</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>   <span class="co">// variável local inicializada</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>   sum_of_squares sum(x);</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>   <span class="co">// Paralelização do Reduce</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>   parallelReduce(<span class="dv">0</span>, x.length(), sum);</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>   <span class="cf">return</span> sum.value;</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<h3 id="soma-dos-quadrados-usando-thrust-1">Soma dos Quadrados usando <code>Thrust</code></h3>
+<p>No arquivo <code>SS_Thrust.cpp</code> usamos os headers <code>&lt;thrust&gt;</code> e também chamamos os objetos <code>Thrust</code> com o <code>namespace</code> <code>thrust::</code>. <code>std::acummulate()</code> vira <code>thrust::transform_reduce()</code>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'><a href='https://rdrr.io/r/base/writeLines.html'>writeLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='st'>"SS_Thrust.cpp"</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#include &lt;Rcpp.h&gt;
+#include &lt;thrust/device_vector.h&gt;
+#include &lt;thrust/functional.h&gt;
+#include &lt;thrust/transform_reduce.h&gt;
+
+// [[Rcpp::plugins(thrust)]]
+
+// [[Rcpp::export]]
+double thrust_sum_of_squares(Rcpp::NumericVector&amp; v){
+  
+  // cria um device_vector na GPU copiando todos os elementos do NumericVector v
+  thrust::device_vector&lt;double&gt; dv(v.cbegin(), v.cend());
+  
+  double sum_of_squares = thrust::transform_reduce(dv.cbegin(),
+                                                   dv.cend(),
+                                                   thrust::square&lt;double&gt;(),
+                                                   0L,
+                                                   thrust::plus&lt;double&gt;());
+  return sum_of_squares;
+}</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span><span class='st'>"SS_Thrust.cpp"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>6</span><span class='op'>:</span><span class='fl'>8</span><span class='op'>)</span>,
+  <span class='op'>{</span>
+    <span class='va'>v</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
+    <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+      RcppParallel <span class='op'>=</span> <span class='fu'>parallel_sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      Thrust <span class='op'>=</span> <span class='fu'>thrust_sum_of_squares</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span>,
+      check <span class='op'>=</span> <span class='cn'>FALSE</span>,
+      relative <span class='op'>=</span> <span class='cn'>TRUE</span>
+    <span class='op'>)</span>
+  <span class='op'>}</span><span class='op'>)</span>
+<span class='va'>b1</span>
+</code></pre>
+</div>
+<pre><code># A tibble: 6 x 7
+  expression           n   min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;       &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 RcppParallel   1000000   1      1        62.5         1      NaN
+2 Thrust         1000000  58.9   52.9       1           1      NaN
+3 RcppParallel  10000000   1      1        25.7         1      NaN
+4 Thrust        10000000  25.5   25.9       1           1      NaN
+5 RcppParallel 100000000   1      1        23.8         1      NaN
+6 Thrust       100000000  24.0   23.9       1           1      NaN</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="figure" style="text-align: center"><span id="fig:figsumofsquares"></span>
+<img src="6-Rcpp_CUDA_files/figure-html5/figsumofsquares-1.png" alt="Benchmarks de Soma dos Quadrados: `RcppParallel` vs CUDA" width="624" />
+<p class="caption">
+Figure 2: Benchmarks de Soma dos Quadrados: <code>RcppParallel</code> vs CUDA
+</p>
+</div>
+</div>
+<p>Nesse caso específico, <code>Thrust</code> é 20-30x mais lento que <code>{RcppParallel}</code>, mas em outros contextos um código altamente paralelizável ao ser executado na GPU com <code>CUDA</code> pode ser que o cenário se inverta.</p>
+<h2 id="ambiente">Ambiente</h2>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>R version 4.0.3 (2020-10-10)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.10
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods  
+[7] base     
+
+other attached packages:
+[1] cpp11_0.2.4        RcppParallel_5.0.2 Matrix_1.3-2      
+[4] dplyr_1.0.2        gt_0.2.2           Rcpp_1.0.5        
+
+loaded via a namespace (and not attached):
+ [1] here_1.0.1               lubridate_1.7.9.2       
+ [3] lattice_0.20-41          tidyr_1.1.2             
+ [5] ps_1.5.0                 png_0.1-7               
+ [7] assertthat_0.2.1         rprojroot_2.0.2         
+ [9] digest_0.6.27            utf8_1.1.4              
+[11] R6_2.5.0                 backports_1.2.1         
+[13] evaluate_0.14            httr_1.4.2              
+[15] ggplot2_3.3.3            highr_0.8               
+[17] pillar_1.4.7             rlang_0.4.10            
+[19] curl_4.3                 rstudioapi_0.13         
+[21] callr_3.5.1              checkmate_2.0.0         
+[23] rmarkdown_2.6            desc_1.2.0              
+[25] stringr_1.4.0            RcppEigen_0.3.3.9.1     
+[27] igraph_1.2.6             munsell_0.5.0           
+[29] compiler_4.0.3           xfun_0.20               
+[31] pkgconfig_2.0.3          htmltools_0.5.0         
+[33] downlit_0.2.1            tidyselect_1.1.0        
+[35] tibble_3.0.4             bookdown_0.21           
+[37] emo_0.0.0.9000           fansi_0.4.1             
+[39] crayon_1.3.4             brio_1.1.0              
+[41] commonmark_1.7           crandep_0.1.1           
+[43] BH_1.72.0-3              grid_4.0.3              
+[45] jsonlite_1.7.2           gtable_0.3.0            
+[47] lifecycle_0.2.0          magrittr_2.0.1          
+[49] scales_1.1.1             bench_1.1.1             
+[51] cli_2.2.0                stringi_1.5.3           
+[53] profmem_0.6.0            farver_2.0.3            
+[55] RcppArmadillo_0.10.1.2.2 decor_1.0.0             
+[57] xml2_1.3.2               ellipsis_0.3.1          
+[59] generics_0.1.0           vctrs_0.3.6             
+[61] distill_1.1              cranlogs_2.1.1          
+[63] tools_4.0.3              glue_1.4.2              
+[65] purrr_0.3.4              jpeg_0.1-8.1            
+[67] processx_3.4.5           parallel_4.0.3          
+[69] yaml_2.2.1               colorspace_2.0-0        
+[71] rvest_0.3.6              knitr_1.30              
+[73] sass_0.2.0              </code></pre>
+</div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
@@ -2330,11 +2708,21 @@ Tutoriais
 <p>If you see mistakes or want to suggest changes, please <a href="https://github.com/storopoli/Rcpp/issues/new">create an issue</a> on the source repository.</p>
 <h3 id="reuse">Reuse</h3>
 <p>Text and figures are licensed under Creative Commons Attribution <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Source code is available at <a href="https://github.com/storopoli/Rcpp">https://github.com/storopoli/Rcpp</a>, unless otherwise noted. The figures that have been reused from other sources don't fall under this license and can be recognized by a note in their caption: "Figure from ...".</p>
+<h3 id="citation">Citation</h3>
+<p>For attribution, please cite this work as</p>
+<pre class="citation-appendix short">Storopoli (2021, Feb. 2). Rcpp - A interface entre R e C++: Usando `{Rcpp}` na GPU com `CUDA`. Retrieved from https://storopoli.github.io/Rcpp/6-Rcpp_CUDA.html</pre>
+<p>BibTeX citation</p>
+<pre class="citation-appendix long">@misc{storopoli2021rcppgpu,
+  author = {Storopoli, Jose},
+  title = {Rcpp - A interface entre R e C++: Usando `{Rcpp}` na GPU com `CUDA`},
+  url = {https://storopoli.github.io/Rcpp/6-Rcpp_CUDA.html},
+  year = {2021}
+}</pre>
 </div>
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
 <div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2021 <a href="https://github.com/storopoli/Rcpp">Jose Storopoli</a>.</p>
+<p>© Copyright 2021 <a href="https://storopoli.io/Rcpp">Jose Storopoli</a>.</p>
 <p>Content licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->

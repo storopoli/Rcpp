@@ -17,6 +17,7 @@ Acesse o site dos tutoriais em [storopoli.io/Rcpp](https://storopoli.io/Rcpp).
 3. [Manipulação de Matrizes -- `{RcppEigen}` e `{RcppArmadillo}`](https://storopoli.io/Rcpp/3-RcppEigen_RcppArmadillo.html)
 4. [Paralelização -- `{RcppParallel}`](https://storopoli/.io/Rcpp/4-RcppParallel.html)
 5. [`{cpp11}` -- Nova Interface do pessoal do RStudio](https://storopoli.io/Rcpp/5-cpp11.html)
+6. [Usando `{Rcpp}` na GPU com CUDA](https://storopoli.io/Rcpp/6-Rcpp_CUDA.html)
 
 ## Como Configurar um Ambiente para `{Rcpp}`
 

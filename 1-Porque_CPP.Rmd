@@ -57,14 +57,19 @@ int addCpp(int x, int y, int z){
 addCpp(10, 17, 31)
 ```
 
-Comparando tempo de execução (em ns) com a função `mark()` do pacote `{bench}`:
+Comparando tempo de execução com a função `mark()` do pacote `{bench}`:
 
-```{r bench_add}
-bench::mark(
+```{r bench-add, message=FALSE}
+b1 <- bench::mark(
   R   = addR(10, 17, 31),
   Cpp = addCpp(10, 17, 31),
-  time_unit = "ns"
+  relative = TRUE
 )
+b1
+```
+
+```{r fig-bench-add, echo=FALSE, fig.cap='Benchmark da função soma: R vs C++'}
+ggplot2::autoplot(b1, "violin")
 ```
 
 Aqui vocês vem que C++ não tem nenhuma vantagem sobre R: é mais verboso, chato de escrever e ainda é mais lenta!
@@ -117,15 +122,25 @@ NumericMatrix gibbsCpp(int N, int thin) {
 )
 ```
 
-E vamos para o benchmark (em µs):
+E vamos para o benchmark comparando alguns tamanhos de inputs:
 
-```{r bench_gibbs}
-bench::mark(
-  R = gibbsR(100, 10),
-  Cpp = gibbsCpp(100, 10),
-  check = FALSE,
-  time_unit = "us"
+```{r bench-gibbs, message=FALSE}
+b2 <- bench::press(
+  N = 10^c(2:3),
+{
+  bench::mark(
+    R = gibbsR(N, 10),
+    Cpp = gibbsCpp(N, 10),
+    check = FALSE,
+    relative = TRUE
+  )
+}
 )
+b2
+```
+
+```{r fig-bench-gibbs, echo=FALSE, fig.cap='Benchmarks do Amostrador de Gibbs: R vs C++'}
+ggplot2::autoplot(b2, "violin")
 ```
 
 No meu computador `gibbsCpp()` executa 20x mais rápido que `gibbsR()`!
