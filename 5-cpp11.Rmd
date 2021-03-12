@@ -22,8 +22,8 @@ get_reverse_deps <- function(package) {
   length(crandep::get_dep(package, "Reverse_linking_to"))
 }
 get_downloads <- function(package = "cpp11") {
-  cranlogs::cran_downloads(package = package, from = "2016-01-01", to = "2020-12-31") %>% 
-    pull(count) %>% 
+  cranlogs::cran_downloads(package = package, from = "2016-01-01", to = "2020-12-31") %>%
+    pull(count) %>%
     sum()
 }
 ```
@@ -49,7 +49,7 @@ As mudanças que motivaram `{cpp11}` incluem:
 - Ser *completamente* [baseada em header (*header-only*)](https://cpp11.r-lib.org/articles/motivations.html#header-only).
 - Capaz de [*vendoring*](https://cpp11.r-lib.org/articles/motivations.html#vendoring), se desejado.
 - Mais robusta [proteção] (https://cpp11.r-lib.org/articles/motivations.html#protection) usando uma estrutura de dados de lista vinculada (*linked list*) muito mais eficiente.
-- [Crecimento de vetores](https://cpp11.r-lib.org/articles/motivations.html#growing-vectors) de forma mais eficiente.
+- [Crescimento de vetores](https://cpp11.r-lib.org/articles/motivations.html#growing-vectors) de forma mais eficiente.
 
 ## Como usar `{cpp11}` no seu código C++
 
@@ -90,10 +90,10 @@ tibble::tribble(
                      "wrap",                   NA,            "as_sexp",               "<cpp11/as.hpp>",
                        "as",                   NA,             "as_cpp",               "<cpp11/as.hpp>",
                      "stop",               "stop",                   NA,          "<cpp11/protect.hpp>"
-  ) %>% 
-  mutate_all(tidyr::replace_na, "-") %>% 
-  mutate_all(~stringr::str_glue("`{.}`")) %>% 
-  gt() %>% 
+  ) %>%
+  mutate_all(tidyr::replace_na, "-") %>%
+  mutate_all(~stringr::str_glue("`{.}`")) %>%
+  gt() %>%
   fmt_markdown(everything())
 ```
 
@@ -106,9 +106,9 @@ tibble::tribble(
     "integer",      "int",
   "character", "r_string",
     "logical",     "bool"
-  ) %>% 
-  mutate_all(~stringr::str_glue("`{.}`")) %>% 
-  gt() %>% 
+  ) %>%
+  mutate_all(~stringr::str_glue("`{.}`")) %>%
+  gt() %>%
   fmt_markdown(everything())
 ```
 
@@ -121,9 +121,9 @@ tibble::tribble(
            ~Rcpp,     ~cpp11,
     "cppFunction()",   "cpp_function()",
     "sourceCpp()",     "cpp_source()"
-) %>% 
-  mutate_all(~stringr::str_glue("`{.}`")) %>% 
-  gt() %>% 
+) %>%
+  mutate_all(~stringr::str_glue("`{.}`")) %>%
+  gt() %>%
   fmt_markdown(everything())
 
 ```
@@ -148,7 +148,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 double sum_of_squares_rcpp(NumericVector v){
   double sum_of_elems = 0;
-  
+
   sum_of_elems += std::accumulate(v.cbegin(),
                                   v.cend(),
                                   0.0,
@@ -173,7 +173,7 @@ namespace writable = cpp11::writable;
 
 [[cpp11::register]] double sum_of_squares_cpp11(doubles v){
   double sum_of_elems = 0;
-  
+
   sum_of_elems += std::accumulate(v.cbegin(),
                                   v.cend(),
                                   0.0,
@@ -204,7 +204,7 @@ b1
 ggplot2::autoplot(b1, "violin")
 ```
 
-Quando usada a biblioteca padrão C++11 STL tanto `{cpp11}` quanto `{Rcpp}` e `{Rcpp}` Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos. É claro que solução do `{Rcpp}` Sugar é muito mais elegante e simples com uma única linhana função.
+Quando usada a biblioteca padrão C++11 STL tanto `{cpp11}` quanto `{Rcpp}` e `{Rcpp}` Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com `r format(n, big.mark = ".", decimal.mark = ",")` elementos. É claro que solução do `{Rcpp}` Sugar é muito mais elegante e simples com uma única linha na função.
 
 ## `{cpp11}` e Rmarkdown
 

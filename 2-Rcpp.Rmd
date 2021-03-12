@@ -54,7 +54,7 @@ using namespace Rcpp;
    using Rcpp::List;
    List  // toda vez que você digitar List C++ entende que é o List do Rcpp.
    ```
-   
+
 Além disso, para cada função que for criada no código C++ é necessário incluir o `// [[Rcpp::export]]` logo acima da função. Isto é necessário pois indica ao `{Rcpp}` que a função deve ser exportada de volta para uso no ambiente do R. No exemplo abaixo criei uma função `addCpp()` logo depois do `Rcpp::export`:
 
 ```cpp
@@ -191,8 +191,8 @@ tibble::tribble(
       "Date",      "Date",                     "DateVector",                              "-",       "Date",         "-",  "-",
   "Datetime",   "POSIXct",                 "DatetimeVector",                              "-",   "Datetime",     "-", "time_t"
   ) %>%
-  mutate_all(~stringr::str_glue("`{.}`")) %>% 
-  gt() %>% 
+  mutate_all(~stringr::str_glue("`{.}`")) %>%
+  gt() %>%
   fmt_markdown(everything())
 ```
 
@@ -204,8 +204,8 @@ tibble::tribble(
   "data.frame", "DataFrame",
         "list",      "List"
   ) %>%
-  mutate_all(~stringr::str_glue("`{.}`")) %>% 
-  gt() %>% 
+  mutate_all(~stringr::str_glue("`{.}`")) %>%
+  gt() %>%
   fmt_markdown(everything())
 ```
 
@@ -229,9 +229,9 @@ NumericVector v (3);
 // v <- rep(1, 3)
 NumericVector v (3,1);
 
-// v <- c(1,2,3) 
+// v <- c(1,2,3)
 // C++11 Inicialização em Lista
-NumericVector v = {1,2,3}; 
+NumericVector v = {1,2,3};
 
 // v <- c(1,2,3)
 NumericVector v = NumericVector::create(1,2,3);
@@ -361,7 +361,7 @@ Pronto seu objeto `DataFrame` quando for retornado ao R será uma `tibble` do `{
 
 ## `{Rcpp}` Sugar
 
-Além dos tipos de dados, `{Rcpp}` também tem uma ampla gama de "açúcares" sintáticos (*syntactic sugar*) para as mais variadas operações e funções. Antes de tentar criar algo do zero veja se não há um [`{Rccp}` Sugar para isso já implementado na vinheta](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf). 
+Além dos tipos de dados, `{Rcpp}` também tem uma ampla gama de "açúcares" sintáticos (*syntactic sugar*) para as mais variadas operações e funções. Antes de tentar criar algo do zero veja se não há um [`{Rccp}` Sugar para isso já implementado na vinheta](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf).
 
 ## Exemplo -- Multiplicação de Matrizes
 
@@ -374,11 +374,11 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector mat_mul(const NumericVector& A, const NumericVector& B) {
   NumericVector C = A * B;
-  
+
   // dimensões para Vector virar Matrix no R
   int dim = sqrt(A.length());
   C.attr("dim") = Dimension(dim, dim);
-  
+
   return C;
 }
 ```
@@ -440,12 +440,12 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 double sum_of_squares_rcpp(NumericVector v){
   double sum_of_elems = 0;
-  
+
   // primeiro for multiplicando cada elemento consigo mesmo
   for(int i=0; i < v.size(); i++){
     v[i] = v[i] * v[i];
   }
-  
+
   // segundo for somando todos os elementos
   for(auto it = v.cbegin(); it != v.cend(); ++it)
     sum_of_elems += *it;
@@ -454,7 +454,7 @@ double sum_of_squares_rcpp(NumericVector v){
 
 // [[Rcpp::export]]
 double sum_of_squares_rcpp20(const NumericVector v){
-  
+
   return transform_reduce(v.cbegin(),
                           v.cend(),
                           0L,
@@ -546,7 +546,7 @@ using namespace Rcpp;
 int cppGCD(int& a, int& b){
   return std::gcd(a, b);
 }
- 
+
 // [[Rcpp::export]]
 int boostGCD(int& a, int& b) {
     return boost::integer::gcd(a, b);
@@ -605,7 +605,7 @@ Para obter mais detalhes, consulte a vinheta do pacote `{Rcpp}`, `vignette("Rcpp
 
 Diversos materiais me ajudaram a aprender e criar esse conjunto de tutoriais de `{Rcpp}`:
 
-* Livro [Seamless R and C++ Integration with Rcpp](http://www.rcpp.org/book/) do criador do ecossitema `{Rcpp}` Dirk Eddelbuettel.
+* Livro [Seamless R and C++ Integration with Rcpp](http://www.rcpp.org/book/) do criador do ecossistema `{Rcpp}` Dirk Eddelbuettel.
 * [Capítulo 25 -- Rewriting R code in C++](https://adv-r.hadley.nz/rcpp.html) do livro Advanced R do Hadley Wickham.
 * [Galeria de exemplos de `{Rcpp}`](https://gallery.rcpp.org).
 * [Vinheta do `{Rcpp}` Sugar](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf).

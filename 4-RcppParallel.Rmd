@@ -39,7 +39,7 @@ O Pacote `{RcppParallel}` usa a biblioteca `TBB` da Intel. [`TBB` (**T**hreading
 * MacOS: `brew install tbb`
 * Windows: baixe no [site da Intel](https://software.intel.com/content/www/us/en/develop/articles/get-started-with-tbb.html)
 
-**Segundo**, installe o pacote `{RcppParallel}` para R.
+**Segundo**, instale o pacote `{RcppParallel}` para R.
 
 **Terceiro**, coloque em todo código que deseja paralelizar com `{RcppParallel}` a seguinte síntaxe:
 
@@ -107,16 +107,16 @@ struct SquareRoot : public Worker
    // Variáveis Membro públicas
    const RMatrix<double> input;
    RMatrix<double> output;
-   
+
    // Construtor do Objeto Worker SquareRoot
-   SquareRoot(const Rcpp::NumericMatrix input, Rcpp::NumericMatrix output) 
+   SquareRoot(const Rcpp::NumericMatrix input, Rcpp::NumericMatrix output)
       : input(input), output(output) {}
-   
+
    // Overload do operador () -- functor
    void operator()(std::size_t begin, std::size_t end) {
-      std::transform(input.begin() + begin, 
-                     input.begin() + end, 
-                     output.begin() + begin, 
+      std::transform(input.begin() + begin,
+                     input.begin() + end,
+                     output.begin() + begin,
                      ::sqrt);
    }
 };
@@ -124,16 +124,16 @@ struct SquareRoot : public Worker
 // Função que chama o Objeto Worker SquareRoot
 // [[Rcpp::export]]
 NumericMatrix parallelMatrixSqrt(NumericMatrix x) {
-  
+
   // Variável local output inicializada
   NumericMatrix output(x.nrow(), x.ncol());
-  
+
   // Invocação do operador() do Objeto Worker SquareRoot
   SquareRoot squareRoot(x, output);
-  
+
   // Paralelização do loop for
   parallelFor(0, x.length(), squareRoot);
-  
+
   return output;
 }
 
@@ -208,13 +208,13 @@ struct sum_of_squares : public Worker
   // Variáveis Membro públicas
   const RVector<double> input;
   double value;
-  
+
   // Construtor padrão do Objeto Worker
   sum_of_squares(const NumericVector input) : input(input), value(0) {}
-  
+
   // Construtor "divisor"
   sum_of_squares(const sum_of_squares& sum, Split) : input(sum.input), value(0) {}
-  
+
   // Overload do operador ()
   void operator()(std::size_t begin, std::size_t end) {
       value += std::accumulate(input.begin() + begin,
@@ -222,9 +222,9 @@ struct sum_of_squares : public Worker
                                0.0,
                                [] (auto i, auto j) {return i + (j * j);});
    }
-  
-  void join(const sum_of_squares& rhs) { 
-      value += rhs.value; 
+
+  void join(const sum_of_squares& rhs) {
+      value += rhs.value;
    }
 };
 
@@ -233,10 +233,10 @@ struct sum_of_squares : public Worker
 double parallel_sum_of_squares(NumericVector x) {
    // variável local inicializada
    sum_of_squares sum(x);
-   
+
    // Paralelização do Reduce
    parallelReduce(0, x.length(), sum);
-   
+
    return sum.value;
 }
 

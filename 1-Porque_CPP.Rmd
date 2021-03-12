@@ -21,11 +21,11 @@ knitr::opts_chunk$set(echo = TRUE,
 <!--Academicons Icons-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
-## Linguagems Dinâmicas vs Estáticas^[Julia é um caso a parte pois pode ser tanto codificada de maneira estática quando dinâmica, mas isso é assunto para outro tutorial.]
+## Linguagens Dinâmicas vs Estáticas^[Julia é um caso a parte pois pode ser tanto codificada de maneira estática quando dinâmica, mas isso é assunto para outro tutorial.]
 
-Geralmente as linguaguens de programação são categorizadas entre linguagens dinamicamente tipadas ou estaticamente tipadas.
+Geralmente as linguagens de programação são categorizadas entre linguagens dinamicamente tipadas ou estaticamente tipadas.
 
-O **R é uma liguagem dinamicamente tipada**. Isso quer dizer que os tipos das variáveis e dados **não são declarados no código** e, portanto, conhecidos/checados somente em tempo de execução. Além do R, Ruby, Python e Clojure também são exemplos de linguagens dinamicamente tipadas. A principal vantagem de uma linguagem dinamicamente tipada é a sua **agilidade**: você se torna mais produtivo e o código mais enxuto, mas isto vem com um custo. A principal desvantagem é que linguagems dinamicamente tipadas são **bem mais lentas** em tempo de execução.
+O **R é uma linguagem dinamicamente tipada**. Isso quer dizer que os tipos das variáveis e dados **não são declarados no código** e, portanto, conhecidos/checados somente em tempo de execução. Além do R, Ruby, Python e Clojure também são exemplos de linguagens dinamicamente tipadas. A principal vantagem de uma linguagem dinamicamente tipada é a sua **agilidade**: você se torna mais produtivo e o código mais enxuto, mas isto vem com um custo. A principal desvantagem é que linguagems dinamicamente tipadas são **bem mais lentas** em tempo de execução.
 
 O **C++ é uma linguagem estaticamente tipada**. Isso quer dizer que os tipos das variáveis e dos dados **são explicitamente definidos no código** e, portanto, conhecidos/checados em tempo de compilação. Além de C++, Java, C#, F#, Kotlin e Go são exemplos de linguagens estaticamente tipadas. A principal vantagem de uma linguagem estaticamente tipada é a sua **velocidade em tempo de execução**. Sua principal desvantagem é a **rigidez**: você se torna menos produtivo e o código muito mais verboso.
 
@@ -76,7 +76,7 @@ Aqui vocês vem que C++ não tem nenhuma vantagem sobre R: é mais verboso, chat
 
 ### Exemplo - Amostrador de Gibbs
 
-Como segundo exemplo vamos fazer algo mais computacionalmente intensivo. Para quem não conhece, [Amostrador de Gibbs (*Gibss Sampler*)](https://en.wikipedia.org/wiki/Gibbs_sampling) é um algoritmo de aproximação de uma distribuição probabilística multivariada que usa Método de Montecarlo com correntes Markov; e é primariamente utilizado em casos quando amostragem direta não é possível. Este exemplo foi retirado do [blog do Dirk Eddelbuettel](http://dirk.eddelbuettel.com/blog/2011/07/14/) mantenedor do ecossitema `{Rcpp}` de pacotes de interfaces entre R e C++.
+Como segundo exemplo vamos fazer algo mais computacionalmente intensivo. Para quem não conhece, [Amostrador de Gibbs (*Gibss Sampler*)](https://en.wikipedia.org/wiki/Gibbs_sampling) é um algoritmo de aproximação de uma distribuição probabilística multivariada que usa Método de Montecarlo com correntes Markov; e é primariamente utilizado em casos quando amostragem direta não é possível. Este exemplo foi retirado do [blog do Dirk Eddelbuettel](http://dirk.eddelbuettel.com/blog/2011/07/14/) mantenedor do ecossistema `{Rcpp}` de pacotes de interfaces entre R e C++.
 
 O código em R é assim:
 
@@ -99,7 +99,7 @@ gibbsR <- function(N, thin) {
 Agora o código em C++ (não se preocupe agora com os `Rcpp` que aparecem no código, isto será explicado na [segunda parte desse tutorial](2-Rcpp.html)):
 
 ```{r gibbsCpp, warning=FALSE}
-sourceCpp(code = 
+sourceCpp(code =
 "#include <Rcpp.h>
 using namespace Rcpp;
 
@@ -152,19 +152,19 @@ No meu computador `gibbsCpp()` executa 20x mais rápido que `gibbsR()`!
 1. **Livros**:
    * [A Tour of C++](https://stroustrup.com/Tour.html): livro de 2018 do criador de C++, Bjarne Stroustrup. É bem conciso e recomendado para quem conhece alguma linguagem de programação orientada a objetos (ex: Python, Java, ...).
    * [C++ Primer](https://computingsavvy.com/books/c-primer-fifth-edition/): uma das principais referências de C++. Está na quinta edição de 2011. É interessante para aprender o básico de C++ junto com uma introdução à biblioteca padrão (*Standard Template Library* -- STL). Como C++ lança uma nova edição a cada 3 anos, esse livro não possui todas as novas funcionalidades de C++14, C++17 e C++20.
-  
+
 2. **Referências**:
    * [cppreference.com](https://en.cppreference.com): aqui está a bíblia de C++ totalmente atualizada. Para tudo o que você precisar vale a pena consultar aqui, mas ela é bem técnica. Necessário um certo nível de conhecimento básico em C++ para compreender.
    * [geeksforgeeks.com](https://www.geeksforgeeks.org/c-plus-plus/): Geeks for Geeks é um site da Índia sobre programação com uma abordagem mais descontraída. A referência de C++ é bem mais "leve" que a cppreference. Vale a pena para ajudar a entender conceitos que você não tenha entendido pois tem exemplos interessantes.
 3. **Vídeos no YouTube**:
    * [CppCon](https://www.youtube.com/user/CppCon): a principal conferência anual sobre C++, todos os vídeos das sessões da conferência são disponibilizados gratuitamente no YouTube.
    * [CppNow](https://www.youtube.com/user/BoostCon): outra conferência anual sobre C++ com uma pegada mais descontraída e participação da platéia. O vídeo do Conor Hoekstra^[um dos hosts do podcast ADSP.] sobre [*Algorithm Intution*](https://youtu.be/48gV1SNm3WA) é fenomenal.
-   * [Meeting Cpp](https://www.youtube.com/user/MeetingCPP): outra conferência anual sobre C++, possui bons vídeos com uma pegada similar a CppNow. 
+   * [Meeting Cpp](https://www.youtube.com/user/MeetingCPP): outra conferência anual sobre C++, possui bons vídeos com uma pegada similar a CppNow.
    * [The Cherno](https://www.youtube.com/user/TheChernoProject): Um ex-programador de jogos da EA. Ele tem uma didática excelente e eu recomendo a playlist [C++](https://www.youtube.com/playlist?list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb) do seu canal.
 4. **Podcasts**:
    * [CppCast](https://cppcast.com): podcast de entrevista com desenvolvedores e pessoas de destaque da comunidade C++. Sempre iniciam os episódios comentando com o entrevistado as últimas notícias do mundo C++ e programação em geral.
    * [cpp.chat](https://cpp.chat): similar ao CppCast.
-   * [ADSP](https://adspthepodcast.com): este é um podcast novo e promissor. Seu nome ADSP significa *Algorithms + Data Structures = Programs*^[Algoritmos + Estruturas de Dados = Programas.] e um dos hosts é o Conor Hoekstra programador da NVIDIA e o palestrante do vídeo [*Algorithm Intution*](https://youtu.be/48gV1SNm3WA). 
+   * [ADSP](https://adspthepodcast.com): este é um podcast novo e promissor. Seu nome ADSP significa *Algorithms + Data Structures = Programs*^[Algoritmos + Estruturas de Dados = Programas.] e um dos hosts é o Conor Hoekstra programador da NVIDIA e o palestrante do vídeo [*Algorithm Intution*](https://youtu.be/48gV1SNm3WA).
 
 ### História do C++
 
@@ -197,9 +197,9 @@ tibble::tribble(
   "Datetime",   "POSIXct",                 "DatetimeVector",                              "-",   "Datetime",      "time_t"
   ) %>%
   select(R, `C++`) %>%
-  filter(!(R %in% c("Date", "POSIXct"))) %>% 
-  mutate_all(~stringr::str_glue("`{.}`")) %>% 
-  gt() %>% 
+  filter(!(R %in% c("Date", "POSIXct"))) %>%
+  mutate_all(~stringr::str_glue("`{.}`")) %>%
+  gt() %>%
   fmt_markdown(everything())
 ```
 
@@ -234,12 +234,12 @@ Por que usar referências? Por dois motivos:
 2. Paramêtros de funções podem especificados por valor ou por referências. No caso de referências,  isso é extremamente útil quando queremos **alterar os valores dos parâmetros *in-place* pela função**.
 
 
-### Funcões em C++ 
+### Funções em C++
 
 A figura \@ref(fig:cppfunction) mostra a anatomia de uma função em C++. Ela é bem similar à estrutura de funções no R. Com duas notórias diferenças:
 
 * **Tipo de Retorno**: toda função em C++ deve especificar, antes do seu nome, o tipo de dado que é retornado pela função.
-* **Valor de Retorno**: toda função em C++ deve especificar explicitamente qual valor retornar com um `return`. No R podemos ser mais desleixados pois o valor de retorno será sempre a ultima declaração da função. Em C++ isto não funciona. A lógica de C++ é que a função termina quando ela atinge o primeiro `return` e retorna o dado/variável especificado(a). 
+* **Valor de Retorno**: toda função em C++ deve especificar explicitamente qual valor retornar com um `return`. No R podemos ser mais desleixados pois o valor de retorno será sempre a ultima declaração da função. Em C++ isto não funciona. A lógica de C++ é que a função termina quando ela atinge o primeiro `return` e retorna o dado/variável especificado(a).
 
 ```{r cppfunction, echo=FALSE, fig.cap='Anatomia de uma função em C++. Figura adaptada da Vinheta Oficial Introdutória do `{Rcpp}` de Dirk Eddelbuettel'}
 knitr::include_graphics("images/cpp_function.png")
@@ -253,14 +253,14 @@ Como podem ver, nesse cenário simples temos um pequeno ganho, pelo tempo median
 
 ```{r increment_cpp, warning=FALSE}
 cppFunction(
-"int increment_val(int x){ 
+"int increment_val(int x){
     x++;
     return x;
 }"
 )
 
 cppFunction(
-"int increment_ref(int& x){ 
+"int increment_ref(int& x){
     x++;
     return x;
 }"
@@ -385,7 +385,7 @@ knitr::include_graphics("images/gandalf-wise.png")
 
 ## O que mais existe em C++?
 
-Nesse breve sobrevoo de C++ a intenção é apenas possibilitar alguém que não tenha nenhum conhecimento em C++ à ser introduzido em alguns conceitos de C++, notoriamente focando em **funções** (eu acredito ser a principal razão de usarmos C++ em R -- acelerar o tempo de execução de funcões). Usando uma analogia, esse sobrevoo permite o leitor "dirigir C++ por um estacionamento vazio". Caso se interesse, C++ é uma linguagem EXTREMAMENTE rica e complexa. Veja os livros, referências, vídeos e podcasts que eu recomendei lá em cima.
+Nesse breve sobrevoo de C++ a intenção é apenas possibilitar alguém que não tenha nenhum conhecimento em C++ à ser introduzido em alguns conceitos de C++, notoriamente focando em **funções** (eu acredito ser a principal razão de usarmos C++ em R -- acelerar o tempo de execução de funções). Usando uma analogia, esse sobrevoo permite o leitor "dirigir C++ por um estacionamento vazio". Caso se interesse, C++ é uma linguagem EXTREMAMENTE rica e complexa. Veja os livros, referências, vídeos e podcasts que eu recomendei lá em cima.
 
 ## Ambiente
 

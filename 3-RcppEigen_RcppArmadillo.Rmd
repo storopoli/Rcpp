@@ -96,7 +96,7 @@ knitr::include_graphics("images/algebra-linear.jpg")
 * MacOS: `brew install armadillo`
 * Windows: baixe no [site do `Armadillo`](http://arma.sourceforge.net/download.html)
 
-**Segundo**, installe o pacote `{RcppArmadillo}` para R.
+**Segundo**, instale o pacote `{RcppArmadillo}` para R.
 
 **Terceiro**, coloque em todo código que deseja usar o `Armadillo` com `{Rcpp}` a seguinte síntaxe:
 
@@ -270,7 +270,7 @@ v.segment(pos,n)
 m.block(i,j,rows,cols)
 
 // Matriz - Cantos (Corners)
-m.topLeftCorner(rows,cols) 
+m.topLeftCorner(rows,cols)
 m.topRightCorner(rows,cols)
 m.bottomLeftCorner(rows,cols)
 m.bottomRightCorner(rows,cols)
@@ -296,13 +296,13 @@ Por padrão os elementos de uma matriz não são inicializados na sua criação.
   ```cpp
   // Matriz com Zeros
   Matrix2d::Zero()
-  
+
   // Matrizes Aleatórias
   Matrix2i::Random()
-  
+
   // Matriz Identidade
   Matrix3d::Identity()
-  
+
   // Vetores Espaçados Linearmente (size, low, high)
   // tipo um seq() do R
   VectorXf v;
@@ -362,9 +362,9 @@ tibble::tribble(
        "integer vector",             "VectorXi",
        "complex vector",            "VectorXcd",
     "Matrix::dgCMatrix", "SparseMatrix<double>"
-  ) %>% 
-  mutate_all(~stringr::str_glue("`{.}`")) %>% 
-  gt() %>% 
+  ) %>%
+  mutate_all(~stringr::str_glue("`{.}`")) %>%
+  gt() %>%
   fmt_markdown(everything())
 ```
 
@@ -409,11 +409,11 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector mat_mul(const NumericVector& A, const NumericVector& B) {
   NumericVector C = A * B;
-  
+
   // dimensões para Vector virar Matrix no R
   int dim = sqrt(A.length());
   C.attr("dim") = Dimension(dim, dim);
-  
+
   return C;
 }
 ```
@@ -465,7 +465,7 @@ ggplot2::autoplot(b1, "violin")
 ```
 
 
-No meu computador `{RcppEigen}` é mais rápido que `{RcppArmadillo}`, mas ambos são mais lentos que uma implementação simples com `{Rcpp}`. 
+No meu computador `{RcppEigen}` é mais rápido que `{RcppArmadillo}`, mas ambos são mais lentos que uma implementação simples com `{Rcpp}`.
 
 ### Exemplo -- Matriz Esparsa
 
@@ -499,13 +499,13 @@ using namespace arma;
 Rcpp::List fast_lm_arma(const vec& y, const mat& X) {
 
   int n = X.n_rows, k = X.n_cols;
-  
-  colvec coef  = solve(X, y); 
-  colvec resid = y - X*coef; 
-  
+
+  colvec coef  = solve(X, y);
+  colvec resid = y - X*coef;
+
   double sig2 = as_scalar(trans(resid)*resid/(n-k));
   colvec stderrest = sqrt(sig2 * diagvec(inv(trans(X)*X)));
-  
+
   return Rcpp::List::create(Rcpp::Named("coefficients") = coef,
                             Rcpp::Named("stderr")       = stderrest);
 }
@@ -521,7 +521,7 @@ using namespace Eigen;
 Rcpp::List fast_lm_eigen(const VectorXd& y, const MatrixXd& X) {
 
   int n = X.rows(), k = X.cols();
-	
+
 	// Usando SVD Decomposition
 	//VectorXd coef = X.bdcSvd(ComputeThinU | ComputeThinV).solve(y);
 
@@ -530,13 +530,13 @@ Rcpp::List fast_lm_eigen(const VectorXd& y, const MatrixXd& X) {
 
 	// Usando Normal Equations com LDL Decomposition (mais rápida)
 	VectorXd coef = (X.transpose() * X).ldlt().solve(X.transpose() * y);
-	
+
 	VectorXd resid = y - X*coef;
 
 	double sig2 = resid.squaredNorm() / (n - k);
- 
+
   VectorXd stderrest = (sig2 * ((X.transpose() * X).inverse()).diagonal()).array().cwiseSqrt();
-	
+
 	return Rcpp::List::create(Rcpp::Named("coefficients") = coef,
                             Rcpp::Named("stderr")       = stderrest);
 }
