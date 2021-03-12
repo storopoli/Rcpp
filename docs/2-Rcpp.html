@@ -458,8 +458,15 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     top: 0;
   }
 
+  /* adjust viewport for navbar height */
+  /* helps vertically center bootstrap (non-distill) content */
+  .min-vh-100 {
+    min-height: calc(100vh - 100px) !important;
+  }
+
   </style>
 
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
   <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
   <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
   <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
@@ -567,19 +574,21 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             var results = fuse.search(query, searchOptions);
             callback(results
               .map(function(result) { return result.item; })
-              .filter(function(item) { return !!item.description; })
             );
           },
           templates: {
             suggestion: function(suggestion) {
+              var img = suggestion.preview && Object.keys(suggestion.preview).length > 0
+                ? `<img src="${offsetURL(suggestion.preview)}"</img>`
+                : '';
               var html = `
                 <div class="search-item">
                   <h3>${suggestion.title}</h3>
                   <div class="search-item-description">
-                    ${suggestion.description}
+                    ${suggestion.description || ''}
                   </div>
                   <div class="search-item-preview">
-                    <img src="${suggestion.preview ? offsetURL(suggestion.preview) : ''}"</img>
+                    ${img}
                   </div>
                 </div>
               `;
@@ -602,6 +611,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   </script>
 
   <style type="text/css">
+
+  .nav-search {
+    font-size: x-small;
+  }
 
   /* Algolioa Autocomplete */
 
@@ -677,6 +690,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item h3 {
+    font-size: 1rem;
     margin-block-start: 0;
     margin-block-end: 5px;
   }
@@ -904,6 +918,11 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     text-decoration: underline;
   }
 
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
   @media(min-width: 768px) {
 
   d-article pre,
@@ -1058,6 +1077,17 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
   }
 
 
@@ -1725,7 +1755,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       var layout = $(this).attr('data-layout');
 
       // apply layout to markdown level block elements
-      var elements = $(this).children().not('div.sourceCode, pre, script');
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
         var layout_div = $('<div class="' + layout + '"></div>');
         if (layout_div.hasClass('shaded')) {
@@ -1840,6 +1870,20 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
 
       // clear polling timer
       clearInterval(tid);
@@ -2180,7 +2224,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   d-article div.sourceCode code,
   d-article pre code {
-  	font-family: var(--mono-font), var(--mono-default);
+    font-family: var(--mono-font), var(--mono-default);
   }
 
 
@@ -2205,76 +2249,78 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   /*-- BODY --*/
-  /* only text inside of <p> tags */
-  d-article > p {
+  d-article > p,  /* only text inside of <p> tags */
+  d-article > ul, /* lists */
+  d-article > ol {
     color: var(--body-color, rgba(0, 0, 0, 0.8));
     font-size: var(--body-size, 1.06rem);
   }
 
+
   /*-- CODE --*/
   d-article div.sourceCode code,
   d-article pre code {
-  	font-size: var(--code-size, 14px);
+    font-size: var(--code-size, 14px);
   }
 
   /*-- ASIDE --*/
   d-article aside {
-  	font-size: var(--aside-size, 12px);
-  	color: var(--aside-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--aside-size, 12px);
+    color: var(--aside-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- FIGURE CAPTIONS --*/
   figure .caption,
   figure figcaption,
   .figure .caption {
-  	font-size: var(--fig-cap-size, 13px);
-  	color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--fig-cap-size, 13px);
+    color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- METADATA --*/
   d-byline h3 {
-  	font-size: var(--heading-size, 0.6rem);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.5));
+    font-size: var(--heading-size, 0.6rem);
+    color: var(--heading-color, rgba(0, 0, 0, 0.5));
   }
 
   d-byline {
-  	font-size: var(--body-size, 0.8rem);
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    font-size: var(--body-size, 0.8rem);
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   d-byline a,
   d-article d-byline a {
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   /*-- TABLE OF CONTENTS --*/
   .d-contents nav h3 {
-  	font-size: var(--heading-size, 18px);
+    font-size: var(--heading-size, 18px);
   }
 
   .d-contents nav a {
-  	font-size: var(--contents-size, 13px);
+    font-size: var(--contents-size, 13px);
   }
 
   /*-- APPENDIX --*/
   d-appendix h3 {
     font-size: var(--heading-size, 15px);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.65));
+    color: var(--heading-color, rgba(0, 0, 0, 0.65));
   }
 
   d-appendix {
     font-size: var(--text-size, 0.8em);
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   d-appendix d-footnote-list a.footnote-backlink {
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   /*-- WEBSITE HEADER + FOOTER --*/
   .distill-site-header .title {
-  	font-size: var(--title-size, 18px);
-  	font-family: var(--navbar-font), var(--heading-default);
+    font-size: var(--title-size, 18px);
+    font-family: var(--navbar-font), var(--heading-default);
   }
 
   .distill-site-header a,
@@ -2282,35 +2328,44 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     font-family: var(--navbar-font), var(--heading-default);
   }
 
-  .distill-site-header a:hover {
-  	color: var(--hover-color, white);
+  .nav-dropdown .nav-dropbtn {
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    font-size: var(--text-size, 15px);
+  }
+
+  .distill-site-header a:hover,
+  .nav-dropdown:hover .nav-dropbtn {
+    color: var(--hover-color, white);
   }
 
   .distill-site-header {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer a:hover {
-  	color: var(--hover-color, white);
+    color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
-  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+  <script src="site_libs/popper-2.6.0/popper.min.js"></script>
+  <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
   <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
   <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
-  <script>
+  <script type="text/javascript" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
+  <script type="text/javascript" cookie-consent="tracking">
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -2438,7 +2493,7 @@ Tutoriais
 <p>A maneira mais fácil e simples de usar código C++ no R é pelo pacote <code>{Rccp}</code>. O primeiro passo é importar o pacote:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://www.rcpp.org'>Rcpp</a></span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://www.rcpp.org'>Rcpp</a></span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -2476,7 +2531,7 @@ Tutoriais
 <p>Criei um arquivo chamado <code>addCpp.cpp</code> com o código C++ pronto para ser usado pelo <code>{Rcpp}</code> com o <code>sourceCpp()</code>. Note que inclui um bloco de código R que automaticamente será executado após a compilação do arquivo. O ideal é inserir esses blocos de código R na parte final dos seus arquivos <code>.cpp</code>.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/base/writeLines.html'>writeLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='st'>"addCpp.cpp"</span><span class='op'>)</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/writeLines.html'>writeLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='st'>"addCpp.cpp"</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>#include &lt;Rcpp.h&gt;
@@ -2500,7 +2555,7 @@ addCpp(11, 21, 31)
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span>file <span class='op'>=</span> <span class='st'>"addCpp.cpp"</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span>file <span class='op'>=</span> <span class='st'>"addCpp.cpp"</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>
@@ -2511,7 +2566,7 @@ addCpp(11, 21, 31)
 <p>Da mesma maneira que usamos <code>sourceCpp()</code> para um arquivo <code>.cpp</code>, também é possível usar uma <code>string</code> em código C++. Abaixo o mesmo exemplo anterior, mas usando uma <code>string</code>:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span>code <span class='op'>=</span> <span class='st'>"
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span>code <span class='op'>=</span> <span class='st'>"
 #include &lt;Rcpp.h&gt;
 using namespace Rcpp;
 
@@ -2536,7 +2591,7 @@ addCpp(11, 21, 31)
 <p>Usarei o mesmo exemplo do <code>sourceCpp()</code>, sendo que agora não preciso mais incluir as instruções do <code>{Rcpp}</code>:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/cppFunction.html'>cppFunction</a></span><span class='op'>(</span><span class='st'>"
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/cppFunction.html'>cppFunction</a></span><span class='op'>(</span><span class='st'>"
 int addCpp(int x, int y, int z){
   int result = x + y + z;
   return result;
@@ -2559,7 +2614,7 @@ int addCpp(int x, int y, int z){
 <p>Isto não funciona muito bem quando executamos uma função C++ no R com o <code>{Rcpp}</code>. Para isso existem dois objetos na <code>namespace</code> <code>Rcpp</code>: <code>Rcout</code> e <code>Rcerr</code>. Veja um exemplo:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/base/writeLines.html'>writeLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='st'>"teste_print.cpp"</span><span class='op'>)</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/writeLines.html'>writeLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='st'>"teste_print.cpp"</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>#include &lt;Rcpp.h&gt;
@@ -2573,7 +2628,7 @@ void teste_print(){
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span><span class='st'>"teste_print.cpp"</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span><span class='st'>"teste_print.cpp"</span><span class='op'>)</span>
 <span class='fu'>teste_print</span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2594,13 +2649,13 @@ void teste_print(){
 <p>Temos sete tipos de variáveis que são usualmente usados no R: <code>logical</code>, <code>integer</code>, <code>numeric</code>,<code>complex</code>, <code>character</code>, <code>Date</code> e <code>POSIXct</code>. Sendo que esses sete tipos são usados no R para construir vetores (<code>arrays</code> 1-D) e matrizes (<code>arrays</code> 2-D). Apenas um lembrete:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>vec_int</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1L</span>, <span class='fl'>2L</span>, <span class='fl'>3L</span>, <span class='fl'>4L</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>vec_int</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1L</span>, <span class='fl'>2L</span>, <span class='fl'>3L</span>, <span class='fl'>4L</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>vec_int</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code> int [1:4] 1 2 3 4</code></pre>
 <div class="sourceCode">
-<pre><code><span class='va'>mat_num</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.1</span>, <span class='fl'>2.2</span>, <span class='fl'>3.3</span>, <span class='fl'>4.4</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>2</span>, ncol <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>mat_num</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.1</span>, <span class='fl'>2.2</span>, <span class='fl'>3.3</span>, <span class='fl'>4.4</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>2</span>, ncol <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>mat_num</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2613,7 +2668,7 @@ void teste_print(){
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#rmgdhydhru .gt_table {
+#hlowiptipt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2638,7 +2693,7 @@ void teste_print(){
   border-left-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_heading {
+#hlowiptipt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2650,7 +2705,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_title {
+#hlowiptipt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2660,7 +2715,7 @@ void teste_print(){
   border-bottom-width: 0;
 }
 
-#rmgdhydhru .gt_subtitle {
+#hlowiptipt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2670,13 +2725,13 @@ void teste_print(){
   border-top-width: 0;
 }
 
-#rmgdhydhru .gt_bottom_border {
+#hlowiptipt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_col_headings {
+#hlowiptipt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2691,7 +2746,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_col_heading {
+#hlowiptipt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2711,7 +2766,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#rmgdhydhru .gt_column_spanner_outer {
+#hlowiptipt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2723,15 +2778,15 @@ void teste_print(){
   padding-right: 4px;
 }
 
-#rmgdhydhru .gt_column_spanner_outer:first-child {
+#hlowiptipt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rmgdhydhru .gt_column_spanner_outer:last-child {
+#hlowiptipt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rmgdhydhru .gt_column_spanner {
+#hlowiptipt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2743,7 +2798,7 @@ void teste_print(){
   width: 100%;
 }
 
-#rmgdhydhru .gt_group_heading {
+#hlowiptipt .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2765,7 +2820,7 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#rmgdhydhru .gt_empty_group_heading {
+#hlowiptipt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2780,15 +2835,15 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#rmgdhydhru .gt_from_md > :first-child {
+#hlowiptipt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rmgdhydhru .gt_from_md > :last-child {
+#hlowiptipt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rmgdhydhru .gt_row {
+#hlowiptipt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2807,7 +2862,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#rmgdhydhru .gt_stub {
+#hlowiptipt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2819,7 +2874,7 @@ void teste_print(){
   padding-left: 12px;
 }
 
-#rmgdhydhru .gt_summary_row {
+#hlowiptipt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2829,7 +2884,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#rmgdhydhru .gt_first_summary_row {
+#hlowiptipt .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2839,7 +2894,7 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_grand_summary_row {
+#hlowiptipt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2849,7 +2904,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#rmgdhydhru .gt_first_grand_summary_row {
+#hlowiptipt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2859,11 +2914,11 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_striped {
+#hlowiptipt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#rmgdhydhru .gt_table_body {
+#hlowiptipt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2872,7 +2927,7 @@ void teste_print(){
   border-bottom-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_footnotes {
+#hlowiptipt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2886,13 +2941,13 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_footnote {
+#hlowiptipt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#rmgdhydhru .gt_sourcenotes {
+#hlowiptipt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2906,46 +2961,46 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rmgdhydhru .gt_sourcenote {
+#hlowiptipt .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#rmgdhydhru .gt_left {
+#hlowiptipt .gt_left {
   text-align: left;
 }
 
-#rmgdhydhru .gt_center {
+#hlowiptipt .gt_center {
   text-align: center;
 }
 
-#rmgdhydhru .gt_right {
+#hlowiptipt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rmgdhydhru .gt_font_normal {
+#hlowiptipt .gt_font_normal {
   font-weight: normal;
 }
 
-#rmgdhydhru .gt_font_bold {
+#hlowiptipt .gt_font_bold {
   font-weight: bold;
 }
 
-#rmgdhydhru .gt_font_italic {
+#hlowiptipt .gt_font_italic {
   font-style: italic;
 }
 
-#rmgdhydhru .gt_super {
+#hlowiptipt .gt_super {
   font-size: 65%;
 }
 
-#rmgdhydhru .gt_footnote_marks {
+#hlowiptipt .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="rmgdhydhru" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="hlowiptipt" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3082,7 +3137,7 @@ void teste_print(){
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#rnxrsfdjnd .gt_table {
+#zpxxfmikco .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3107,7 +3162,7 @@ void teste_print(){
   border-left-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_heading {
+#zpxxfmikco .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3119,7 +3174,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_title {
+#zpxxfmikco .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3129,7 +3184,7 @@ void teste_print(){
   border-bottom-width: 0;
 }
 
-#rnxrsfdjnd .gt_subtitle {
+#zpxxfmikco .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3139,13 +3194,13 @@ void teste_print(){
   border-top-width: 0;
 }
 
-#rnxrsfdjnd .gt_bottom_border {
+#zpxxfmikco .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_col_headings {
+#zpxxfmikco .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3160,7 +3215,7 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_col_heading {
+#zpxxfmikco .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3180,7 +3235,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#rnxrsfdjnd .gt_column_spanner_outer {
+#zpxxfmikco .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3192,15 +3247,15 @@ void teste_print(){
   padding-right: 4px;
 }
 
-#rnxrsfdjnd .gt_column_spanner_outer:first-child {
+#zpxxfmikco .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rnxrsfdjnd .gt_column_spanner_outer:last-child {
+#zpxxfmikco .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rnxrsfdjnd .gt_column_spanner {
+#zpxxfmikco .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3212,7 +3267,7 @@ void teste_print(){
   width: 100%;
 }
 
-#rnxrsfdjnd .gt_group_heading {
+#zpxxfmikco .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3234,7 +3289,7 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#rnxrsfdjnd .gt_empty_group_heading {
+#zpxxfmikco .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3249,15 +3304,15 @@ void teste_print(){
   vertical-align: middle;
 }
 
-#rnxrsfdjnd .gt_from_md > :first-child {
+#zpxxfmikco .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rnxrsfdjnd .gt_from_md > :last-child {
+#zpxxfmikco .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rnxrsfdjnd .gt_row {
+#zpxxfmikco .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3276,7 +3331,7 @@ void teste_print(){
   overflow-x: hidden;
 }
 
-#rnxrsfdjnd .gt_stub {
+#zpxxfmikco .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3288,7 +3343,7 @@ void teste_print(){
   padding-left: 12px;
 }
 
-#rnxrsfdjnd .gt_summary_row {
+#zpxxfmikco .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3298,7 +3353,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#rnxrsfdjnd .gt_first_summary_row {
+#zpxxfmikco .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3308,7 +3363,7 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_grand_summary_row {
+#zpxxfmikco .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3318,7 +3373,7 @@ void teste_print(){
   padding-right: 5px;
 }
 
-#rnxrsfdjnd .gt_first_grand_summary_row {
+#zpxxfmikco .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3328,11 +3383,11 @@ void teste_print(){
   border-top-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_striped {
+#zpxxfmikco .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#rnxrsfdjnd .gt_table_body {
+#zpxxfmikco .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3341,7 +3396,7 @@ void teste_print(){
   border-bottom-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_footnotes {
+#zpxxfmikco .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3355,13 +3410,13 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_footnote {
+#zpxxfmikco .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#rnxrsfdjnd .gt_sourcenotes {
+#zpxxfmikco .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3375,46 +3430,46 @@ void teste_print(){
   border-right-color: #D3D3D3;
 }
 
-#rnxrsfdjnd .gt_sourcenote {
+#zpxxfmikco .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#rnxrsfdjnd .gt_left {
+#zpxxfmikco .gt_left {
   text-align: left;
 }
 
-#rnxrsfdjnd .gt_center {
+#zpxxfmikco .gt_center {
   text-align: center;
 }
 
-#rnxrsfdjnd .gt_right {
+#zpxxfmikco .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rnxrsfdjnd .gt_font_normal {
+#zpxxfmikco .gt_font_normal {
   font-weight: normal;
 }
 
-#rnxrsfdjnd .gt_font_bold {
+#zpxxfmikco .gt_font_bold {
   font-weight: bold;
 }
 
-#rnxrsfdjnd .gt_font_italic {
+#zpxxfmikco .gt_font_italic {
   font-style: italic;
 }
 
-#rnxrsfdjnd .gt_super {
+#zpxxfmikco .gt_super {
   font-size: 65%;
 }
 
-#rnxrsfdjnd .gt_footnote_marks {
+#zpxxfmikco .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="rnxrsfdjnd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="zpxxfmikco" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3453,9 +3508,9 @@ void teste_print(){
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">// v &lt;- rep(1, 3)</span></span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>NumericVector v (<span class="dv">3</span>,<span class="dv">1</span>);</span>
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">// v &lt;- c(1,2,3) </span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">// v &lt;- c(1,2,3)</span></span>
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">// C++11 Inicialização em Lista</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>NumericVector v = {<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}; </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>NumericVector v = {<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>};</span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co">// v &lt;- c(1,2,3)</span></span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>NumericVector v = NumericVector::create(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>);</span>
@@ -3534,7 +3589,7 @@ void teste_print(){
 <p>Para retornar uma <code>tibble</code> do <code>{tidyverse}</code> com o <code>{Rcpp}</code> é só você notar que uma <code>tibble</code> não é nada mais que um <code>data.frame</code> com algumas classes extras:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -3555,17 +3610,17 @@ void teste_print(){
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>NumericVector mat_mul(<span class="at">const</span> NumericVector&amp; A, <span class="at">const</span> NumericVector&amp; B) {</span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  NumericVector C = A * B;</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// dimensões para Vector virar Matrix no R</span></span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> dim = sqrt(A.length());</span>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  C.attr(<span class="st">&quot;dim&quot;</span>) = Dimension(dim, dim);</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> C;</span>
 <span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
   n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>,
   <span class='op'>{</span>
     <span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
@@ -3582,10 +3637,10 @@ void teste_print(){
 <pre><code># A tibble: 4 x 7
   expression     n   min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 R            100  73.1   72.3       1        1         1  
-2 Cpp          100   1      1        70.9      1.03     72.9
-3 R           1000 382.   212.        1        1       NaN  
-4 Cpp         1000   1      1       218.       1.00    Inf  </code></pre>
+1 R            100  70.0   72.1       1        1         1  
+2 Cpp          100   1      1        58.2      1.03     76.3
+3 R           1000 692.   307.        1        1       NaN  
+4 Cpp         1000   1      1       309.       1.00    Inf  </code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:figmatmul"></span>
@@ -3610,7 +3665,7 @@ Figure 1: Benchmarks de Multiplicação de Matriz: R vs C++
 </ol>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>sum_of_squares_R</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span> <span class='op'>{</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>sum_of_squares_R</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>v</span> <span class='op'>*</span> <span class='va'>v</span><span class='op'>)</span>
 <span class='op'>}</span>
 </code></pre>
@@ -3627,12 +3682,12 @@ Figure 1: Benchmarks de Multiplicação de Matriz: R vs C++
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp(NumericVector v){</span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sum_of_elems = <span class="dv">0</span>;</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// primeiro for multiplicando cada elemento consigo mesmo</span></span>
 <span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i &lt; v.size(); i++){</span>
 <span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    v[i] = v[i] * v[i];</span>
 <span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">// segundo for somando todos os elementos</span></span>
 <span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="kw">auto</span> it = v.cbegin(); it != v.cend(); ++it)</span>
 <span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    sum_of_elems += *it;</span>
@@ -3641,7 +3696,7 @@ Figure 1: Benchmarks de Multiplicação de Matriz: R vs C++
 <span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp20(<span class="at">const</span> NumericVector v){</span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> transform_reduce(v.cbegin(),</span>
 <span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>                          v.cend(),</span>
 <span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">0</span><span class="bu">L</span>,</span>
@@ -3656,7 +3711,7 @@ Figure 1: Benchmarks de Multiplicação de Matriz: R vs C++
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
 <span class='va'>b2</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
   n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>)</span>,
@@ -3677,22 +3732,22 @@ Figure 1: Benchmarks de Multiplicação de Matriz: R vs C++
 <pre><code># A tibble: 16 x 7
    expression     n   min median `itr/sec` mem_alloc `gc/sec`
    &lt;bch:expr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
- 1 R             10  1      1         1.57    NaN         NaN
- 2 rcpp          10  1.77   1.67      1       Inf         NaN
- 3 rcpp20        10  1.69   1.61      1.06    Inf         Inf
- 4 rcppsugar     10  1.68   1.57      1.06    Inf         NaN
- 5 R            100  1      1         1.78      1         Inf
- 6 rcpp         100  1.88   1.81      1         3.01      NaN
- 7 rcpp20       100  1.39   1.37      1.26      3.01      Inf
- 8 rcppsugar    100  1.43   1.42      1.28      3.01      NaN
- 9 R           1000  1.16   1.18      2.92      3.15      Inf
-10 rcpp        1000  3.49   3.45      1         1         Inf
-11 rcpp20      1000  1      1         3.33      1         Inf
-12 rcppsugar   1000  1.24   1.22      2.79      1         NaN
-13 R          10000  2.13   2.10      3.91     31.4       Inf
-14 rcpp       10000  8.87   8.34      1         1         NaN
-15 rcpp20     10000  1      1         8.43      1         Inf
-16 rcppsugar  10000  1.75   1.63      5.13      1         Inf</code></pre>
+ 1 R             10  1      1         1.84    NaN         NaN
+ 2 rcpp          10  2.13   2.01      1       Inf         NaN
+ 3 rcpp20        10  1.95   1.89      1.06    Inf         Inf
+ 4 rcppsugar     10  1.98   1.88      1.07    Inf         NaN
+ 5 R            100  1      1         1.99      1         NaN
+ 6 rcpp         100  2.11   1.99      1         3.01      Inf
+ 7 rcpp20       100  1.57   1.51      1.31      3.01      Inf
+ 8 rcppsugar    100  1.62   1.55      1.30      3.01      NaN
+ 9 R           1000  1.31   1.32      2.74      3.15      Inf
+10 rcpp        1000  3.44   3.64      1         1         Inf
+11 rcpp20      1000  1      1         3.59      1         NaN
+12 rcppsugar   1000  1.23   1.22      2.96      1         Inf
+13 R          10000  2.43   2.51      2.47     31.4       Inf
+14 rcpp       10000  8.41   8.28      1         1         NaN
+15 rcpp20     10000  1      1         8.31      1         Inf
+16 rcppsugar  10000  1.74   1.79      4.15      1         NaN</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:figss"></span>
@@ -3727,7 +3782,7 @@ Figure 2: Benchmarks de Soma dos Quadrados: R vs alternativas C++
 </ol>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>rGCD</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>rGCD</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='kw'>if</span> <span class='op'>(</span><span class='va'>a</span> <span class='op'>==</span> <span class='fl'>0</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>b</span>
   <span class='op'>}</span>
@@ -3752,7 +3807,7 @@ Figure 2: Benchmarks de Soma dos Quadrados: R vs alternativas C++
 <span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> cppGCD(<span class="dt">int</span>&amp; a, <span class="dt">int</span>&amp; b){</span>
 <span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">std::</span>gcd(a, b);</span>
 <span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> boostGCD(<span class="dt">int</span>&amp; a, <span class="dt">int</span>&amp; b) {</span>
 <span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">boost::</span>integer<span class="ex">::</span>gcd(a, b);</span>
@@ -3760,7 +3815,7 @@ Figure 2: Benchmarks de Soma dos Quadrados: R vs alternativas C++
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fl'>7919</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fl'>7919</span>
 <span class='va'>b</span> <span class='op'>&lt;-</span> <span class='fl'>7412</span>
 <span class='va'>b3</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
   R <span class='op'>=</span> <span class='fu'>rGCD</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span>,
@@ -3774,9 +3829,9 @@ Figure 2: Benchmarks de Soma dos Quadrados: R vs alternativas C++
 <pre><code># A tibble: 3 x 6
   expression   min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 R           3.95   4.04      1         6.29      Inf
-2 cpp         1.02   1.03      3.80      1         NaN
-3 boost       1      1         3.86      1         Inf</code></pre>
+1 R           4.05   4.17      1         6.29     1   
+2 cpp         1.03   1.02      3.94      1        1.97
+3 boost       1      1         4.02      1        2.01</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:figGCD"></span>
@@ -3813,7 +3868,7 @@ importFrom(Rcpp, sourceCpp)</code></pre></li>
 <h2 id="materiais-adicionais-de-consulta">Materiais Adicionais de Consulta</h2>
 <p>Diversos materiais me ajudaram a aprender e criar esse conjunto de tutoriais de <code>{Rcpp}</code>:</p>
 <ul>
-<li>Livro <a href="http://www.rcpp.org/book/">Seamless R and C++ Integration with Rcpp</a> do criador do ecossitema <code>{Rcpp}</code> Dirk Eddelbuettel.</li>
+<li>Livro <a href="http://www.rcpp.org/book/">Seamless R and C++ Integration with Rcpp</a> do criador do ecossistema <code>{Rcpp}</code> Dirk Eddelbuettel.</li>
 <li><a href="https://adv-r.hadley.nz/rcpp.html">Capítulo 25 – Rewriting R code in C++</a> do livro Advanced R do Hadley Wickham.</li>
 <li><a href="https://gallery.rcpp.org">Galeria de exemplos de <code>{Rcpp}</code></a>.</li>
 <li><a href="http://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf">Vinheta do <code>{Rcpp}</code> Sugar</a>.</li>
@@ -3824,10 +3879,10 @@ importFrom(Rcpp, sourceCpp)</code></pre></li>
 <h2 id="ambiente">Ambiente</h2>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
-<pre><code>R version 4.0.3 (2020-10-10)
+<pre><code>R version 4.0.4 (2021-02-15)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 20.10
 
@@ -3848,28 +3903,29 @@ attached base packages:
 [7] base     
 
 other attached packages:
-[1] dplyr_1.0.2 gt_0.2.2    Rcpp_1.0.5 
+[1] dplyr_1.0.5 gt_0.2.2    Rcpp_1.0.6 
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.1.0  xfun_0.20         purrr_0.3.4      
- [4] colorspace_2.0-0  vctrs_0.3.6       generics_0.1.0   
- [7] htmltools_0.5.0   emo_0.0.0.9000    yaml_2.2.1       
-[10] utf8_1.1.4        rlang_0.4.10      pillar_1.4.7     
-[13] glue_1.4.2        jpeg_0.1-8.1      lifecycle_0.2.0  
-[16] stringr_1.4.0     munsell_0.5.0     commonmark_1.7   
-[19] gtable_0.3.0      bench_1.1.1       evaluate_0.14    
-[22] knitr_1.30        parallel_4.0.3    fansi_0.4.1      
-[25] profmem_0.6.0     highr_0.8         scales_1.1.1     
-[28] backports_1.2.1   checkmate_2.0.0   jsonlite_1.7.2   
-[31] farver_2.0.3      distill_1.1       ggplot2_3.3.3    
-[34] png_0.1-7         digest_0.6.27     stringi_1.5.3    
-[37] bookdown_0.21     grid_4.0.3        rprojroot_2.0.2  
-[40] BH_1.72.0-3       cli_2.2.0         tools_4.0.3      
-[43] magrittr_2.0.1    sass_0.2.0        tibble_3.0.4     
-[46] crayon_1.3.4      tidyr_1.1.2       pkgconfig_2.0.3  
-[49] downlit_0.2.1     ellipsis_0.3.1    lubridate_1.7.9.2
-[52] rstudioapi_0.13   assertthat_0.2.1  rmarkdown_2.6    
-[55] R6_2.5.0          compiler_4.0.3   </code></pre>
+ [1] tidyselect_1.1.0  xfun_0.22         bslib_0.2.4      
+ [4] purrr_0.3.4       colorspace_2.0-0  vctrs_0.3.6      
+ [7] generics_0.1.0    htmltools_0.5.1.1 emo_0.0.0.9000   
+[10] yaml_2.2.1        utf8_1.1.4        rlang_0.4.10     
+[13] jquerylib_0.1.3   pillar_1.5.1      glue_1.4.2       
+[16] DBI_1.1.1         lifecycle_1.0.0   stringr_1.4.0    
+[19] munsell_0.5.0     commonmark_1.7    gtable_0.3.0     
+[22] ragg_1.1.1        bench_1.1.1       evaluate_0.14    
+[25] knitr_1.31        parallel_4.0.4    fansi_0.4.2      
+[28] highr_0.8         profmem_0.6.0     scales_1.1.1     
+[31] backports_1.2.1   checkmate_2.0.0   debugme_1.1.0    
+[34] jsonlite_1.7.2    farver_2.1.0      systemfonts_1.0.1
+[37] textshaping_0.3.2 distill_1.2       png_0.1-7        
+[40] ggplot2_3.3.3     digest_0.6.27     stringi_1.5.3    
+[43] grid_4.0.4        BH_1.75.0-0       cli_2.3.1        
+[46] tools_4.0.4       magrittr_2.0.1    sass_0.3.1       
+[49] tibble_3.1.0      crayon_1.4.1      tidyr_1.1.3      
+[52] pkgconfig_2.0.3   downlit_0.2.1     ellipsis_0.3.1   
+[55] lubridate_1.7.10  assertthat_0.2.1  rmarkdown_2.7    
+[58] rstudioapi_0.13   R6_2.5.0          compiler_4.0.4   </code></pre>
 </div>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">

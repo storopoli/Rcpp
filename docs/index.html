@@ -458,8 +458,15 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     top: 0;
   }
 
+  /* adjust viewport for navbar height */
+  /* helps vertically center bootstrap (non-distill) content */
+  .min-vh-100 {
+    min-height: calc(100vh - 100px) !important;
+  }
+
   </style>
 
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
   <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
   <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
   <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
@@ -567,19 +574,21 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             var results = fuse.search(query, searchOptions);
             callback(results
               .map(function(result) { return result.item; })
-              .filter(function(item) { return !!item.description; })
             );
           },
           templates: {
             suggestion: function(suggestion) {
+              var img = suggestion.preview && Object.keys(suggestion.preview).length > 0
+                ? `<img src="${offsetURL(suggestion.preview)}"</img>`
+                : '';
               var html = `
                 <div class="search-item">
                   <h3>${suggestion.title}</h3>
                   <div class="search-item-description">
-                    ${suggestion.description}
+                    ${suggestion.description || ''}
                   </div>
                   <div class="search-item-preview">
-                    <img src="${suggestion.preview ? offsetURL(suggestion.preview) : ''}"</img>
+                    ${img}
                   </div>
                 </div>
               `;
@@ -602,6 +611,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   </script>
 
   <style type="text/css">
+
+  .nav-search {
+    font-size: x-small;
+  }
 
   /* Algolioa Autocomplete */
 
@@ -677,6 +690,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item h3 {
+    font-size: 1rem;
     margin-block-start: 0;
     margin-block-end: 5px;
   }
@@ -904,6 +918,11 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     text-decoration: underline;
   }
 
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
   @media(min-width: 768px) {
 
   d-article pre,
@@ -1058,6 +1077,17 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
   }
 
 
@@ -1725,7 +1755,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       var layout = $(this).attr('data-layout');
 
       // apply layout to markdown level block elements
-      var elements = $(this).children().not('div.sourceCode, pre, script');
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
         var layout_div = $('<div class="' + layout + '"></div>');
         if (layout_div.hasClass('shaded')) {
@@ -1840,6 +1870,20 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
 
       // clear polling timer
       clearInterval(tid);
@@ -2180,7 +2224,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   d-article div.sourceCode code,
   d-article pre code {
-  	font-family: var(--mono-font), var(--mono-default);
+    font-family: var(--mono-font), var(--mono-default);
   }
 
 
@@ -2205,76 +2249,78 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   /*-- BODY --*/
-  /* only text inside of <p> tags */
-  d-article > p {
+  d-article > p,  /* only text inside of <p> tags */
+  d-article > ul, /* lists */
+  d-article > ol {
     color: var(--body-color, rgba(0, 0, 0, 0.8));
     font-size: var(--body-size, 1.06rem);
   }
 
+
   /*-- CODE --*/
   d-article div.sourceCode code,
   d-article pre code {
-  	font-size: var(--code-size, 14px);
+    font-size: var(--code-size, 14px);
   }
 
   /*-- ASIDE --*/
   d-article aside {
-  	font-size: var(--aside-size, 12px);
-  	color: var(--aside-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--aside-size, 12px);
+    color: var(--aside-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- FIGURE CAPTIONS --*/
   figure .caption,
   figure figcaption,
   .figure .caption {
-  	font-size: var(--fig-cap-size, 13px);
-  	color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--fig-cap-size, 13px);
+    color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- METADATA --*/
   d-byline h3 {
-  	font-size: var(--heading-size, 0.6rem);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.5));
+    font-size: var(--heading-size, 0.6rem);
+    color: var(--heading-color, rgba(0, 0, 0, 0.5));
   }
 
   d-byline {
-  	font-size: var(--body-size, 0.8rem);
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    font-size: var(--body-size, 0.8rem);
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   d-byline a,
   d-article d-byline a {
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   /*-- TABLE OF CONTENTS --*/
   .d-contents nav h3 {
-  	font-size: var(--heading-size, 18px);
+    font-size: var(--heading-size, 18px);
   }
 
   .d-contents nav a {
-  	font-size: var(--contents-size, 13px);
+    font-size: var(--contents-size, 13px);
   }
 
   /*-- APPENDIX --*/
   d-appendix h3 {
     font-size: var(--heading-size, 15px);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.65));
+    color: var(--heading-color, rgba(0, 0, 0, 0.65));
   }
 
   d-appendix {
     font-size: var(--text-size, 0.8em);
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   d-appendix d-footnote-list a.footnote-backlink {
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   /*-- WEBSITE HEADER + FOOTER --*/
   .distill-site-header .title {
-  	font-size: var(--title-size, 18px);
-  	font-family: var(--navbar-font), var(--heading-default);
+    font-size: var(--title-size, 18px);
+    font-family: var(--navbar-font), var(--heading-default);
   }
 
   .distill-site-header a,
@@ -2282,35 +2328,44 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     font-family: var(--navbar-font), var(--heading-default);
   }
 
-  .distill-site-header a:hover {
-  	color: var(--hover-color, white);
+  .nav-dropdown .nav-dropbtn {
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    font-size: var(--text-size, 15px);
+  }
+
+  .distill-site-header a:hover,
+  .nav-dropdown:hover .nav-dropbtn {
+    color: var(--hover-color, white);
   }
 
   .distill-site-header {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer a:hover {
-  	color: var(--hover-color, white);
+    color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
-  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+  <script src="site_libs/popper-2.6.0/popper.min.js"></script>
+  <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
   <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
   <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
-  <script>
+  <script type="text/javascript" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
+  <script type="text/javascript" cookie-consent="tracking">
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -2442,7 +2497,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#emzlmteulh .gt_table {
+#yykwgfpgpf .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2467,7 +2522,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-left-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_heading {
+#yykwgfpgpf .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2479,7 +2534,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_title {
+#yykwgfpgpf .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2489,7 +2544,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-bottom-width: 0;
 }
 
-#emzlmteulh .gt_subtitle {
+#yykwgfpgpf .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2499,13 +2554,13 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-top-width: 0;
 }
 
-#emzlmteulh .gt_bottom_border {
+#yykwgfpgpf .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_col_headings {
+#yykwgfpgpf .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2520,7 +2575,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_col_heading {
+#yykwgfpgpf .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2540,7 +2595,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   overflow-x: hidden;
 }
 
-#emzlmteulh .gt_column_spanner_outer {
+#yykwgfpgpf .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2552,15 +2607,15 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-right: 4px;
 }
 
-#emzlmteulh .gt_column_spanner_outer:first-child {
+#yykwgfpgpf .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#emzlmteulh .gt_column_spanner_outer:last-child {
+#yykwgfpgpf .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#emzlmteulh .gt_column_spanner {
+#yykwgfpgpf .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2572,7 +2627,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   width: 100%;
 }
 
-#emzlmteulh .gt_group_heading {
+#yykwgfpgpf .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2594,7 +2649,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   vertical-align: middle;
 }
 
-#emzlmteulh .gt_empty_group_heading {
+#yykwgfpgpf .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2609,15 +2664,15 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   vertical-align: middle;
 }
 
-#emzlmteulh .gt_from_md > :first-child {
+#yykwgfpgpf .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#emzlmteulh .gt_from_md > :last-child {
+#yykwgfpgpf .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#emzlmteulh .gt_row {
+#yykwgfpgpf .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2636,7 +2691,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   overflow-x: hidden;
 }
 
-#emzlmteulh .gt_stub {
+#yykwgfpgpf .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2648,7 +2703,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-left: 12px;
 }
 
-#emzlmteulh .gt_summary_row {
+#yykwgfpgpf .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2658,7 +2713,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-right: 5px;
 }
 
-#emzlmteulh .gt_first_summary_row {
+#yykwgfpgpf .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2668,7 +2723,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-top-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_grand_summary_row {
+#yykwgfpgpf .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2678,7 +2733,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   padding-right: 5px;
 }
 
-#emzlmteulh .gt_first_grand_summary_row {
+#yykwgfpgpf .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2688,11 +2743,11 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-top-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_striped {
+#yykwgfpgpf .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#emzlmteulh .gt_table_body {
+#yykwgfpgpf .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2701,7 +2756,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-bottom-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_footnotes {
+#yykwgfpgpf .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2715,13 +2770,13 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_footnote {
+#yykwgfpgpf .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#emzlmteulh .gt_sourcenotes {
+#yykwgfpgpf .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2735,46 +2790,46 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
   border-right-color: #D3D3D3;
 }
 
-#emzlmteulh .gt_sourcenote {
+#yykwgfpgpf .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#emzlmteulh .gt_left {
+#yykwgfpgpf .gt_left {
   text-align: left;
 }
 
-#emzlmteulh .gt_center {
+#yykwgfpgpf .gt_center {
   text-align: center;
 }
 
-#emzlmteulh .gt_right {
+#yykwgfpgpf .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#emzlmteulh .gt_font_normal {
+#yykwgfpgpf .gt_font_normal {
   font-weight: normal;
 }
 
-#emzlmteulh .gt_font_bold {
+#yykwgfpgpf .gt_font_bold {
   font-weight: bold;
 }
 
-#emzlmteulh .gt_font_italic {
+#yykwgfpgpf .gt_font_italic {
   font-style: italic;
 }
 
-#emzlmteulh .gt_super {
+#yykwgfpgpf .gt_super {
   font-size: 65%;
 }
 
-#emzlmteulh .gt_footnote_marks {
+#yykwgfpgpf .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="emzlmteulh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="yykwgfpgpf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
       <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Total de Downloads do CRAN</th>
@@ -2794,38 +2849,38 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>Rcpp</code></p>
 </div></td>
-      <td class="gt_row gt_right">41,39M</td>
-      <td class="gt_row gt_right">2.318</td>
+      <td class="gt_row gt_right">41,59M</td>
+      <td class="gt_row gt_right">2.386</td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>BH</code></p>
 </div></td>
-      <td class="gt_row gt_right">23,34M</td>
-      <td class="gt_row gt_right">259</td>
+      <td class="gt_row gt_right">23,45M</td>
+      <td class="gt_row gt_right">273</td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>RcppArmadillo</code></p>
 </div></td>
-      <td class="gt_row gt_right">13,27M</td>
-      <td class="gt_row gt_right">851</td>
+      <td class="gt_row gt_right">13,33M</td>
+      <td class="gt_row gt_right">886</td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>RcppEigen</code></p>
 </div></td>
-      <td class="gt_row gt_right">10,95M</td>
-      <td class="gt_row gt_right">287</td>
+      <td class="gt_row gt_right">11,00M</td>
+      <td class="gt_row gt_right">303</td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>cpp11</code></p>
 </div></td>
-      <td class="gt_row gt_right">3,74M</td>
-      <td class="gt_row gt_right">9</td>
+      <td class="gt_row gt_right">3,76M</td>
+      <td class="gt_row gt_right">13</td>
     </tr>
     <tr>
       <td class="gt_row gt_center"><div class='gt_from_md'><p><code>RcppParallel</code></p>
 </div></td>
-      <td class="gt_row gt_right">2,14M</td>
-      <td class="gt_row gt_right">81</td>
+      <td class="gt_row gt_right">2,16M</td>
+      <td class="gt_row gt_right">86</td>
     </tr>
   </tbody>
   
@@ -2853,7 +2908,7 @@ Figure 1: R com C++ sem dúvida bate a marca dos 12 parsecs
             <em>3</em>
           </sup>
            
-          Total em 11/01/2021.
+          Total em 12/03/2021.
           <br />
         </p>
       </td>

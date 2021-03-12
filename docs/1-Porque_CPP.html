@@ -458,8 +458,15 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     top: 0;
   }
 
+  /* adjust viewport for navbar height */
+  /* helps vertically center bootstrap (non-distill) content */
+  .min-vh-100 {
+    min-height: calc(100vh - 100px) !important;
+  }
+
   </style>
 
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
   <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
   <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
   <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
@@ -567,19 +574,21 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             var results = fuse.search(query, searchOptions);
             callback(results
               .map(function(result) { return result.item; })
-              .filter(function(item) { return !!item.description; })
             );
           },
           templates: {
             suggestion: function(suggestion) {
+              var img = suggestion.preview && Object.keys(suggestion.preview).length > 0
+                ? `<img src="${offsetURL(suggestion.preview)}"</img>`
+                : '';
               var html = `
                 <div class="search-item">
                   <h3>${suggestion.title}</h3>
                   <div class="search-item-description">
-                    ${suggestion.description}
+                    ${suggestion.description || ''}
                   </div>
                   <div class="search-item-preview">
-                    <img src="${suggestion.preview ? offsetURL(suggestion.preview) : ''}"</img>
+                    ${img}
                   </div>
                 </div>
               `;
@@ -602,6 +611,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   </script>
 
   <style type="text/css">
+
+  .nav-search {
+    font-size: x-small;
+  }
 
   /* Algolioa Autocomplete */
 
@@ -677,6 +690,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item h3 {
+    font-size: 1rem;
     margin-block-start: 0;
     margin-block-end: 5px;
   }
@@ -904,6 +918,11 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     text-decoration: underline;
   }
 
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
   @media(min-width: 768px) {
 
   d-article pre,
@@ -1058,6 +1077,17 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
   }
 
 
@@ -1725,7 +1755,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       var layout = $(this).attr('data-layout');
 
       // apply layout to markdown level block elements
-      var elements = $(this).children().not('div.sourceCode, pre, script');
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
         var layout_div = $('<div class="' + layout + '"></div>');
         if (layout_div.hasClass('shaded')) {
@@ -1840,6 +1870,20 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
 
       // clear polling timer
       clearInterval(tid);
@@ -2180,7 +2224,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   d-article div.sourceCode code,
   d-article pre code {
-  	font-family: var(--mono-font), var(--mono-default);
+    font-family: var(--mono-font), var(--mono-default);
   }
 
 
@@ -2205,76 +2249,78 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   /*-- BODY --*/
-  /* only text inside of <p> tags */
-  d-article > p {
+  d-article > p,  /* only text inside of <p> tags */
+  d-article > ul, /* lists */
+  d-article > ol {
     color: var(--body-color, rgba(0, 0, 0, 0.8));
     font-size: var(--body-size, 1.06rem);
   }
 
+
   /*-- CODE --*/
   d-article div.sourceCode code,
   d-article pre code {
-  	font-size: var(--code-size, 14px);
+    font-size: var(--code-size, 14px);
   }
 
   /*-- ASIDE --*/
   d-article aside {
-  	font-size: var(--aside-size, 12px);
-  	color: var(--aside-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--aside-size, 12px);
+    color: var(--aside-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- FIGURE CAPTIONS --*/
   figure .caption,
   figure figcaption,
   .figure .caption {
-  	font-size: var(--fig-cap-size, 13px);
-  	color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--fig-cap-size, 13px);
+    color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- METADATA --*/
   d-byline h3 {
-  	font-size: var(--heading-size, 0.6rem);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.5));
+    font-size: var(--heading-size, 0.6rem);
+    color: var(--heading-color, rgba(0, 0, 0, 0.5));
   }
 
   d-byline {
-  	font-size: var(--body-size, 0.8rem);
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    font-size: var(--body-size, 0.8rem);
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   d-byline a,
   d-article d-byline a {
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   /*-- TABLE OF CONTENTS --*/
   .d-contents nav h3 {
-  	font-size: var(--heading-size, 18px);
+    font-size: var(--heading-size, 18px);
   }
 
   .d-contents nav a {
-  	font-size: var(--contents-size, 13px);
+    font-size: var(--contents-size, 13px);
   }
 
   /*-- APPENDIX --*/
   d-appendix h3 {
     font-size: var(--heading-size, 15px);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.65));
+    color: var(--heading-color, rgba(0, 0, 0, 0.65));
   }
 
   d-appendix {
     font-size: var(--text-size, 0.8em);
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   d-appendix d-footnote-list a.footnote-backlink {
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   /*-- WEBSITE HEADER + FOOTER --*/
   .distill-site-header .title {
-  	font-size: var(--title-size, 18px);
-  	font-family: var(--navbar-font), var(--heading-default);
+    font-size: var(--title-size, 18px);
+    font-family: var(--navbar-font), var(--heading-default);
   }
 
   .distill-site-header a,
@@ -2282,35 +2328,44 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     font-family: var(--navbar-font), var(--heading-default);
   }
 
-  .distill-site-header a:hover {
-  	color: var(--hover-color, white);
+  .nav-dropdown .nav-dropbtn {
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    font-size: var(--text-size, 15px);
+  }
+
+  .distill-site-header a:hover,
+  .nav-dropdown:hover .nav-dropbtn {
+    color: var(--hover-color, white);
   }
 
   .distill-site-header {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer a:hover {
-  	color: var(--hover-color, white);
+    color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
-  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+  <script src="site_libs/popper-2.6.0/popper.min.js"></script>
+  <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
   <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
   <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
-  <script>
+  <script type="text/javascript" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
+  <script type="text/javascript" cookie-consent="tracking">
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -2401,7 +2456,7 @@ Tutoriais
 <nav class="l-text toc figcaption" id="TOC">
 <h3>Contents</h3>
 <ul>
-<li><a href="#linguagems-dinâmicas-vs-estáticas">Linguagems Dinâmicas vs Estáticas</a></li>
+<li><a href="#linguagens-dinâmicas-vs-estáticas">Linguagens Dinâmicas vs Estáticas</a></li>
 <li><a href="#o-quão-lento-r-é-comparado-à-c">O quão lento R é comparado à C++?</a>
 <ul>
 <li><a href="#exemplo---simples-função-de-soma">Exemplo - Simples Função de Soma</a></li>
@@ -2413,7 +2468,7 @@ Tutoriais
 <li><a href="#tipos-de-variáveis-r-vs-c">Tipos de Variáveis – R vs C++</a></li>
 <li><a href="#o-qualificador-const">O qualificador – <code>const</code></a></li>
 <li><a href="#referências">Referências – <code>&amp;</code></a></li>
-<li><a href="#funcões-em-c">Funcões em C++</a></li>
+<li><a href="#funções-em-c">Funções em C++</a></li>
 </ul></li>
 <li><a href="#loops-for-em-c">Loops <code>for</code> em C++</a></li>
 <li><a href="#loops-while-em-c">Loops <code>while</code> em C++</a></li>
@@ -2427,9 +2482,9 @@ Tutoriais
 </div>
 <!--Academicons Icons-->
 <p><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css"></p>
-<h2 id="linguagems-dinâmicas-vs-estáticas">Linguagems Dinâmicas vs Estáticas<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h2>
-<p>Geralmente as linguaguens de programação são categorizadas entre linguagens dinamicamente tipadas ou estaticamente tipadas.</p>
-<p>O <strong>R é uma liguagem dinamicamente tipada</strong>. Isso quer dizer que os tipos das variáveis e dados <strong>não são declarados no código</strong> e, portanto, conhecidos/checados somente em tempo de execução. Além do R, Ruby, Python e Clojure também são exemplos de linguagens dinamicamente tipadas. A principal vantagem de uma linguagem dinamicamente tipada é a sua <strong>agilidade</strong>: você se torna mais produtivo e o código mais enxuto, mas isto vem com um custo. A principal desvantagem é que linguagems dinamicamente tipadas são <strong>bem mais lentas</strong> em tempo de execução.</p>
+<h2 id="linguagens-dinâmicas-vs-estáticas">Linguagens Dinâmicas vs Estáticas<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h2>
+<p>Geralmente as linguagens de programação são categorizadas entre linguagens dinamicamente tipadas ou estaticamente tipadas.</p>
+<p>O <strong>R é uma linguagem dinamicamente tipada</strong>. Isso quer dizer que os tipos das variáveis e dados <strong>não são declarados no código</strong> e, portanto, conhecidos/checados somente em tempo de execução. Além do R, Ruby, Python e Clojure também são exemplos de linguagens dinamicamente tipadas. A principal vantagem de uma linguagem dinamicamente tipada é a sua <strong>agilidade</strong>: você se torna mais produtivo e o código mais enxuto, mas isto vem com um custo. A principal desvantagem é que linguagems dinamicamente tipadas são <strong>bem mais lentas</strong> em tempo de execução.</p>
 <p>O <strong>C++ é uma linguagem estaticamente tipada</strong>. Isso quer dizer que os tipos das variáveis e dos dados <strong>são explicitamente definidos no código</strong> e, portanto, conhecidos/checados em tempo de compilação. Além de C++, Java, C#, F#, Kotlin e Go são exemplos de linguagens estaticamente tipadas. A principal vantagem de uma linguagem estaticamente tipada é a sua <strong>velocidade em tempo de execução</strong>. Sua principal desvantagem é a <strong>rigidez</strong>: você se torna menos produtivo e o código muito mais verboso.</p>
 <h2 id="o-quão-lento-r-é-comparado-à-c">O quão lento R é comparado à C++?</h2>
 <p>Não conseguimos definir um índice preciso de comparação de tempo de execução entre R, C++ ou qualquer outra linguagem de programação. Isto varia muito conforme aplicação, sistema operacional e tamanho dos dados.</p>
@@ -2437,7 +2492,7 @@ Tutoriais
 <p>Como primeiro exemplo, imagine uma função que soma três números inteiros e retorna o valor da soma. Vamos chamar essa função de <code>add()</code> e compararemos o tempo de execução dessa função em R <code>addR()</code> e em C++ <code>addCpp()</code>:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>addR</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>z</span><span class='op'>)</span> <span class='op'>{</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>addR</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>z</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>result</span> <span class='op'>&lt;-</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>y</span> <span class='op'>+</span> <span class='va'>z</span>
     <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>result</span><span class='op'>)</span>
 <span class='op'>}</span>
@@ -2449,7 +2504,7 @@ Tutoriais
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='st'><a href='http://www.rcpp.org'>"Rcpp"</a></span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='st'><a href='http://www.rcpp.org'>"Rcpp"</a></span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/cppFunction.html'>cppFunction</a></span><span class='op'>(</span><span class='st'>"
 int addCpp(int x, int y, int z){
    int result = x + y + z;
@@ -2464,7 +2519,7 @@ int addCpp(int x, int y, int z){
 <p>Comparando tempo de execução com a função <code>mark()</code> do pacote <code>{bench}</code>:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
   R   <span class='op'>=</span> <span class='fu'>addR</span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>17</span>, <span class='fl'>31</span><span class='op'>)</span>,
   Cpp <span class='op'>=</span> <span class='fu'>addCpp</span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>17</span>, <span class='fl'>31</span><span class='op'>)</span>,
   relative <span class='op'>=</span> <span class='cn'>TRUE</span>
@@ -2475,8 +2530,8 @@ int addCpp(int x, int y, int z){
 <pre><code># A tibble: 2 x 6
   expression   min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 R           1      1         3.54      131.      NaN
-2 Cpp         2.85   4.19      1           1       NaN</code></pre>
+1 R           1      1         4.24      131.      NaN
+2 Cpp         3.07   4.90      1           1       NaN</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:fig-bench-add"></span>
@@ -2488,11 +2543,11 @@ Figure 1: Benchmark da função soma: R vs C++
 </div>
 <p>Aqui vocês vem que C++ não tem nenhuma vantagem sobre R: é mais verboso, chato de escrever e ainda é mais lenta!</p>
 <h3 id="exemplo---amostrador-de-gibbs">Exemplo - Amostrador de Gibbs</h3>
-<p>Como segundo exemplo vamos fazer algo mais computacionalmente intensivo. Para quem não conhece, <a href="https://en.wikipedia.org/wiki/Gibbs_sampling">Amostrador de Gibbs (<em>Gibss Sampler</em>)</a> é um algoritmo de aproximação de uma distribuição probabilística multivariada que usa Método de Montecarlo com correntes Markov; e é primariamente utilizado em casos quando amostragem direta não é possível. Este exemplo foi retirado do <a href="http://dirk.eddelbuettel.com/blog/2011/07/14/">blog do Dirk Eddelbuettel</a> mantenedor do ecossitema <code>{Rcpp}</code> de pacotes de interfaces entre R e C++.</p>
+<p>Como segundo exemplo vamos fazer algo mais computacionalmente intensivo. Para quem não conhece, <a href="https://en.wikipedia.org/wiki/Gibbs_sampling">Amostrador de Gibbs (<em>Gibss Sampler</em>)</a> é um algoritmo de aproximação de uma distribuição probabilística multivariada que usa Método de Montecarlo com correntes Markov; e é primariamente utilizado em casos quando amostragem direta não é possível. Este exemplo foi retirado do <a href="http://dirk.eddelbuettel.com/blog/2011/07/14/">blog do Dirk Eddelbuettel</a> mantenedor do ecossistema <code>{Rcpp}</code> de pacotes de interfaces entre R e C++.</p>
 <p>O código em R é assim:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>gibbsR</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>N</span>, <span class='va'>thin</span><span class='op'>)</span> <span class='op'>{</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>gibbsR</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>N</span>, <span class='va'>thin</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='va'>mat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span>nrow <span class='op'>=</span> <span class='va'>N</span>, ncol <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
   <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>0</span>
 
@@ -2511,7 +2566,7 @@ Figure 1: Benchmark da função soma: R vs C++
 <p>Agora o código em C++ (não se preocupe agora com os <code>Rcpp</code> que aparecem no código, isto será explicado na <a href="2-Rcpp.html">segunda parte desse tutorial</a>):</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span>code <span class='op'>=</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/sourceCpp.html'>sourceCpp</a></span><span class='op'>(</span>code <span class='op'>=</span>
 <span class='st'>"#include &lt;Rcpp.h&gt;
 using namespace Rcpp;
 
@@ -2538,7 +2593,7 @@ NumericMatrix gibbsCpp(int N, int thin) {
 <p>E vamos para o benchmark comparando alguns tamanhos de inputs:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>b2</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>b2</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
   N <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>,
 <span class='op'>{</span>
   <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/mark.html'>mark</a></span><span class='op'>(</span>
@@ -2555,10 +2610,10 @@ NumericMatrix gibbsCpp(int N, int thin) {
 <pre><code># A tibble: 4 x 7
   expression     N   min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 R            100  23.5   21.8       1       1284.     1   
-2 Cpp          100   1      1        21.6        1      1.68
-3 R           1000  22.4   23.4       1       2745.     1.42
-4 Cpp         1000   1      1        22.7        1      1   </code></pre>
+1 R            100  22.3   22.3       1       1284.     1.66
+2 Cpp          100   1      1        22.9        1      1   
+3 R           1000  23.6   24.4       1       2745.     1.53
+4 Cpp         1000   1      1        23.1        1      1   </code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:fig-bench-gibbs"></span>
@@ -2615,7 +2670,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hxjtdkgdrq .gt_table {
+#bwlhguxvcm .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2640,7 +2695,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-left-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_heading {
+#bwlhguxvcm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2652,7 +2707,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_title {
+#bwlhguxvcm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2662,7 +2717,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-bottom-width: 0;
 }
 
-#hxjtdkgdrq .gt_subtitle {
+#bwlhguxvcm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2672,13 +2727,13 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-top-width: 0;
 }
 
-#hxjtdkgdrq .gt_bottom_border {
+#bwlhguxvcm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_col_headings {
+#bwlhguxvcm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2693,7 +2748,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_col_heading {
+#bwlhguxvcm .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2713,7 +2768,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   overflow-x: hidden;
 }
 
-#hxjtdkgdrq .gt_column_spanner_outer {
+#bwlhguxvcm .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2725,15 +2780,15 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-right: 4px;
 }
 
-#hxjtdkgdrq .gt_column_spanner_outer:first-child {
+#bwlhguxvcm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hxjtdkgdrq .gt_column_spanner_outer:last-child {
+#bwlhguxvcm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hxjtdkgdrq .gt_column_spanner {
+#bwlhguxvcm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2745,7 +2800,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   width: 100%;
 }
 
-#hxjtdkgdrq .gt_group_heading {
+#bwlhguxvcm .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2767,7 +2822,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   vertical-align: middle;
 }
 
-#hxjtdkgdrq .gt_empty_group_heading {
+#bwlhguxvcm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2782,15 +2837,15 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   vertical-align: middle;
 }
 
-#hxjtdkgdrq .gt_from_md > :first-child {
+#bwlhguxvcm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hxjtdkgdrq .gt_from_md > :last-child {
+#bwlhguxvcm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hxjtdkgdrq .gt_row {
+#bwlhguxvcm .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2809,7 +2864,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   overflow-x: hidden;
 }
 
-#hxjtdkgdrq .gt_stub {
+#bwlhguxvcm .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2821,7 +2876,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-left: 12px;
 }
 
-#hxjtdkgdrq .gt_summary_row {
+#bwlhguxvcm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2831,7 +2886,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-right: 5px;
 }
 
-#hxjtdkgdrq .gt_first_summary_row {
+#bwlhguxvcm .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2841,7 +2896,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-top-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_grand_summary_row {
+#bwlhguxvcm .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2851,7 +2906,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   padding-right: 5px;
 }
 
-#hxjtdkgdrq .gt_first_grand_summary_row {
+#bwlhguxvcm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2861,11 +2916,11 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-top-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_striped {
+#bwlhguxvcm .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hxjtdkgdrq .gt_table_body {
+#bwlhguxvcm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2874,7 +2929,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-bottom-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_footnotes {
+#bwlhguxvcm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2888,13 +2943,13 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_footnote {
+#bwlhguxvcm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#hxjtdkgdrq .gt_sourcenotes {
+#bwlhguxvcm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2908,46 +2963,46 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
   border-right-color: #D3D3D3;
 }
 
-#hxjtdkgdrq .gt_sourcenote {
+#bwlhguxvcm .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#hxjtdkgdrq .gt_left {
+#bwlhguxvcm .gt_left {
   text-align: left;
 }
 
-#hxjtdkgdrq .gt_center {
+#bwlhguxvcm .gt_center {
   text-align: center;
 }
 
-#hxjtdkgdrq .gt_right {
+#bwlhguxvcm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hxjtdkgdrq .gt_font_normal {
+#bwlhguxvcm .gt_font_normal {
   font-weight: normal;
 }
 
-#hxjtdkgdrq .gt_font_bold {
+#bwlhguxvcm .gt_font_bold {
   font-weight: bold;
 }
 
-#hxjtdkgdrq .gt_font_italic {
+#bwlhguxvcm .gt_font_italic {
   font-style: italic;
 }
 
-#hxjtdkgdrq .gt_super {
+#bwlhguxvcm .gt_super {
   font-size: 65%;
 }
 
-#hxjtdkgdrq .gt_footnote_marks {
+#bwlhguxvcm .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="hxjtdkgdrq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="bwlhguxvcm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3009,7 +3064,7 @@ Figure 3: Bjarne Stroustrup. Figura de: www.wikipedia.org
 <li>Para <strong>evitar a cópia de objetos na memória</strong>: isso faz o código ficar mais <strong>eficiente</strong>.</li>
 <li>Paramêtros de funções podem especificados por valor ou por referências. No caso de referências, isso é extremamente útil quando queremos <strong>alterar os valores dos parâmetros <em>in-place</em> pela função</strong>.</li>
 </ol>
-<h3 id="funcões-em-c">Funcões em C++</h3>
+<h3 id="funções-em-c">Funções em C++</h3>
 <p>A figura <a href="#fig:cppfunction">4</a> mostra a anatomia de uma função em C++. Ela é bem similar à estrutura de funções no R. Com duas notórias diferenças:</p>
 <ul>
 <li><strong>Tipo de Retorno</strong>: toda função em C++ deve especificar, antes do seu nome, o tipo de dado que é retornado pela função.</li>
@@ -3028,15 +3083,15 @@ Figure 4: Anatomia de uma função em C++. Figura adaptada da Vinheta Oficial In
 <p>Como podem ver, nesse cenário simples temos um pequeno ganho, pelo tempo mediano de execução, ao usarmos o a referência como parâmetro. Claro que nesse exemplo a função é trivial, imaginem como essa diferença escalonaria para maior intensidade computacional ou maior entrada de dados. Sem contar que precisamos de ZERO coletor de lixo (<em>garbage collection</em> – <code>gc</code>), pois não estamos movendo/copiando nada para o escopo local da função.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/cppFunction.html'>cppFunction</a></span><span class='op'>(</span>
-<span class='st'>"int increment_val(int x){ 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/cppFunction.html'>cppFunction</a></span><span class='op'>(</span>
+<span class='st'>"int increment_val(int x){
     x++;
     return x;
 }"</span>
 <span class='op'>)</span>
 
 <span class='fu'><a href='https://rdrr.io/pkg/Rcpp/man/cppFunction.html'>cppFunction</a></span><span class='op'>(</span>
-<span class='st'>"int increment_ref(int&amp; x){ 
+<span class='st'>"int increment_ref(int&amp; x){
     x++;
     return x;
 }"</span>
@@ -3051,8 +3106,8 @@ Figure 4: Anatomia de uma função em C++. Figura adaptada da Vinheta Oficial In
 <pre><code># A tibble: 2 x 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 value        1.37µs    1.5µs   607898.    2.49KB     60.8
-2 reference    1.32µs   1.44µs   612220.    2.49KB     61.2</code></pre>
+1 value        1.42µs   1.61µs   509325.    2.49KB     50.9
+2 reference     1.4µs   1.58µs   589542.    2.49KB      0  </code></pre>
 </div>
 <h2 id="loops-for-em-c">Loops <code>for</code> em C++</h2>
 <blockquote>
@@ -3129,14 +3184,14 @@ Figure 4: Anatomia de uma função em C++. Figura adaptada da Vinheta Oficial In
 <p><img src="images/gandalf-wise.png" width="288" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="o-que-mais-existe-em-c">O que mais existe em C++?</h2>
-<p>Nesse breve sobrevoo de C++ a intenção é apenas possibilitar alguém que não tenha nenhum conhecimento em C++ à ser introduzido em alguns conceitos de C++, notoriamente focando em <strong>funções</strong> (eu acredito ser a principal razão de usarmos C++ em R – acelerar o tempo de execução de funcões). Usando uma analogia, esse sobrevoo permite o leitor “dirigir C++ por um estacionamento vazio”. Caso se interesse, C++ é uma linguagem EXTREMAMENTE rica e complexa. Veja os livros, referências, vídeos e podcasts que eu recomendei lá em cima.</p>
+<p>Nesse breve sobrevoo de C++ a intenção é apenas possibilitar alguém que não tenha nenhum conhecimento em C++ à ser introduzido em alguns conceitos de C++, notoriamente focando em <strong>funções</strong> (eu acredito ser a principal razão de usarmos C++ em R – acelerar o tempo de execução de funções). Usando uma analogia, esse sobrevoo permite o leitor “dirigir C++ por um estacionamento vazio”. Caso se interesse, C++ é uma linguagem EXTREMAMENTE rica e complexa. Veja os livros, referências, vídeos e podcasts que eu recomendei lá em cima.</p>
 <h2 id="ambiente">Ambiente</h2>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
-<pre><code>R version 4.0.3 (2020-10-10)
+<pre><code>R version 4.0.4 (2021-02-15)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 20.10
 
@@ -3157,26 +3212,29 @@ attached base packages:
 [7] base     
 
 other attached packages:
-[1] dplyr_1.0.2 gt_0.2.2    Rcpp_1.0.5 
+[1] dplyr_1.0.5 gt_0.2.2    Rcpp_1.0.6 
 
 loaded via a namespace (and not attached):
- [1] highr_0.8        pillar_1.4.7     compiler_4.0.3  
- [4] tools_4.0.3      digest_0.6.27    downlit_0.2.1   
- [7] checkmate_2.0.0  evaluate_0.14    lifecycle_0.2.0 
-[10] tibble_3.0.4     gtable_0.3.0     png_0.1-7       
-[13] pkgconfig_2.0.3  rlang_0.4.10     bench_1.1.1     
-[16] cli_2.2.0        commonmark_1.7   distill_1.1     
-[19] yaml_2.2.1       parallel_4.0.3   xfun_0.20       
-[22] stringr_1.4.0    knitr_1.30       sass_0.2.0      
-[25] generics_0.1.0   vctrs_0.3.6      tidyselect_1.1.0
-[28] grid_4.0.3       glue_1.4.2       R6_2.5.0        
-[31] jpeg_0.1-8.1     fansi_0.4.1      profmem_0.6.0   
-[34] rmarkdown_2.6    farver_2.0.3     tidyr_1.1.2     
-[37] purrr_0.3.4      ggplot2_3.3.3    magrittr_2.0.1  
-[40] backports_1.2.1  scales_1.1.1     ellipsis_0.3.1  
-[43] htmltools_0.5.0  assertthat_0.2.1 colorspace_2.0-0
-[46] utf8_1.1.4       stringi_1.5.3    munsell_0.5.0   
-[49] crayon_1.3.4    </code></pre>
+ [1] tidyselect_1.1.0  xfun_0.22         bslib_0.2.4      
+ [4] purrr_0.3.4       colorspace_2.0-0  vctrs_0.3.6      
+ [7] generics_0.1.0    htmltools_0.5.1.1 yaml_2.2.1       
+[10] utf8_1.1.4        rlang_0.4.10      jquerylib_0.1.3  
+[13] pillar_1.5.1      glue_1.4.2        DBI_1.1.1        
+[16] jpeg_0.1-8.1      lifecycle_1.0.0   stringr_1.4.0    
+[19] commonmark_1.7    munsell_0.5.0     gtable_0.3.0     
+[22] ragg_1.1.1        bench_1.1.1       evaluate_0.14    
+[25] knitr_1.31        parallel_4.0.4    fansi_0.4.2      
+[28] profmem_0.6.0     highr_0.8         backports_1.2.1  
+[31] checkmate_2.0.0   scales_1.1.1      debugme_1.1.0    
+[34] jsonlite_1.7.2    farver_2.1.0      systemfonts_1.0.1
+[37] textshaping_0.3.2 distill_1.2       png_0.1-7        
+[40] ggplot2_3.3.3     digest_0.6.27     stringi_1.5.3    
+[43] grid_4.0.4        cli_2.3.1         tools_4.0.4      
+[46] magrittr_2.0.1    sass_0.3.1        tibble_3.1.0     
+[49] crayon_1.4.1      tidyr_1.1.3       pkgconfig_2.0.3  
+[52] downlit_0.2.1     ellipsis_0.3.1    assertthat_0.2.1 
+[55] rmarkdown_2.7     rstudioapi_0.13   R6_2.5.0         
+[58] compiler_4.0.4   </code></pre>
 </div>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">

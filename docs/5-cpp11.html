@@ -458,8 +458,15 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     top: 0;
   }
 
+  /* adjust viewport for navbar height */
+  /* helps vertically center bootstrap (non-distill) content */
+  .min-vh-100 {
+    min-height: calc(100vh - 100px) !important;
+  }
+
   </style>
 
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
   <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
   <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
   <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
@@ -567,19 +574,21 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             var results = fuse.search(query, searchOptions);
             callback(results
               .map(function(result) { return result.item; })
-              .filter(function(item) { return !!item.description; })
             );
           },
           templates: {
             suggestion: function(suggestion) {
+              var img = suggestion.preview && Object.keys(suggestion.preview).length > 0
+                ? `<img src="${offsetURL(suggestion.preview)}"</img>`
+                : '';
               var html = `
                 <div class="search-item">
                   <h3>${suggestion.title}</h3>
                   <div class="search-item-description">
-                    ${suggestion.description}
+                    ${suggestion.description || ''}
                   </div>
                   <div class="search-item-preview">
-                    <img src="${suggestion.preview ? offsetURL(suggestion.preview) : ''}"</img>
+                    ${img}
                   </div>
                 </div>
               `;
@@ -602,6 +611,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   </script>
 
   <style type="text/css">
+
+  .nav-search {
+    font-size: x-small;
+  }
 
   /* Algolioa Autocomplete */
 
@@ -677,6 +690,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item h3 {
+    font-size: 1rem;
     margin-block-start: 0;
     margin-block-end: 5px;
   }
@@ -904,6 +918,11 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     text-decoration: underline;
   }
 
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
   @media(min-width: 768px) {
 
   d-article pre,
@@ -1058,6 +1077,17 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
   }
 
 
@@ -1725,7 +1755,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       var layout = $(this).attr('data-layout');
 
       // apply layout to markdown level block elements
-      var elements = $(this).children().not('div.sourceCode, pre, script');
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
         var layout_div = $('<div class="' + layout + '"></div>');
         if (layout_div.hasClass('shaded')) {
@@ -1840,6 +1870,20 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
 
       // clear polling timer
       clearInterval(tid);
@@ -2180,7 +2224,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
   d-article div.sourceCode code,
   d-article pre code {
-  	font-family: var(--mono-font), var(--mono-default);
+    font-family: var(--mono-font), var(--mono-default);
   }
 
 
@@ -2205,76 +2249,78 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 
   /*-- BODY --*/
-  /* only text inside of <p> tags */
-  d-article > p {
+  d-article > p,  /* only text inside of <p> tags */
+  d-article > ul, /* lists */
+  d-article > ol {
     color: var(--body-color, rgba(0, 0, 0, 0.8));
     font-size: var(--body-size, 1.06rem);
   }
 
+
   /*-- CODE --*/
   d-article div.sourceCode code,
   d-article pre code {
-  	font-size: var(--code-size, 14px);
+    font-size: var(--code-size, 14px);
   }
 
   /*-- ASIDE --*/
   d-article aside {
-  	font-size: var(--aside-size, 12px);
-  	color: var(--aside-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--aside-size, 12px);
+    color: var(--aside-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- FIGURE CAPTIONS --*/
   figure .caption,
   figure figcaption,
   .figure .caption {
-  	font-size: var(--fig-cap-size, 13px);
-  	color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
+    font-size: var(--fig-cap-size, 13px);
+    color: var(--fig-cap-color, rgba(0, 0, 0, 0.6));
   }
 
   /*-- METADATA --*/
   d-byline h3 {
-  	font-size: var(--heading-size, 0.6rem);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.5));
+    font-size: var(--heading-size, 0.6rem);
+    color: var(--heading-color, rgba(0, 0, 0, 0.5));
   }
 
   d-byline {
-  	font-size: var(--body-size, 0.8rem);
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    font-size: var(--body-size, 0.8rem);
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   d-byline a,
   d-article d-byline a {
-  	color: var(--body-color, rgba(0, 0, 0, 0.8));
+    color: var(--body-color, rgba(0, 0, 0, 0.8));
   }
 
   /*-- TABLE OF CONTENTS --*/
   .d-contents nav h3 {
-  	font-size: var(--heading-size, 18px);
+    font-size: var(--heading-size, 18px);
   }
 
   .d-contents nav a {
-  	font-size: var(--contents-size, 13px);
+    font-size: var(--contents-size, 13px);
   }
 
   /*-- APPENDIX --*/
   d-appendix h3 {
     font-size: var(--heading-size, 15px);
-  	color: var(--heading-color, rgba(0, 0, 0, 0.65));
+    color: var(--heading-color, rgba(0, 0, 0, 0.65));
   }
 
   d-appendix {
     font-size: var(--text-size, 0.8em);
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   d-appendix d-footnote-list a.footnote-backlink {
-  	color: var(--text-color, rgba(0, 0, 0, 0.5));
+    color: var(--text-color, rgba(0, 0, 0, 0.5));
   }
 
   /*-- WEBSITE HEADER + FOOTER --*/
   .distill-site-header .title {
-  	font-size: var(--title-size, 18px);
-  	font-family: var(--navbar-font), var(--heading-default);
+    font-size: var(--title-size, 18px);
+    font-family: var(--navbar-font), var(--heading-default);
   }
 
   .distill-site-header a,
@@ -2282,35 +2328,44 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     font-family: var(--navbar-font), var(--heading-default);
   }
 
-  .distill-site-header a:hover {
-  	color: var(--hover-color, white);
+  .nav-dropdown .nav-dropbtn {
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    font-size: var(--text-size, 15px);
+  }
+
+  .distill-site-header a:hover,
+  .nav-dropdown:hover .nav-dropbtn {
+    color: var(--hover-color, white);
   }
 
   .distill-site-header {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer {
-  	font-size: var(--text-size, 15px);
-  	color: var(--text-color, rgba(255, 255, 255, 0.8));
-  	background-color: var(--bkgd-color, #0F2E3D);
+    font-size: var(--text-size, 15px);
+    color: var(--text-color, rgba(255, 255, 255, 0.8));
+    background-color: var(--bkgd-color, #0F2E3D);
   }
 
   .distill-site-footer a:hover {
-  	color: var(--hover-color, white);
+    color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
-  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+  <script src="site_libs/popper-2.6.0/popper.min.js"></script>
+  <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
   <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
   <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
-  <script>
+  <script type="text/javascript" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-186284914-4"></script>
+  <script type="text/javascript" cookie-consent="tracking">
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -2415,7 +2470,7 @@ Tutoriais
 <!--Academicons Icons-->
 <p><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css"></p>
 <p>O <a href="https://cpp11.r-lib.org"><code>{cpp11}</code></a> é uma nova interface entre R e C++ desenvolvida pela equipe do RStudio.</p>
-<p>Ainda é muito nova com apenas 9 links reversos de pacotes do CRAN, e com um total de 3.744.820 downloads (de 01/01/2016 à 31/12/2020).</p>
+<p>Ainda é muito nova com apenas 13 links reversos de pacotes do CRAN, e com um total de 3.759.798 downloads (de 01/01/2016 à 31/12/2020).</p>
 <h2 id="principais-motivações-do-cpp11">Principais Motivações do <code>{cpp11}</code></h2>
 <p>As mudanças que motivaram <code>{cpp11}</code> incluem:</p>
 <ul>
@@ -2429,7 +2484,7 @@ Tutoriais
 <li>Ser <em>completamente</em> <a href="https://cpp11.r-lib.org/articles/motivations.html#header-only">baseada em header (<em>header-only</em>)</a>.</li>
 <li>Capaz de <a href="https://cpp11.r-lib.org/articles/motivations.html#vendoring"><em>vendoring</em></a>, se desejado.</li>
 <li>Mais robusta [proteção] (<a href="https://cpp11.r-lib.org/articles/motivations.html#protection" class="uri">https://cpp11.r-lib.org/articles/motivations.html#protection</a>) usando uma estrutura de dados de lista vinculada (<em>linked list</em>) muito mais eficiente.</li>
-<li><a href="https://cpp11.r-lib.org/articles/motivations.html#growing-vectors">Crecimento de vetores</a> de forma mais eficiente.</li>
+<li><a href="https://cpp11.r-lib.org/articles/motivations.html#growing-vectors">Crescimento de vetores</a> de forma mais eficiente.</li>
 </ul>
 <h2 id="como-usar-cpp11-no-seu-código-c">Como usar <code>{cpp11}</code> no seu código C++</h2>
 <p>A sistemática é bem similar ao <code>{Rcpp}</code> e bem simples também. <strong>Primeiro</strong>, instale o pacote <code>{cpp11}</code> no R.</p>
@@ -2446,7 +2501,7 @@ Tutoriais
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#dpubofyylh .gt_table {
+#jpsuqnhuuh .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2471,7 +2526,7 @@ Tutoriais
   border-left-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_heading {
+#jpsuqnhuuh .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2483,7 +2538,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_title {
+#jpsuqnhuuh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2493,7 +2548,7 @@ Tutoriais
   border-bottom-width: 0;
 }
 
-#dpubofyylh .gt_subtitle {
+#jpsuqnhuuh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2503,13 +2558,13 @@ Tutoriais
   border-top-width: 0;
 }
 
-#dpubofyylh .gt_bottom_border {
+#jpsuqnhuuh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_col_headings {
+#jpsuqnhuuh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2524,7 +2579,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_col_heading {
+#jpsuqnhuuh .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2544,7 +2599,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#dpubofyylh .gt_column_spanner_outer {
+#jpsuqnhuuh .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2556,15 +2611,15 @@ Tutoriais
   padding-right: 4px;
 }
 
-#dpubofyylh .gt_column_spanner_outer:first-child {
+#jpsuqnhuuh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#dpubofyylh .gt_column_spanner_outer:last-child {
+#jpsuqnhuuh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#dpubofyylh .gt_column_spanner {
+#jpsuqnhuuh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2576,7 +2631,7 @@ Tutoriais
   width: 100%;
 }
 
-#dpubofyylh .gt_group_heading {
+#jpsuqnhuuh .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2598,7 +2653,7 @@ Tutoriais
   vertical-align: middle;
 }
 
-#dpubofyylh .gt_empty_group_heading {
+#jpsuqnhuuh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2613,15 +2668,15 @@ Tutoriais
   vertical-align: middle;
 }
 
-#dpubofyylh .gt_from_md > :first-child {
+#jpsuqnhuuh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#dpubofyylh .gt_from_md > :last-child {
+#jpsuqnhuuh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#dpubofyylh .gt_row {
+#jpsuqnhuuh .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2640,7 +2695,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#dpubofyylh .gt_stub {
+#jpsuqnhuuh .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2652,7 +2707,7 @@ Tutoriais
   padding-left: 12px;
 }
 
-#dpubofyylh .gt_summary_row {
+#jpsuqnhuuh .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2662,7 +2717,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#dpubofyylh .gt_first_summary_row {
+#jpsuqnhuuh .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2672,7 +2727,7 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_grand_summary_row {
+#jpsuqnhuuh .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2682,7 +2737,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#dpubofyylh .gt_first_grand_summary_row {
+#jpsuqnhuuh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2692,11 +2747,11 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_striped {
+#jpsuqnhuuh .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dpubofyylh .gt_table_body {
+#jpsuqnhuuh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2705,7 +2760,7 @@ Tutoriais
   border-bottom-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_footnotes {
+#jpsuqnhuuh .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2719,13 +2774,13 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_footnote {
+#jpsuqnhuuh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#dpubofyylh .gt_sourcenotes {
+#jpsuqnhuuh .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2739,46 +2794,46 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#dpubofyylh .gt_sourcenote {
+#jpsuqnhuuh .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#dpubofyylh .gt_left {
+#jpsuqnhuuh .gt_left {
   text-align: left;
 }
 
-#dpubofyylh .gt_center {
+#jpsuqnhuuh .gt_center {
   text-align: center;
 }
 
-#dpubofyylh .gt_right {
+#jpsuqnhuuh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dpubofyylh .gt_font_normal {
+#jpsuqnhuuh .gt_font_normal {
   font-weight: normal;
 }
 
-#dpubofyylh .gt_font_bold {
+#jpsuqnhuuh .gt_font_bold {
   font-weight: bold;
 }
 
-#dpubofyylh .gt_font_italic {
+#jpsuqnhuuh .gt_font_italic {
   font-style: italic;
 }
 
-#dpubofyylh .gt_super {
+#jpsuqnhuuh .gt_super {
   font-size: 65%;
 }
 
-#dpubofyylh .gt_footnote_marks {
+#jpsuqnhuuh .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="dpubofyylh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="jpsuqnhuuh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -2930,7 +2985,7 @@ Tutoriais
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ddzxxqkucs .gt_table {
+#chxulthexy .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2955,7 +3010,7 @@ Tutoriais
   border-left-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_heading {
+#chxulthexy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2967,7 +3022,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_title {
+#chxulthexy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2977,7 +3032,7 @@ Tutoriais
   border-bottom-width: 0;
 }
 
-#ddzxxqkucs .gt_subtitle {
+#chxulthexy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2987,13 +3042,13 @@ Tutoriais
   border-top-width: 0;
 }
 
-#ddzxxqkucs .gt_bottom_border {
+#chxulthexy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_col_headings {
+#chxulthexy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3008,7 +3063,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_col_heading {
+#chxulthexy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3028,7 +3083,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#ddzxxqkucs .gt_column_spanner_outer {
+#chxulthexy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3040,15 +3095,15 @@ Tutoriais
   padding-right: 4px;
 }
 
-#ddzxxqkucs .gt_column_spanner_outer:first-child {
+#chxulthexy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ddzxxqkucs .gt_column_spanner_outer:last-child {
+#chxulthexy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ddzxxqkucs .gt_column_spanner {
+#chxulthexy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3060,7 +3115,7 @@ Tutoriais
   width: 100%;
 }
 
-#ddzxxqkucs .gt_group_heading {
+#chxulthexy .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3082,7 +3137,7 @@ Tutoriais
   vertical-align: middle;
 }
 
-#ddzxxqkucs .gt_empty_group_heading {
+#chxulthexy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3097,15 +3152,15 @@ Tutoriais
   vertical-align: middle;
 }
 
-#ddzxxqkucs .gt_from_md > :first-child {
+#chxulthexy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ddzxxqkucs .gt_from_md > :last-child {
+#chxulthexy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ddzxxqkucs .gt_row {
+#chxulthexy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3124,7 +3179,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#ddzxxqkucs .gt_stub {
+#chxulthexy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3136,7 +3191,7 @@ Tutoriais
   padding-left: 12px;
 }
 
-#ddzxxqkucs .gt_summary_row {
+#chxulthexy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3146,7 +3201,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#ddzxxqkucs .gt_first_summary_row {
+#chxulthexy .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3156,7 +3211,7 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_grand_summary_row {
+#chxulthexy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3166,7 +3221,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#ddzxxqkucs .gt_first_grand_summary_row {
+#chxulthexy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3176,11 +3231,11 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_striped {
+#chxulthexy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ddzxxqkucs .gt_table_body {
+#chxulthexy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3189,7 +3244,7 @@ Tutoriais
   border-bottom-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_footnotes {
+#chxulthexy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3203,13 +3258,13 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_footnote {
+#chxulthexy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ddzxxqkucs .gt_sourcenotes {
+#chxulthexy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3223,46 +3278,46 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#ddzxxqkucs .gt_sourcenote {
+#chxulthexy .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ddzxxqkucs .gt_left {
+#chxulthexy .gt_left {
   text-align: left;
 }
 
-#ddzxxqkucs .gt_center {
+#chxulthexy .gt_center {
   text-align: center;
 }
 
-#ddzxxqkucs .gt_right {
+#chxulthexy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ddzxxqkucs .gt_font_normal {
+#chxulthexy .gt_font_normal {
   font-weight: normal;
 }
 
-#ddzxxqkucs .gt_font_bold {
+#chxulthexy .gt_font_bold {
   font-weight: bold;
 }
 
-#ddzxxqkucs .gt_font_italic {
+#chxulthexy .gt_font_italic {
   font-style: italic;
 }
 
-#ddzxxqkucs .gt_super {
+#chxulthexy .gt_super {
   font-size: 65%;
 }
 
-#ddzxxqkucs .gt_footnote_marks {
+#chxulthexy .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ddzxxqkucs" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="chxulthexy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3307,7 +3362,7 @@ Tutoriais
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#azxflegqez .gt_table {
+#vturoadajy .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3332,7 +3387,7 @@ Tutoriais
   border-left-color: #D3D3D3;
 }
 
-#azxflegqez .gt_heading {
+#vturoadajy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3344,7 +3399,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#azxflegqez .gt_title {
+#vturoadajy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3354,7 +3409,7 @@ Tutoriais
   border-bottom-width: 0;
 }
 
-#azxflegqez .gt_subtitle {
+#vturoadajy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3364,13 +3419,13 @@ Tutoriais
   border-top-width: 0;
 }
 
-#azxflegqez .gt_bottom_border {
+#vturoadajy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#azxflegqez .gt_col_headings {
+#vturoadajy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3385,7 +3440,7 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#azxflegqez .gt_col_heading {
+#vturoadajy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3405,7 +3460,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#azxflegqez .gt_column_spanner_outer {
+#vturoadajy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3417,15 +3472,15 @@ Tutoriais
   padding-right: 4px;
 }
 
-#azxflegqez .gt_column_spanner_outer:first-child {
+#vturoadajy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#azxflegqez .gt_column_spanner_outer:last-child {
+#vturoadajy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#azxflegqez .gt_column_spanner {
+#vturoadajy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3437,7 +3492,7 @@ Tutoriais
   width: 100%;
 }
 
-#azxflegqez .gt_group_heading {
+#vturoadajy .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3459,7 +3514,7 @@ Tutoriais
   vertical-align: middle;
 }
 
-#azxflegqez .gt_empty_group_heading {
+#vturoadajy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3474,15 +3529,15 @@ Tutoriais
   vertical-align: middle;
 }
 
-#azxflegqez .gt_from_md > :first-child {
+#vturoadajy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#azxflegqez .gt_from_md > :last-child {
+#vturoadajy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#azxflegqez .gt_row {
+#vturoadajy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3501,7 +3556,7 @@ Tutoriais
   overflow-x: hidden;
 }
 
-#azxflegqez .gt_stub {
+#vturoadajy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3513,7 +3568,7 @@ Tutoriais
   padding-left: 12px;
 }
 
-#azxflegqez .gt_summary_row {
+#vturoadajy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3523,7 +3578,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#azxflegqez .gt_first_summary_row {
+#vturoadajy .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3533,7 +3588,7 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#azxflegqez .gt_grand_summary_row {
+#vturoadajy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3543,7 +3598,7 @@ Tutoriais
   padding-right: 5px;
 }
 
-#azxflegqez .gt_first_grand_summary_row {
+#vturoadajy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3553,11 +3608,11 @@ Tutoriais
   border-top-color: #D3D3D3;
 }
 
-#azxflegqez .gt_striped {
+#vturoadajy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#azxflegqez .gt_table_body {
+#vturoadajy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3566,7 +3621,7 @@ Tutoriais
   border-bottom-color: #D3D3D3;
 }
 
-#azxflegqez .gt_footnotes {
+#vturoadajy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3580,13 +3635,13 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#azxflegqez .gt_footnote {
+#vturoadajy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#azxflegqez .gt_sourcenotes {
+#vturoadajy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3600,46 +3655,46 @@ Tutoriais
   border-right-color: #D3D3D3;
 }
 
-#azxflegqez .gt_sourcenote {
+#vturoadajy .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#azxflegqez .gt_left {
+#vturoadajy .gt_left {
   text-align: left;
 }
 
-#azxflegqez .gt_center {
+#vturoadajy .gt_center {
   text-align: center;
 }
 
-#azxflegqez .gt_right {
+#vturoadajy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#azxflegqez .gt_font_normal {
+#vturoadajy .gt_font_normal {
   font-weight: normal;
 }
 
-#azxflegqez .gt_font_bold {
+#vturoadajy .gt_font_bold {
   font-weight: bold;
 }
 
-#azxflegqez .gt_font_italic {
+#vturoadajy .gt_font_italic {
   font-style: italic;
 }
 
-#azxflegqez .gt_super {
+#vturoadajy .gt_super {
   font-size: 65%;
 }
 
-#azxflegqez .gt_footnote_marks {
+#vturoadajy .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="azxflegqez" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="vturoadajy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -3680,7 +3735,7 @@ Tutoriais
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum_of_squares_rcpp(NumericVector v){</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sum_of_elems = <span class="dv">0</span>;</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  sum_of_elems += <span class="bu">std::</span>accumulate(v.cbegin(),</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                                  v.cend(),</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                                  <span class="fl">0.0</span>,</span>
@@ -3703,7 +3758,7 @@ Tutoriais
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>[[<span class="at">cpp11</span>::<span class="at">register</span>]] <span class="dt">double</span> sum_of_squares_cpp11(doubles v){</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sum_of_elems = <span class="dv">0</span>;</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  sum_of_elems += <span class="bu">std::</span>accumulate(v.cbegin(),</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                                  v.cend(),</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                                  <span class="fl">0.0</span>,</span>
@@ -3713,7 +3768,7 @@ Tutoriais
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 <span class='va'>b1</span> <span class='op'>&lt;-</span> <span class='fu'>bench</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/bench/man/press.html'>press</a></span><span class='op'>(</span>
   n <span class='op'>=</span> <span class='fl'>10</span><span class='op'>^</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>)</span>,
   <span class='op'>{</span>
@@ -3732,15 +3787,15 @@ Tutoriais
 <pre><code># A tibble: 9 x 7
   expression       n   min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 Rcpp         10000  1      1.08      1.13       Inf      Inf
-2 cpp11        10000  1.21   1.21      1          NaN      NaN
-3 Rcppsugar    10000  1.00   1         1.20       Inf      NaN
-4 Rcpp        100000  1.00   1.00      1.08       Inf      NaN
-5 cpp11       100000  1.03   1.07      1          NaN      NaN
-6 Rcppsugar   100000  1      1         1.07       Inf      NaN
-7 Rcpp       1000000  1.00   1.00      1.05       Inf      NaN
-8 cpp11      1000000  1.02   1.07      1          NaN      NaN
-9 Rcppsugar  1000000  1      1         1.07       Inf      NaN</code></pre>
+1 Rcpp         10000  1.02   1.02      1.12       Inf      NaN
+2 cpp11        10000  1.24   1.19      1          NaN      NaN
+3 Rcppsugar    10000  1      1         1.18       Inf      Inf
+4 Rcpp        100000  1.00   1         1.04       Inf      NaN
+5 cpp11       100000  1.03   1.03      1          NaN      NaN
+6 Rcppsugar   100000  1      1.00      1.03       Inf      NaN
+7 Rcpp       1000000  1      1.00      1.02       Inf      NaN
+8 cpp11      1000000  1.01   1.02      1          NaN      NaN
+9 Rcppsugar  1000000  1.00   1         1.02       Inf      Inf</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="figure" style="text-align: center"><span id="fig:figsumofsquars"></span>
@@ -3750,7 +3805,7 @@ Figure 1: Benchmarks de Soma dos Quadrados: <code>Rcpp</code> vs <code>cpp11</co
 </p>
 </div>
 </div>
-<p>Quando usada a biblioteca padrão C++11 STL tanto <code>{cpp11}</code> quanto <code>{Rcpp}</code> e <code>{Rcpp}</code> Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com function () , {, length(peek_mask(“n()”)$current_rows()), } elementos. É claro que solução do <code>{Rcpp}</code> Sugar é muito mais elegante e simples com uma única linhana função.</p>
+<p>Quando usada a biblioteca padrão C++11 STL tanto <code>{cpp11}</code> quanto <code>{Rcpp}</code> e <code>{Rcpp}</code> Sugar, pelo menos neste simples benchmark e no meu computador, possuem um desempenho similar para um vetor com function () , {, length(peek_mask(“n()”)$current_rows()), } elementos. É claro que solução do <code>{Rcpp}</code> Sugar é muito mais elegante e simples com uma única linha na função.</p>
 <h2 id="cpp11-e-rmarkdown"><code>{cpp11}</code> e Rmarkdown</h2>
 <p>Na mesma lógica de <code>{Rcpp}</code>, para usar o <code>{cpp11}</code> em documentos rmarkdown basta colocar <code>cpp11</code> no chunk ao invés de <code>r</code>. Além disso é necessário instalar o pacote <code>{decor}</code>. Não esqueça de chamar um <code>library(cpp11)</code> no arquivo rmarkdown.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -3769,10 +3824,10 @@ Figure 2: <code>{cpp11}</code> no Rmarkdown
 <h2 id="ambiente">Ambiente</h2>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/utils/sessionInfo.html'>sessionInfo</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
-<pre><code>R version 4.0.3 (2020-10-10)
+<pre><code>R version 4.0.4 (2021-02-15)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 20.10
 
@@ -3793,46 +3848,33 @@ attached base packages:
 [7] base     
 
 other attached packages:
-[1] cpp11_0.2.4        RcppParallel_5.0.2 Matrix_1.3-2      
-[4] dplyr_1.0.2        gt_0.2.2           Rcpp_1.0.5        
+[1] gt_0.2.2    cpp11_0.2.6 dplyr_1.0.5
 
 loaded via a namespace (and not attached):
- [1] lubridate_1.7.9.2        lattice_0.20-41         
- [3] tidyr_1.1.2              ps_1.5.0                
- [5] png_0.1-7                assertthat_0.2.1        
- [7] rprojroot_2.0.2          digest_0.6.27           
- [9] utf8_1.1.4               R6_2.5.0                
-[11] backports_1.2.1          evaluate_0.14           
-[13] httr_1.4.2               ggplot2_3.3.3           
-[15] highr_0.8                pillar_1.4.7            
-[17] rlang_0.4.10             curl_4.3                
-[19] rstudioapi_0.13          callr_3.5.1             
-[21] checkmate_2.0.0          rmarkdown_2.6           
-[23] desc_1.2.0               stringr_1.4.0           
-[25] RcppEigen_0.3.3.9.1      igraph_1.2.6            
-[27] munsell_0.5.0            compiler_4.0.3          
-[29] xfun_0.20                pkgconfig_2.0.3         
-[31] htmltools_0.5.0          downlit_0.2.1           
-[33] tidyselect_1.1.0         tibble_3.0.4            
-[35] bookdown_0.21            emo_0.0.0.9000          
-[37] fansi_0.4.1              crayon_1.3.4            
-[39] brio_1.1.0               commonmark_1.7          
-[41] crandep_0.1.1            BH_1.72.0-3             
-[43] grid_4.0.3               jsonlite_1.7.2          
-[45] gtable_0.3.0             lifecycle_0.2.0         
-[47] magrittr_2.0.1           scales_1.1.1            
-[49] bench_1.1.1              cli_2.2.0               
-[51] stringi_1.5.3            profmem_0.6.0           
-[53] farver_2.0.3             RcppArmadillo_0.10.1.2.2
-[55] decor_1.0.0              xml2_1.3.2              
-[57] ellipsis_0.3.1           generics_0.1.0          
-[59] vctrs_0.3.6              distill_1.1             
-[61] cranlogs_2.1.1           tools_4.0.3             
-[63] glue_1.4.2               purrr_0.3.4             
-[65] jpeg_0.1-8.1             processx_3.4.5          
-[67] parallel_4.0.3           yaml_2.2.1              
-[69] colorspace_2.0-0         rvest_0.3.6             
-[71] knitr_1.30               sass_0.2.0              </code></pre>
+ [1] Rcpp_1.0.6        tidyr_1.1.3       png_0.1-7        
+ [4] ps_1.6.0          assertthat_0.2.1  rprojroot_2.0.2  
+ [7] digest_0.6.27     utf8_1.1.4        R6_2.5.0         
+[10] backports_1.2.1   evaluate_0.14     highr_0.8        
+[13] httr_1.4.2        ggplot2_3.3.3     pillar_1.5.1     
+[16] rlang_0.4.10      curl_4.3          rstudioapi_0.13  
+[19] callr_3.5.1       jquerylib_0.1.3   checkmate_2.0.0  
+[22] rmarkdown_2.7     textshaping_0.3.2 desc_1.3.0       
+[25] stringr_1.4.0     igraph_1.2.6      munsell_0.5.0    
+[28] compiler_4.0.4    xfun_0.22         pkgconfig_2.0.3  
+[31] systemfonts_1.0.1 htmltools_0.5.1.1 downlit_0.2.1    
+[34] tidyselect_1.1.0  tibble_3.1.0      fansi_0.4.2      
+[37] crayon_1.4.1      brio_1.1.1        commonmark_1.7   
+[40] crandep_0.1.1     grid_4.0.4        jsonlite_1.7.2   
+[43] gtable_0.3.0      lifecycle_1.0.0   DBI_1.1.1        
+[46] magrittr_2.0.1    scales_1.1.1      bench_1.1.1      
+[49] profmem_0.6.0     cli_2.3.1         stringi_1.5.3    
+[52] debugme_1.1.0     farver_2.1.0      xml2_1.3.2       
+[55] decor_1.0.0       bslib_0.2.4       ellipsis_0.3.1   
+[58] ragg_1.1.1        generics_0.1.0    vctrs_0.3.6      
+[61] distill_1.2       tools_4.0.4       cranlogs_2.1.1   
+[64] glue_1.4.2        purrr_0.3.4       processx_3.4.5   
+[67] parallel_4.0.4    yaml_2.2.1        colorspace_2.0-0 
+[70] rvest_1.0.0       knitr_1.31        sass_0.3.1       </code></pre>
 </div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
