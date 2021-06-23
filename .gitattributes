@@ -1,13 +1,21 @@
 # Rmarkdown
 *.Rmd linguist-language=R
 
+# TeX Support Files
+*.csl
+
+# Site Support Files
+*.xml linguist-vendored
+*.js linguist-vendored
+*.css linguist-vendored
+*.html linguist-documentation
+
 # Serialisation
 *.json  text
 *.toml  text
-*.xml   text
 *.yaml  text
 *.yml   text
-*.html  text
+
 
 # Data files
 *.csv   text
