@@ -3,7 +3,6 @@ title: "Rcpp - A interface entre R e C++"
 description: |
   Como fazer seu código R ficar mais rápido com Rcpp
 base_url: https://storopoli.io/Rcpp
-google_analytics: "UA-186284914-4"
 theme: "theme.css"
 output_dir: "docs"
 alt_formats: true
@@ -18,7 +17,7 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "Tutoriais"
-      menu: 
+      menu:
         - text: "1. Por que C++? R não é suficiente?"
           href: 1-Porque_CPP.html
         - text: "2. Como incorporar C++ no R - {Rcpp}"
